@@ -28,10 +28,8 @@ services:
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    cgroup_parent: consolidate
   cassandra:
     build: cassandra
-    cgroup_parent: consolidate
   influxdb:
     image: influxdb:latest
   collector:
