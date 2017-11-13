@@ -19,6 +19,7 @@ docker-compose -f unrestricted.yml exec host bash -c 'echo ${MEMORY} > /rootfs/s
 docker-compose -f unrestricted.yml down
 
 # Run
+docker-compose -f restricted.yml create
 docker-compose -f restricted.yml up -d
 docker-compose -f restricted.yml exec sysbencha job run --dbsize ${DBSIZE} --duration 300
 docker-compose -f restricted.yml exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
