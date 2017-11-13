@@ -12,10 +12,10 @@ compose up -d --build
 compose exec sysbencha prepare --dbsize ${DBSIZE}
 compose exec sysbenchb prepare --dbsize ${DBSIZE}
 compose exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
-compose exec host bash -c 'rm -rf           /rootfs/${CGROUP}'
-compose exec host bash -c 'mkdir            /rootfs/${CGROUP}'
-compose exec host bash -c 'echo 1 >         /rootfs/${CGROUP}/memory.use_hierarchy'
-compose exec host bash -c 'echo ${MEMORY} > /rootfs/${CGROUP}/memory.limit_in_bytes'
+compose exec host bash -c "rm -rf           /rootfs/${CGROUP}"
+compose exec host bash -c "mkdir            /rootfs/${CGROUP}"
+compose exec host bash -c "echo 1 >         /rootfs/${CGROUP}/memory.use_hierarchy"
+compose exec host bash -c "echo ${MEMORY} > /rootfs/${CGROUP}/memory.limit_in_bytes"
 compose down
 
 compose() { docker-compose -f restricted.yml $@; }
