@@ -2,7 +2,6 @@
 set -x -e
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
-: ${CGROUP:=/sys/fs/cgroup/memory/consolidate}
 
 compose() { docker-compose -f unrestricted.yml $@; }
 
@@ -14,10 +13,10 @@ compose up -d
 compose exec sysbencha prepare --dbsize ${DBSIZE}
 compose exec sysbenchb prepare --dbsize ${DBSIZE}
 compose exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
-compose exec host bash -c "rm -rf /rootfs/${CGROUP}"
-compose exec host bash -c "mkdir /rootfs/${CGROUP}"
-compose exec host bash -c "echo 1 > /rootfs/${CGROUP}/memory.use_hierarchy"
-compose exec host bash -c "echo ${MEMORY} > /rootfs/${CGROUP}/memory.limit_in_bytes"
+compose exec host bash -c 'rm -rf /rootfs/sys/fs/cgroup/memory/consolidate'
+compose exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
+compose exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/memory.use_hierarchy'
+compose exec host bash -c 'echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolidate/memory.limit_in_bytes'
 compose down
 
 compose() { docker-compose -f restricted.yml $@; }
