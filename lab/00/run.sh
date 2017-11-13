@@ -4,6 +4,7 @@ set -x -e
 : ${MEMORY:=3800358912}
 
 # Prepare
+docker-compose -f restricted.yml down
 docker-compose -f unrestricted.yml down
 docker-compose -f unrestricted.yml build
 docker-compose -f unrestricted.yml create
