@@ -53,6 +53,7 @@ services:
   cassandra:
     build: cassandra
     cgroup_parent: consolidate
+    mem_limit: 2516901888
     cpuset: 0,4,1,5
     blkio_config:
       device_read_bps:
