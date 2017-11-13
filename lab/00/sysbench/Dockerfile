@@ -7,7 +7,8 @@ RUN apt-get update \
     libtool \
     mysql-server \
     mysql-client \
-    libmysqlclient-dev
+    libmysqlclient-dev \
+    inotify-tools
 WORKDIR /sysbench
 COPY sysbench .
 RUN ./autogen.sh \
@@ -21,4 +22,6 @@ RUN pip install -r requirements.txt
 COPY benchmark.py .
 COPY prepare /usr/bin/prepare
 COPY run /usr/bin/run
-ENTRYPOINT [ "sleep", "inf" ]
+COPY job /usr/bin/job
+COPY daemon /usr/bin/daemon
+ENTRYPOINT [ "daemon" ]

@@ -20,19 +20,18 @@ services:
       - influxdb
   mysqla:
     build: mysql
+    hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
   mysqlb:
     build: mysql
+    hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
     cgroup_parent: consolidate
   cassandra:
-    image: cassandra:latest
+    build: cassandra
     cgroup_parent: consolidate
-    entrypoint:
-      - "sleep"
-      - "inf"
   influxdb:
     image: influxdb:latest
   collector:

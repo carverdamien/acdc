@@ -92,7 +92,7 @@ def influxformat(measurement, fields, tags={}):
         "measurement": measurement,
         "tags": tags,
         "time": t,
-        "fields": fields,
+        "fields": { k:float(fields[k]) for k in fields},
     }
     yield point
 

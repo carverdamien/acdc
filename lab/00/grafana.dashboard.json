@@ -22,7 +22,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.2.0"
+      "version": "4.6.1"
     },
     {
       "type": "panel",
@@ -38,7 +38,17 @@
     }
   ],
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
   "gnetId": null,
@@ -55,6 +65,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_DOCKERSTATS}",
           "fill": 1,
           "id": 1,
@@ -76,15 +88,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "alias": "sort",
+              "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "memory_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -102,15 +116,16 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "sort"
+                  "value": "mysqla"
                 }
               ]
             },
             {
-              "alias": "mysql",
+              "alias": "mysqlb",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "memory_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -128,7 +143,34 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "mysql"
+                  "value": "mysqlb"
+                }
+              ]
+            },
+            {
+              "alias": "cassandra",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "memory_stats",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "usage"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "cassandra"
                 }
               ]
             }
@@ -144,6 +186,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -171,6 +214,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_DOCKERSTATS}",
           "fill": 1,
           "id": 3,
@@ -192,15 +237,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "alias": "sort",
+              "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "cpu_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -218,15 +265,16 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "sort"
+                  "value": "mysqla"
                 }
               ]
             },
             {
-              "alias": "mysql",
+              "alias": "mysqlb",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "cpu_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -244,7 +292,34 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "mysql"
+                  "value": "mysqlb"
+                }
+              ]
+            },
+            {
+              "alias": "cassandra",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "cpu_stats",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "percent_usage"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "cassandra"
                 }
               ]
             }
@@ -260,6 +335,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -299,6 +375,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_SYSBENCHSTATS}",
           "fill": 1,
           "id": 2,
@@ -320,14 +398,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
+              "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "online",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -341,7 +422,40 @@
                   }
                 ]
               ],
-              "tags": []
+              "tags": [
+                {
+                  "key": "hostname",
+                  "operator": "=",
+                  "value": "mysqla"
+                }
+              ]
+            },
+            {
+              "alias": "mysqlb",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "online",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "rtps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "hostname",
+                  "operator": "=",
+                  "value": "mysqlb"
+                }
+              ]
             }
           ],
           "thresholds": [],
@@ -355,6 +469,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -382,6 +497,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_SYSBENCHSTATS}",
           "fill": 1,
           "id": 6,
@@ -403,14 +520,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
+              "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "online",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -424,7 +544,40 @@
                   }
                 ]
               ],
-              "tags": []
+              "tags": [
+                {
+                  "key": "hostname",
+                  "operator": "=",
+                  "value": "mysqla"
+                }
+              ]
+            },
+            {
+              "alias": "mysqlb",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "online",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "trps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "hostname",
+                  "operator": "=",
+                  "value": "mysqlb"
+                }
+              ]
             }
           ],
           "thresholds": [],
@@ -438,6 +591,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -477,6 +631,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_DOCKERSTATS}",
           "fill": 1,
           "id": 5,
@@ -498,15 +654,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "alias": "mysql Rbps",
+              "alias": "mysqla Rbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -524,15 +682,16 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "mysql"
+                  "value": "mysqla"
                 }
               ]
             },
             {
-              "alias": "mysql Wbps",
+              "alias": "mysqlb Wbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "C",
               "resultFormat": "time_series",
@@ -550,7 +709,7 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "mysql"
+                  "value": "mysqla"
                 }
               ]
             }
@@ -566,6 +725,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -593,6 +753,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_DOCKERSTATS}",
           "fill": 1,
           "id": 7,
@@ -614,15 +776,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "alias": "mysql Rbps",
+              "alias": "mysqla Rbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -640,15 +804,16 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "mysql"
+                  "value": "mysqla"
                 }
               ]
             },
             {
-              "alias": "mysql Wbps",
+              "alias": "mysqla Wbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "C",
               "resultFormat": "time_series",
@@ -666,7 +831,7 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "mysql"
+                  "value": "mysqla"
                 }
               ]
             }
@@ -682,6 +847,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -721,6 +887,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_DOCKERSTATS}",
           "fill": 1,
           "id": 4,
@@ -742,15 +910,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "alias": "sort Rbps",
+              "alias": "mysqlb Rbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -768,15 +938,16 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "sort"
+                  "value": "mysqlb"
                 }
               ]
             },
             {
-              "alias": "sort Wbps",
+              "alias": "mysqlb Wbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "D",
               "resultFormat": "time_series",
@@ -794,7 +965,7 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "sort"
+                  "value": "mysqlb"
                 }
               ]
             }
@@ -810,6 +981,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -837,6 +1009,8 @@
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "${DS_DOCKERSTATS}",
           "fill": 1,
           "id": 8,
@@ -858,15 +1032,17 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "alias": "sort Rbps",
+              "alias": "mysqlb Rbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -884,15 +1060,16 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "sort"
+                  "value": "mysqlb"
                 }
               ]
             },
             {
-              "alias": "sort Wbps",
+              "alias": "mysqlb Wbps",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "blkio_stats",
+              "orderByTime": "ASC",
               "policy": "default",
               "refId": "D",
               "resultFormat": "time_series",
@@ -910,7 +1087,7 @@
                 {
                   "key": "com.docker.compose.service",
                   "operator": "=",
-                  "value": "sort"
+                  "value": "mysqlb"
                 }
               ]
             }
@@ -926,6 +1103,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,

@@ -1,0 +1,7 @@
+#!/bin/bash
+set -x
+
+inotifywait -m -e close_write . --format %f | while read job
+do
+    (bash ${job}; rm -f ${job}) &
+done
