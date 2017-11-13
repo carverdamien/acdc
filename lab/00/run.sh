@@ -8,7 +8,9 @@ compose() { docker-compose -f unrestricted.yml $@; }
 
 # Prepare
 compose down
-compose up -d --build
+compose build
+compose create
+compose up -d
 compose exec sysbencha prepare --dbsize ${DBSIZE}
 compose exec sysbenchb prepare --dbsize ${DBSIZE}
 compose exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
