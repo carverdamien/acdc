@@ -3,5 +3,6 @@ set -x
 
 inotifywait -m -e close_write . --format %f | while read job
 do
-    (bash ${job}; rm -f ${job}) &
+	mv ${job} /tmp/${job}
+    (bash /tmp/${job}; rm -f /tmp/${job}) &
 done
