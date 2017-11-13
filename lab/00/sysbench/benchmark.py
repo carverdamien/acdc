@@ -40,7 +40,7 @@ def wait_for_server_to_start():
         except Exception as e:
             print(e)
         print('Waiting for %s to start' % (host))
-        time.sleep(10)
+        time.sleep(1)
         
 def prepare(args):
     try:
@@ -53,7 +53,7 @@ def prepare(args):
         count = int(out.split('\n')[1])
         if count != args.dbsize:
             raise Exception('count != dbsize')
-        subprocess.check_call(mysql_call + ['-e', 'shutdown'])
+        #subprocess.check_call(mysql_call + ['-e', 'shutdown'])
 
 def run(args):
     client = influxdb.InfluxDBClient(host='influxdb',
