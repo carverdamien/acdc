@@ -3,34 +3,30 @@ set -x -e
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
 
-compose() { docker-compose -f unrestricted.yml $@; }
-
 # Prepare
-compose down
-compose build
-compose create
-compose up -d
-compose exec sysbencha prepare --dbsize ${DBSIZE}
-compose exec sysbenchb prepare --dbsize ${DBSIZE}
-compose exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
-compose exec host bash -c 'rm -rf /rootfs/sys/fs/cgroup/memory/consolidate'
-compose exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
-compose exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/memory.use_hierarchy'
-compose exec host bash -c 'echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolidate/memory.limit_in_bytes'
-compose down
-
-compose() { docker-compose -f restricted.yml $@; }
+docker-compose -f unrestricted.yml down
+docker-compose -f unrestricted.yml build
+docker-compose -f unrestricted.yml create
+docker-compose -f unrestricted.yml up -d
+docker-compose -f unrestricted.yml exec sysbencha prepare --dbsize ${DBSIZE}
+docker-compose -f unrestricted.yml exec sysbenchb prepare --dbsize ${DBSIZE}
+docker-compose -f unrestricted.yml exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
+docker-compose -f unrestricted.yml exec host bash -c 'rm -rf /rootfs/sys/fs/cgroup/memory/consolidate'
+docker-compose -f unrestricted.yml exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
+docker-compose -f unrestricted.yml exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/memory.use_hierarchy'
+docker-compose -f unrestricted.yml exec host bash -c 'echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolidate/memory.limit_in_bytes'
+docker-compose -f unrestricted.yml down
 
 # Run
-compose up -d
-compose exec sysbencha job run --dbsize ${DBSIZE} --duration 300
-compose exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
+docker-compose -f restricted.yml up -d
+docker-compose -f restricted.yml exec sysbencha job run --dbsize ${DBSIZE} --duration 300
+docker-compose -f restricted.yml exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 120
-compose exec cassandra job start
+docker-compose -f restricted.yml exec cassandra job start
 sleep 60
-compose exec cassandra job stop
+docker-compose -f restricted.yml exec cassandra job stop
 sleep 60
-compose exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
+docker-compose -f restricted.yml exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 60
 
 # Report
