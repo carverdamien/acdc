@@ -1,0 +1,61 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  sysbencha:
+    build: sysbench
+    links:
+      - mysqla:mysql
+      - influxdb
+  sysbenchb:
+    build: sysbench
+    links:
+      - mysqlb:mysql
+      - influxdb
+  mysqla:
+    build: mysql
+    volumes:
+      - data-mysqla:/var/lib/mysql
+  mysqlb:
+    build: mysql
+    volumes:
+      - data-mysqlb:/var/lib/mysql
+    cgroup_parent: consolidate
+  cassandra:
+    image: cassandra:latest
+    cgroup_parent: consolidate
+    entrypoint:
+      - "sleep"
+      - "inf"
+  influxdb:
+    image: influxdb:latest
+  collector:
+    build: collector
+    command: [ "--influx", "--influxdbhost=influxdb" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-sort:
+  data-mysqla:
+  data-mysqlb:
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
