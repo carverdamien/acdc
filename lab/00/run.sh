@@ -15,7 +15,7 @@ docker-compose -f unrestricted.yml exec host bash -c 'echo 3 > /rootfs/proc/sys/
 docker-compose -f unrestricted.yml exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
 docker-compose -f unrestricted.yml exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
 docker-compose -f unrestricted.yml exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/memory.use_hierarchy'
-docker-compose -f unrestricted.yml exec host bash -c 'echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolidate/memory.limit_in_bytes'
+docker-compose -f unrestricted.yml exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolidate/memory.limit_in_bytes"
 docker-compose -f unrestricted.yml down
 
 # Run
