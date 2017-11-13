@@ -3,6 +3,7 @@ set -x
 
 inotifywait -m -e close_write . --format %f | while read job
 do
-	mv ${job} /tmp/${job}
-    (bash /tmp/${job}; rm -f /tmp/${job}) &
+	tmp=$(mktemp /tmp/job.XXX)
+	mv ${job} ${tmp}
+    (bash ${tmp}; rm -f ${tmp}) &
 done
