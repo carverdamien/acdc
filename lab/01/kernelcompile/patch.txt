@@ -1,5 +1,18 @@
+diff --git a/Makefile b/Makefile
+index 0f9cb36..ae42a00 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 4
+ PATCHLEVEL = 6
+ SUBLEVEL = 0
+-EXTRAVERSION =
++EXTRAVERSION = .01
+ NAME = Charred Weasel
+ 
+ # *DOCUMENTATION*
 diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 1191d79aa495..1a78f02d9e84 100644
+index 1191d79..1ee27c7 100644
 --- a/include/linux/memcontrol.h
 +++ b/include/linux/memcontrol.h
 @@ -70,6 +70,8 @@ enum mem_cgroup_events_index {
@@ -12,7 +25,7 @@ index 1191d79aa495..1a78f02d9e84 100644
  	/* default hierarchy events */
  	MEMCG_LOW = MEM_CGROUP_EVENTS_NSTATS,
 diff --git a/include/linux/swap.h b/include/linux/swap.h
-index ad220359f1b0..8341bf5825fa 100644
+index ad22035..8341bf5 100644
 --- a/include/linux/swap.h
 +++ b/include/linux/swap.h
 @@ -320,6 +320,7 @@ extern unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
@@ -24,7 +37,7 @@ index ad220359f1b0..8341bf5825fa 100644
  						  gfp_t gfp_mask,
  						  bool may_swap);
 diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index fe787f5c41bd..d2b32db03c7b 100644
+index fe787f5..7e3a3fc 100644
 --- a/mm/memcontrol.c
 +++ b/mm/memcontrol.c
 @@ -113,6 +113,8 @@ static const char * const mem_cgroup_events_names[] = {
@@ -100,7 +113,7 @@ index fe787f5c41bd..d2b32db03c7b 100644
  				nr_reclaims--;
  			continue;
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 142cb61f4822..833736779375 100644
+index 142cb61..cbe2a02 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
 @@ -80,6 +80,11 @@ struct scan_control {

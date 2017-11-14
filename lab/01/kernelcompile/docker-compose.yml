@@ -2,3 +2,7 @@ version: '2.2'
 services:
   kernelcompile:
     build: .
+    volumes:
+      - ./boot:/boot
+      - ./modules:/lib/modules
+
