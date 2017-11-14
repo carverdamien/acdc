@@ -1,0 +1,90 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  sysbencha:
+    build: sysbench
+    cpuset: 2,3,6,7
+    links:
+      - mysqla:mysql
+      - influxdb
+  sysbenchb:
+    build: sysbench
+    cpuset: 0,4,1,5
+    links:
+      - mysqlb:mysql
+      - influxdb
+  mysqla:
+    build: mysql
+    hostname: mysqla
+    volumes:
+      - data-mysqla:/var/lib/mysql
+    cgroup_parent: consolidate
+    mem_limit: 1G
+    cpuset: 2,3,6,7
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '27mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '27mb'
+  mysqlb:
+    build: mysql
+    hostname: mysqlb
+    volumes:
+      - data-mysqlb:/var/lib/mysql
+    cgroup_parent: consolidate
+    mem_limit: 1G
+    cpuset: 0,4,1,5
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '27mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '27mb'
+  cassandra:
+    build: cassandra
+    cgroup_parent: consolidate
+    mem_limit: 2516901888
+    cpuset: 0,4,1,5
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '27mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '27mb'
+  influxdb:
+    image: influxdb:latest
+  collector:
+    build: collector
+    command: [ "--influx", "--influxdbhost=influxdb" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-sort:
+  data-mysqla:
+  data-mysqlb:
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
