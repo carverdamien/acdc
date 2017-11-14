@@ -2,4 +2,4 @@
 set -x -e
 
 PATH=$PATH:$PWD/grub-list
-grub-reboot-on 4.6.0.01
+grub-reboot-on 4.6.0.01+
