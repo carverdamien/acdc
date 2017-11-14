@@ -50,7 +50,6 @@ services:
     links:
       - influxdb
 volumes:
-  data-sort:
   data-mysqla:
     external: true
   data-mysqlb:
