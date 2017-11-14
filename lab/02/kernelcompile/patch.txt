@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 0f9cb36..ae42a00 100644
+index 0f9cb36d45c2..a4ad55775fe5 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,7 +1,7 @@
@@ -12,7 +12,7 @@ index 0f9cb36..ae42a00 100644
  
  # *DOCUMENTATION*
 diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 1191d79..1ee27c7 100644
+index 1191d79aa495..546d349115a4 100644
 --- a/include/linux/memcontrol.h
 +++ b/include/linux/memcontrol.h
 @@ -70,6 +70,8 @@ enum mem_cgroup_events_index {
@@ -24,8 +24,17 @@ index 1191d79..1ee27c7 100644
  	MEM_CGROUP_EVENTS_NSTATS,
  	/* default hierarchy events */
  	MEMCG_LOW = MEM_CGROUP_EVENTS_NSTATS,
+@@ -190,6 +192,8 @@ struct mem_cgroup {
+ 
+ 	unsigned long soft_limit;
+ 
++	unsigned long priority;
++
+ 	/* vmpressure notifications */
+ 	struct vmpressure vmpressure;
+ 
 diff --git a/include/linux/swap.h b/include/linux/swap.h
-index ad22035..8341bf5 100644
+index ad220359f1b0..8341bf5825fa 100644
 --- a/include/linux/swap.h
 +++ b/include/linux/swap.h
 @@ -320,6 +320,7 @@ extern unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
@@ -37,7 +46,7 @@ index ad22035..8341bf5 100644
  						  gfp_t gfp_mask,
  						  bool may_swap);
 diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index fe787f5..7e3a3fc 100644
+index fe787f5c41bd..3caac7a28aeb 100644
 --- a/mm/memcontrol.c
 +++ b/mm/memcontrol.c
 @@ -113,6 +113,8 @@ static const char * const mem_cgroup_events_names[] = {
@@ -94,7 +103,54 @@ index fe787f5..7e3a3fc 100644
  							GFP_KERNEL, true);
  		if (!progress) {
  			nr_retries--;
-@@ -5003,7 +5005,7 @@ static ssize_t memory_high_write(struct kernfs_open_file *of,
+@@ -2816,6 +2818,13 @@ static u64 mem_cgroup_read_u64(struct cgroup_subsys_state *css,
+ 	}
+ }
+ 
++static u64 mem_cgroup_read_priority(struct cgroup_subsys_state *css,
++				    struct cftype *cft)
++{
++	struct mem_cgroup *memcg = mem_cgroup_from_css(css);
++	return (u64)memcg->priority;
++}
++
+ #ifndef CONFIG_SLOB
+ static int memcg_online_kmem(struct mem_cgroup *memcg)
+ {
+@@ -3005,6 +3014,20 @@ static ssize_t mem_cgroup_write(struct kernfs_open_file *of,
+ 	return ret ?: nbytes;
+ }
+ 
++static ssize_t mem_cgroup_write_priority(struct kernfs_open_file *of,
++				char *buf, size_t nbytes, loff_t off)
++{
++	struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
++	unsigned long priority;
++	char *endptr;
++	buf = strstrip(buf);
++	priority = simple_strtoull(buf, &endptr, 0);
++	if (*endptr != '\0')
++		return -EINVAL;
++	memcg->priority = priority;
++	return nbytes;
++}
++
+ static ssize_t mem_cgroup_reset(struct kernfs_open_file *of, char *buf,
+ 				size_t nbytes, loff_t off)
+ {
+@@ -3929,6 +3952,11 @@ static struct cftype mem_cgroup_legacy_files[] = {
+ 		.read_u64 = mem_cgroup_read_u64,
+ 	},
+ 	{
++		.name = "priority",
++		.write = mem_cgroup_write_priority,
++		.read_u64 = mem_cgroup_read_priority,
++	},
++	{
+ 		.name = "failcnt",
+ 		.private = MEMFILE_PRIVATE(_MEM, RES_FAILCNT),
+ 		.write = mem_cgroup_reset,
+@@ -5003,7 +5031,7 @@ static ssize_t memory_high_write(struct kernfs_open_file *of,
  
  	nr_pages = page_counter_read(&memcg->memory);
  	if (nr_pages > high)
@@ -103,7 +159,7 @@ index fe787f5..7e3a3fc 100644
  					     GFP_KERNEL, true);
  
  	memcg_wb_domain_size_changed(memcg);
-@@ -5057,7 +5059,7 @@ static ssize_t memory_max_write(struct kernfs_open_file *of,
+@@ -5057,7 +5085,7 @@ static ssize_t memory_max_write(struct kernfs_open_file *of,
  		}
  
  		if (nr_reclaims) {
@@ -113,10 +169,10 @@ index fe787f5..7e3a3fc 100644
  				nr_reclaims--;
  			continue;
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 142cb61..cbe2a02 100644
+index 142cb61f4822..62227e249c5b 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
-@@ -80,6 +80,11 @@ struct scan_control {
+@@ -80,6 +80,14 @@ struct scan_control {
  	 * primary target of this reclaim invocation.
  	 */
  	struct mem_cgroup *target_mem_cgroup;
@@ -125,10 +181,28 @@ index 142cb61..cbe2a02 100644
 +	 * caused target_mem_cgroup to reach its limit.
 +	 */
 +	struct mem_cgroup *mem_charging;
++
++	unsigned long current_mem_cgroup_priority;
++	unsigned long next_mem_cgroup_priority;
  
  	/* Scan (total_size >> priority) pages at once */
  	int priority;
-@@ -2423,6 +2428,15 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
+@@ -2411,6 +2419,14 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
+ 			unsigned long reclaimed;
+ 			unsigned long scanned;
+ 
++			/* Protect cgroup with smallest priority */
++			if (memcg->priority < sc->current_mem_cgroup_priority) {
++				/* Find next priority */
++				if (memcg->priority > sc->next_mem_cgroup_priority)
++					sc->next_mem_cgroup_priority = memcg->priority;
++				continue;
++			}
++
+ 			if (mem_cgroup_low(root, memcg)) {
+ 				if (!sc->may_thrash)
+ 					continue;
+@@ -2423,6 +2439,15 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
  			shrink_zone_memcg(zone, memcg, sc, &lru_pages);
  			zone_lru_pages += lru_pages;
  
@@ -144,7 +218,63 @@ index 142cb61..cbe2a02 100644
  			if (memcg && is_classzone)
  				shrink_slab(sc->gfp_mask, zone_to_nid(zone),
  					    memcg, sc->nr_scanned - scanned,
-@@ -2915,6 +2929,7 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
+@@ -2628,6 +2653,22 @@ static bool shrink_zones(struct zonelist *zonelist, struct scan_control *sc)
+ 	return reclaimable;
+ }
+ 
++/* TODO: store value when user updates priority (i.e. move to memcontrol.c) */
++static unsigned long max_mem_cgroup_priority(struct scan_control *sc)
++{
++	unsigned long max = 0;
++	struct mem_cgroup *iter = NULL;
++
++	/* Find maximum priority */
++	iter = mem_cgroup_iter(sc->target_mem_cgroup, NULL, NULL);
++	do {
++		if (iter->priority > max)
++			max = iter->priority;
++	} while (iter = mem_cgroup_iter(sc->target_mem_cgroup, iter, NULL));
++
++	return max;
++}
++
+ /*
+  * This is the main entry point to direct page reclaim.
+  *
+@@ -2651,6 +2692,8 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
+ 	unsigned long total_scanned = 0;
+ 	unsigned long writeback_threshold;
+ 	bool zones_reclaimable;
++	unsigned long init_mem_cgroup_priority = max_mem_cgroup_priority(sc);
++	sc->current_mem_cgroup_priority = init_mem_cgroup_priority;
+ retry:
+ 	delayacct_freepages_start();
+ 
+@@ -2697,6 +2740,15 @@ retry:
+ 	if (sc->nr_reclaimed)
+ 		return sc->nr_reclaimed;
+ 
++	/* Retry and consider more cgroups by decreasing priority */
++	if (sc->current_mem_cgroup_priority > 0) {
++		WARN_ON(sc->current_mem_cgroup_priority <= sc->next_mem_cgroup_priority);
++		sc->current_mem_cgroup_priority = sc->next_mem_cgroup_priority;
++		sc->next_mem_cgroup_priority = 0;
++		sc->priority = initial_priority;
++		goto retry;
++	}
++
+ 	/* Aborted reclaim to try compaction? don't OOM, then */
+ 	if (sc->compaction_ready)
+ 		return 1;
+@@ -2705,6 +2757,7 @@ retry:
+ 	if (!sc->may_thrash) {
+ 		sc->priority = initial_priority;
+ 		sc->may_thrash = 1;
++		sc->current_mem_cgroup_priority = init_mem_cgroup_priority;
+ 		goto retry;
+ 	}
+ 
+@@ -2915,6 +2968,7 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
  }
  
  unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
@@ -152,7 +282,7 @@ index 142cb61..cbe2a02 100644
  					   unsigned long nr_pages,
  					   gfp_t gfp_mask,
  					   bool may_swap)
-@@ -2927,6 +2942,7 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
+@@ -2927,6 +2981,7 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
  		.gfp_mask = (gfp_mask & GFP_RECLAIM_MASK) |
  				(GFP_HIGHUSER_MOVABLE & ~GFP_RECLAIM_MASK),
  		.target_mem_cgroup = memcg,
