@@ -24,22 +24,33 @@ docker-compose -f unrestricted.yml down
 # Run
 docker-compose -f restricted.yml create
 docker-compose -f restricted.yml up -d
+# Get containers id
+mysqla=$(docker-compose -f restricted.yml ps -q mysqla)
+mysqlb=$(docker-compose -f restricted.yml ps -q mysqlb)
+cassandra=$(docker-compose -f restricted.yml ps -q cassandra)
 # set priority of mysqla to 1
+docker-compose -f restricted.yml exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqla}/memory.priority"
 # set priority of mysqlb to 1
+docker-compose -f restricted.yml exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb}/memory.priority"
 # set priority of cassandra to 2
+docker-compose -f restricted.yml exec host bash -c "echo 2 > /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra}/memory.priority"
 docker-compose -f restricted.yml exec sysbencha job run --dbsize ${DBSIZE} --duration 300
 docker-compose -f restricted.yml exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 60
-# set priority of mysqla to 1
-# set priority of mysqlb to 1
-# set priority of cassandra to 2
+# set priority of mysqla to 1 (NOP)
+# set priority of mysqlb to 2
+docker-compose -f restricted.yml exec host bash -c "echo 2 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb}/memory.priority"
+# set priority of cassandra to 1
+docker-compose -f restricted.yml exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra}/memory.priority"
 sleep 60
 docker-compose -f restricted.yml exec cassandra job start
 sleep 60
 docker-compose -f restricted.yml exec cassandra job stop
-# set priority of mysqla to 1
+# set priority of mysqla to 1 (NOP)
 # set priority of mysqlb to 1
+docker-compose -f restricted.yml exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb}/memory.priority"
 # set priority of cassandra to 2
+docker-compose -f restricted.yml exec host bash -c "echo 2 > /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra}/memory.priority"
 sleep 60
 docker-compose -f restricted.yml exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 60
