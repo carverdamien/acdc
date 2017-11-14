@@ -10,7 +10,7 @@ ENV CHECKOUT v4.6
 COPY patch.txt linux/patch.txt
 RUN cd linux \
 &&  git checkout ${CHECKOUT} \
-&&  git patch patch.txt
+&&  git apply patch.txt
 COPY kconfig linux/.config
 COPY entrypoint.sh entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh" ]
