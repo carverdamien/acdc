@@ -84,7 +84,9 @@ services:
 volumes:
   data-sort:
   data-mysqla:
+    external: true
   data-mysqlb:
+    external: true
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
