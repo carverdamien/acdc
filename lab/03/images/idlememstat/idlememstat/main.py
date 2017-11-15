@@ -158,7 +158,7 @@ def tracker_to_influx_points(idlemem_tracker):
     def to_record(read, cgroup, total, idle):
         cid = cgroup.split('/')[-1]
         client = docker.APIClient()
-        inspect = client.inspect(cid)
+        inspect = client.inspect_container(cid)
         name = inspect['name']
         return {
             "measurement" : 'idlememstats',
