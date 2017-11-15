@@ -184,7 +184,7 @@ def print_docker_idlemem_info(idlemem_tracker):
              total[0] / 1024, idle[0] / 1024,
              total[1] / 1024, idle[1] / 1024)
 
-def idlemem_info_records(idlemem_tracker):
+def tracker_to_influx_points(idlemem_tracker):
     def to_record(read, cgroup, total, idle):
         return {
             "measurement" : 'idlememstats',
