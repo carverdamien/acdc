@@ -173,7 +173,7 @@ def print_docker_idlemem_info_hdr():
         ('container', 'total', 'idle', "anon", "anon_idle", "file", "file_idle")
 
 def print_docker_idlemem_info(idlemem_tracker):
-    containers = [c['Id'] for c in docker.client.Client().containers()]
+    containers = [c['Id'] for c in docker.APIClient().containers()]
     for cgroup, total, idle in idlemem_info(idlemem_tracker):
         cid = cgroup.split('/')[-1]
         if cid not in containers: continue
