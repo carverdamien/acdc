@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+RELEASE=$1
+get() { grub-list | sed -n "s/\([^ ]\+\) *.* $RELEASE\$/\1/p"; }
+
+[ `get | wc -l` -eq 1 ]
+
+sudo grub-reboot $(get | cut -d ' ' -f1)
+sudo reboot
