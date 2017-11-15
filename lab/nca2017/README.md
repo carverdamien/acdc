@@ -1,6 +1,6 @@
 # Goal
 
-Test if the memory of active containers is protected during consolidation.
+Quick redo nca2017
 
 ## scripts
 
