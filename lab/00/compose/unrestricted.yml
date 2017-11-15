@@ -9,31 +9,31 @@ services:
     volumes:
       - /:/rootfs
   sysbencha:
-    build: sysbench
+    build: images/sysbench
     links:
       - mysqla:mysql
       - influxdb
   sysbenchb:
-    build: sysbench
+    build: images/sysbench
     links:
       - mysqlb:mysql
       - influxdb
   mysqla:
-    build: mysql
+    build: images/mysql
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
   mysqlb:
-    build: mysql
+    build: images/mysql
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
   cassandra:
-    build: cassandra
+    build: images/cassandra
   influxdb:
     image: influxdb:latest
   collector:
-    build: collector
+    build: images/collector
     command: [ "--influx", "--influxdbhost=influxdb" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
