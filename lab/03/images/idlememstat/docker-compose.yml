@@ -1,22 +1,29 @@
 version: "2.0"
 services:
-  mongo:
-    image: mongo
   idlememstat:
     build: .
     privileged: true
-    command: [ "-d", "1", "--docker", "--mongo" ]
-    network_mode: "service:mongo"
+    command: [ "-d", "1", "--docker", "--influx" ]
     environment:
-      - KPAGEFLAGS_PATH=/host/proc/kpageflags
-      - KPAGECGROUP_PATH=/host/proc/kpagecgroup
-      - KPAGEIDLE_PATH=/host/sys/kernel/mm/page_idle/bitmap
-      - MEMCG_ROOT_PATH=/host/sys/fs/cgroup/memory
-      - ZONE_INFO_PATH=/host/proc/zoneinfo
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /proc/zoneinfo:/host/proc/zoneinfo
-      - /proc/kpageflags:/host/proc/kpageflags
-      - /proc/kpagecgroup:/host/proc/kpagecgroup
-      - /sys/kernel/mm/page_idle/bitmap:/host/sys/kernel/mm/page_idle/bitmap
-      - /sys/fs/cgroup/memory:/host/sys/fs/cgroup/memory
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+    links:
+      - influxdb
+  influxdb:
+    image: influxdb:latest
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    links:
+      - influxdb

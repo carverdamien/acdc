@@ -7,7 +7,7 @@ import sys
 import threading
 import time
 import docker
-import pymongo
+import influxdb
 
 import kpageutil
 
@@ -185,20 +185,25 @@ def print_docker_idlemem_info(idlemem_tracker):
              total[1] / 1024, idle[1] / 1024)
 
 def idlemem_info_records(idlemem_tracker):
-    def to_record(read, cgroup, to_record, idle):
+    def to_record(read, cgroup, total, idle):
         return {
-            'read' : read,
-            'cgroup' : cgroup,
-            'Id' : cgroup.split('/')[-1],
-            'memory_stats' : {
+            "measurement" : 'idlememstats',
+            "time" : read,
+            "tags" : {
+                'cgroup' : cgroup,
+                'cid' :    cgroup.split('/')[-1],
+            },
+            "fields": {
+                'anon'  : total[0],
+                'file'  : total[1],
                 'total' : total[0] + total[1],
-                'stats' : {
-                    'idle_anon' : idle[0],
-                    'idle_file' : idle[1],
-                    'anon' : total[0],
-                    'file' : total[1],
-                }
-            }
+                'idle_anon'  : idle[0],
+                'idle_file'  : idle[1],
+                'idle_total' : idle[0] + idle[1],
+                'idle_total_ratio' : float(idle[0] + idle[1]) / float(1 + total[0] + total[1]),
+                'idle_anon_ratio'  : float(idle[0]) / float(1 + total[0]),
+                'idle_file_ratio'  : float(idle[1]) / float(1 + total[1]),
+            },
         }
     read = time.strftime("%Y-%m-%dT%H:%M:%S") # FIX ME: should come from kpageutil.ccp
     return [to_record(read, cgroup, total, idle)
@@ -213,8 +218,10 @@ def main():
     parser.add_option("-d", dest="delay", default=DEFAULT_DELAY, type=int)
     parser.add_option("--cgroup", dest="cgroup", default=False, action="store_true")
     parser.add_option("--docker", dest="docker", default=False, action="store_true")
-    parser.add_option("--mongo", dest="mongo", default=False, action="store_true")
-    parser.add_option('--dbname', dest="dbname", type=str, nargs='?', default='prod')
+    parser.add_option("--influx", dest="influx", default=False, action="store_true")
+    parser.add_option("--influxdbname", dest="influxdbname", type=str, nargs=1, default='idlememstats')
+    parser.add_option("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='localhost')
+    parser.add_option("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
     (options, args) = parser.parse_args()
 
     global _shutdown_request
@@ -236,12 +243,15 @@ def main():
         print_idlemem_info_hdr()
         on_update_callbacks.append(print_idlemem_info)
 
-    if options.mongo:
-        def mongo_idlemem_info(idlemem_tracker):
-            with pymongo.MongoClient() as client:
-                db = client[options.dbname]
-                db.dockerstats.insert_many(idlemem_info_records(idlemem_tracker))
-        on_update_callbacks.append(mongo_idlemem_info)
+    if options.influx:
+        client = influxdb.InfluxDBClient(host=options.influxdbhost,
+                                port=int(options.influxdbport),
+                                database=options.influxdbname)
+        client.create_database(options.influxdbname)
+        def influx_idlemem_info(idlemem_tracker):
+            points = tracker_to_influx_points(idlemem_tracker)
+            client.write_points(points)
+        on_update_callbacks.append(influx_idlemem_info)
 
     idlemem_tracker = IdleMemTracker(options.delay, on_update)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
