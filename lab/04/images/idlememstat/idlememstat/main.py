@@ -193,6 +193,8 @@ def main():
     parser.add_option("--influxdbname", dest="influxdbname", type=str, nargs=1, default='idlememstats')
     parser.add_option("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='localhost')
     parser.add_option("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
+    parser.add_option("--updateMemoryPriority", dest="updateMemoryPriority", default=False, action="store_true")
+    parser.add_option("--cgroup", dest="cgroup", type=str, nargs=1)
     (options, args) = parser.parse_args()
 
     global _shutdown_request
@@ -207,6 +209,8 @@ def main():
     def on_update(idlemem_tracker):
         points = [p for p in tracker_to_influx_points(idlemem_tracker)]
         client.write_points(points)
+        if options.updateMemoryPriority:
+            print('TODO')
 
     idlemem_tracker = IdleMemTracker(options.delay, on_update)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
