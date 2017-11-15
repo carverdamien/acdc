@@ -72,7 +72,7 @@ index fe787f5c41bd..97f264d50369 100644
  	mem_cgroup_events(mem_over_limit, MEMCG_MAX, 1);
  
 -	nr_reclaimed = try_to_free_mem_cgroup_pages(mem_over_limit, nr_pages,
-+	nr_reclaimed = try_to_free_mem_cgroup_pages(memcg, mem_over_limit, nr_pages,
++	nr_reclaimed = try_to_free_mem_cgroup_pages(mem_over_limit, memcg, nr_pages,
  						    gfp_mask, may_swap);
  
  	if (mem_cgroup_margin(mem_over_limit) >= nr_pages)
