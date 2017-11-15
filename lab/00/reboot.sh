@@ -4,5 +4,5 @@ set -x -e
 source kernel
 [ -n "${KERNEL}" ]
 
-PATH="${PATH}:${PWD}/images/kernelcompile/grub-list"
+PATH="${PATH}:${PWD}/utils/grub-list"
 grub-reboot-on "${KERNEL}"

@@ -1,7 +1,9 @@
 #!/bin/bash
 set -x -e
 
-[ "$(uname -sr)" == "Linux 4.6.0+" ]
+source kernel
+[ -n "${KERNEL}" ]
+[ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
