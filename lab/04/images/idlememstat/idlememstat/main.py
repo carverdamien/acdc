@@ -183,6 +183,24 @@ def tracker_to_influx_points(idlemem_tracker):
         except Exception as e:
             print(e)
 
+def updateMemoryPriority(idlemem_tracker, parent_cgroup):
+    cgroups = []
+    for dir, subdirs, files in os.walk(parent_cgroup):
+        ino = os.stat(dir)[stat.ST_INO]
+        idle = idlemem_tracker.get_idle_size(ino)
+        total = get_memcg_usage(dir)
+        cgroups.append((dir, total, idle))
+    def cmp(a,b):
+        # TODO: make cmp configurable
+        a_dir, a_total, a_idle = a
+        b_dir, b_total, b_idle = b
+        return (a_idle[0]+a_idle[1]) - (b_idle[0]+b_idle[1])
+    i = 0
+    for dir, total, idle in sorted(cgroups, cmp=cmp):
+        with open('/'.join([dir, 'memory.priority']), 'w') as f:
+            f.write("%d\n" % i)
+        i += 1
+
 def _sighandler(signum, frame):
     global _shutdown_request
     _shutdown_request = True
@@ -210,7 +228,7 @@ def main():
         points = [p for p in tracker_to_influx_points(idlemem_tracker)]
         client.write_points(points)
         if options.updateMemoryPriority:
-            print('TODO')
+            updateMemoryPriority(idlemem_tracker, options.cgroup)
 
     idlemem_tracker = IdleMemTracker(options.delay, on_update)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
