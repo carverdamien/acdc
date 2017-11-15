@@ -155,11 +155,7 @@ def idlemem_info(idlemem_tracker):
         yield (cgroup, total, idle)
 
 def tracker_to_influx_points(idlemem_tracker):
-    def to_record(read, cgroup, total, idle):
-        cid = cgroup.split('/')[-1]
-        client = docker.APIClient()
-        inspect = client.inspect_container(cid)
-        name = inspect['name']
+    def to_record(read, name, total, idle):
         return {
             "measurement" : 'idlememstats',
             "time" : read,
@@ -179,9 +175,15 @@ def tracker_to_influx_points(idlemem_tracker):
             },
         }
     read = time.strftime("%Y-%m-%dT%H:%M:%S") # FIX ME: should come from kpageutil.ccp
+    dockerclient = docker.APIClient()
+    containers = dockerclient.containers()
     for cgroup, total, idle in idlemem_info(idlemem_tracker):
         try:
-            yield to_record(read, cgroup, total, idle)
+            cid = cgroup.split('/')[-1]
+            if cid not in containers: continue
+            inspect = dockerclient.inspect_container(cid)
+            name = inspect['Name']
+            yield to_record(read, name, total, idle)
         except Exception as e:
             print(e)
 
