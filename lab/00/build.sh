@@ -2,7 +2,7 @@
 set -x -e
 
 source kernel
-[ -n ${KERNEL} ]
+[ -n "${KERNEL}" ]
 
-docker-compose -p ${KERNEL} --project-directory $PWD -f compose/kernelcompile.yml build
-docker-compose -p ${KERNEL} --project-directory $PWD -f compose/kernelcompile.yml up
+docker-compose -p "${KERNEL}" --project-directory "${PWD}" -f compose/kernelcompile.yml build
+docker-compose -p "${KERNEL}" --project-directory "${PWD}" -f compose/kernelcompile.yml up
