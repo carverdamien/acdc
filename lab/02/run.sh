@@ -29,12 +29,29 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
+# Get containers id
+mysqla=$(${RUN} ps -q mysqla)
+mysqlb=$(${RUN} ps -q mysqlb)
+cassandra=$(${RUN} ps -q cassandra)
+# Set priorities
+${RUN} exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqla}/memory.priority"
+${RUN} exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb}/memory.priority"
+${RUN} exec host bash -c "echo 2 > /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra}/memory.priority"
 ${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 300
 ${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
-sleep 120
+sleep 60
+# Set priorities
+${RUN} exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqla}/memory.priority"
+${RUN} exec host bash -c "echo 2 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb}/memory.priority"
+${RUN} exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra}/memory.priority"
+sleep 60
 ${RUN} exec cassandra job start
 sleep 60
 ${RUN} exec cassandra job stop
+# Set priorities
+${RUN} exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqla}/memory.priority"
+${RUN} exec host bash -c "echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb}/memory.priority"
+${RUN} exec host bash -c "echo 2 > /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra}/memory.priority"
 sleep 60
 ${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 60
