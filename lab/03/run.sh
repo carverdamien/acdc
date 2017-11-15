@@ -42,3 +42,4 @@ sleep 60
 # Report
 ${PRE} exec influxdb influx -database dockerstats   -execute 'select * from /.*/' -format=csv > data/dockerstats.csv
 ${PRE} exec influxdb influx -database sysbenchstats -execute 'select * from /.*/' -format=csv > data/sysbenchstats.csv
+${PRE} exec influxdb influx -database idlememstats  -execute 'select * from /.*/' -format=csv > data/idlememstats.csv
