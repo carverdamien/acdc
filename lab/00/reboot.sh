@@ -1,5 +1,8 @@
 #!/bin/bash
 set -x -e
 
-PATH=$PATH:$PWD/grub-list
-grub-reboot-on 4.6.0+
+source kernel
+[ -n ${KERNEL} ]
+
+PATH=$PATH:$PWD/images/kernelcompile/grub-list
+grub-reboot-on ${KERNEL}

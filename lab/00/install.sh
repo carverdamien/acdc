@@ -1,11 +1,12 @@
 #!/bin/bash
 set -x -e
 
-KERNEL=4.6.0+
+source kernel
+[ -n ${KERNEL} ]
 
-cp -a ./boot/config-${KERNEL} /boot/config-${KERNEL}
-cp -a ./boot/System.map-${KERNEL} /boot/System.map-${KERNEL}
-cp -a ./boot/vmlinuz-${KERNEL} /boot/vmlinuz-${KERNEL}
-cp -a ./modules/${KERNEL} /lib/modules/${KERNEL}
+cp -a ./build/kernel/boot/config-${KERNEL} /boot/config-${KERNEL}
+cp -a ./build/kernel/boot/System.map-${KERNEL} /boot/System.map-${KERNEL}
+cp -a ./build/kernel/boot/vmlinuz-${KERNEL} /boot/vmlinuz-${KERNEL}
+cp -a ./build/kernel/modules/${KERNEL} /lib/modules/${KERNEL}
 update-initramfs -c -k ${KERNEL}
 update-grub

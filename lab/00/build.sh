@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x -e
 
-docker-compose build
-docker-compose up
+docker-compose -f compose/kernelcompile.yml build
+docker-compose -f compose/kernelcompile.yml up
