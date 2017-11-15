@@ -3,7 +3,7 @@ services:
   idlememstat:
     build: .
     privileged: true
-    command: [ "-d", "1", "--docker", "--influx", "--influxdbhost", "influxdb" ]
+    command: [ "-d", "1", "--influxdbhost", "influxdb" ]
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
       - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup

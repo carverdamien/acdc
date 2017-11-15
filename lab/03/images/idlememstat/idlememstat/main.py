@@ -146,11 +146,6 @@ def get_memcg_usage(path):
                 file_usage += int(v)
     return (anon_usage, file_usage)
 
-
-def print_idlemem_info_hdr():
-    print "%-20s%10s%10s%10s%10s%10s%10s" % \
-        ('cgroup', 'total', 'idle', "anon", "anon_idle", "file", "file_idle")
-
 def idlemem_info(idlemem_tracker):
     for dir, subdirs, files in os.walk(MEMCG_ROOT_PATH):
         ino = os.stat(dir)[stat.ST_INO]
@@ -159,39 +154,17 @@ def idlemem_info(idlemem_tracker):
         cgroup = dir.replace(MEMCG_ROOT_PATH, '', 1) or '/'
         yield (cgroup, total, idle)
 
-def print_idlemem_info(idlemem_tracker):
-    for cgroup, total, idle in idlemem_info(idlemem_tracker):
-        print "%-20s%10d%10d%10d%10d%10d%10d" % \
-            (cgroup,
-             (total[0] + total[1]) / 1024,
-             (idle[0] + idle[1]) / 1024,
-             total[0] / 1024, idle[0] / 1024,
-             total[1] / 1024, idle[1] / 1024)
-
-def print_docker_idlemem_info_hdr():
-    print "%-20s%10s%10s%10s%10s%10s%10s" % \
-        ('container', 'total', 'idle', "anon", "anon_idle", "file", "file_idle")
-
-def print_docker_idlemem_info(idlemem_tracker):
-    containers = [c['Id'] for c in docker.APIClient().containers()]
-    for cgroup, total, idle in idlemem_info(idlemem_tracker):
-        cid = cgroup.split('/')[-1]
-        if cid not in containers: continue
-        print "%-20s%10d%10d%10d%10d%10d%10d" % \
-            (cid,
-             (total[0] + total[1]) / 1024,
-             (idle[0] + idle[1]) / 1024,
-             total[0] / 1024, idle[0] / 1024,
-             total[1] / 1024, idle[1] / 1024)
-
 def tracker_to_influx_points(idlemem_tracker):
     def to_record(read, cgroup, total, idle):
+        cid = cgroup.split('/')[-1]
+        client = docker.APIClient()
+        inspect = client.inspect(cid)
+        name = inspect['name']
         return {
             "measurement" : 'idlememstats',
             "time" : read,
             "tags" : {
-                'cgroup' : cgroup,
-                'cid' :    cgroup.split('/')[-1],
+                'name' : name,
             },
             "fields": {
                 'anon'  : total[0],
@@ -206,8 +179,11 @@ def tracker_to_influx_points(idlemem_tracker):
             },
         }
     read = time.strftime("%Y-%m-%dT%H:%M:%S") # FIX ME: should come from kpageutil.ccp
-    return [to_record(read, cgroup, total, idle)
-            for cgroup, total, idle in idlemem_info(idlemem_tracker)]
+    for cgroup, total, idle in idlemem_info(idlemem_tracker):
+        try:
+            yield to_record(read, cgroup, total, idle)
+        except Exception as e:
+            print(e)
 
 def _sighandler(signum, frame):
     global _shutdown_request
@@ -216,9 +192,6 @@ def _sighandler(signum, frame):
 def main():
     parser = optparse.OptionParser()
     parser.add_option("-d", dest="delay", default=DEFAULT_DELAY, type=int)
-    parser.add_option("--cgroup", dest="cgroup", default=False, action="store_true")
-    parser.add_option("--docker", dest="docker", default=False, action="store_true")
-    parser.add_option("--influx", dest="influx", default=False, action="store_true")
     parser.add_option("--influxdbname", dest="influxdbname", type=str, nargs=1, default='idlememstats')
     parser.add_option("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='localhost')
     parser.add_option("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
@@ -229,29 +202,13 @@ def main():
     signal.signal(signal.SIGINT, _sighandler)
     signal.signal(signal.SIGTERM, _sighandler)
 
-    on_update_callbacks = []
-
+    client = influxdb.InfluxDBClient(host=options.influxdbhost,
+                            port=int(options.influxdbport),
+                            database=options.influxdbname)
+    client.create_database(options.influxdbname)
     def on_update(idlemem_tracker):
-        for c in on_update_callbacks:
-            c(idlemem_tracker)
-
-    if options.docker:
-        print_docker_idlemem_info_hdr()
-        on_update_callbacks.append(print_docker_idlemem_info)
-
-    if options.cgroup:
-        print_idlemem_info_hdr()
-        on_update_callbacks.append(print_idlemem_info)
-
-    if options.influx:
-        client = influxdb.InfluxDBClient(host=options.influxdbhost,
-                                port=int(options.influxdbport),
-                                database=options.influxdbname)
-        client.create_database(options.influxdbname)
-        def influx_idlemem_info(idlemem_tracker):
-            points = tracker_to_influx_points(idlemem_tracker)
-            client.write_points(points)
-        on_update_callbacks.append(influx_idlemem_info)
+        points = [p for p in tracker_to_influx_points(idlemem_tracker)]
+        client.write_points(points)
 
     idlemem_tracker = IdleMemTracker(options.delay, on_update)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
