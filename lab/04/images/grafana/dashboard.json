@@ -704,6 +704,33 @@
                   "value": "cassandra"
                 }
               ]
+            },
+            {
+              "alias": "idlememstat",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "cpu_stats",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "D",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "percent_usage"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "idlememstat"
+                }
+              ]
             }
           ],
           "thresholds": [],
@@ -1852,5 +1879,5 @@
   },
   "timezone": "browser",
   "title": "New dashboard Copy",
-  "version": 2
+  "version": 3
 }
