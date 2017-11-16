@@ -40,5 +40,7 @@ ${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 60
 
 # Report
-${PRE} exec influxdb influx -database dockerstats   -execute 'select * from /.*/' -format=csv > data/dockerstats.csv
-${PRE} exec influxdb influx -database sysbenchstats -execute 'select * from /.*/' -format=csv > data/sysbenchstats.csv
+for m in memory_stats blkio_stats networks cpu_stats sysbench_stats
+do
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$m.csv
+done

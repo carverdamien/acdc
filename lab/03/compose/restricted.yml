@@ -67,7 +67,7 @@ services:
     image: influxdb:latest
   collector:
     build: images/collector
-    command: [ "--influx", "--influxdbhost=influxdb" ]
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     links:
@@ -75,7 +75,7 @@ services:
   idlememstat:
     build: images/idlememstat
     privileged: true
-    command: [ "-d", "10", "--influxdbhost", "influxdb" ]
+    command: [ "-d", "10", "--influxdbhost", "influxdb", "--influxdbname=acdc" ]
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
       - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
