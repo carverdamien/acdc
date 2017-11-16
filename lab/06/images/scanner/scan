@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e -x
+
+CGROUP=$1
+PAGES=$2
+SLEEP=$3
+
+while :
+do
+	sleep ${SLEEP}
+	echo ${PAGES} > ${CGROUP}/memory.force_scan
+done
