@@ -42,5 +42,5 @@ sleep 60
 # Report
 for m in memory_stats blkio_stats networks cpu_stats sysbench_stats
 do
-	${PRE} exec influxdb influx -database acdc -execute "select $m from /.*/" -format=csv > data/$m.csv
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$m.csv
 done
