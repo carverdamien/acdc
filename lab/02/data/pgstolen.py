@@ -12,7 +12,7 @@ df = pd.read_csv('memory_stats.csv')
 
 plt.figure()
 for label in ['mysqla', 'mysqlb', 'cassandra']:
-	for metric in ['stats.priority']:
+	for metric in ['stats.pgstolen']:
 		sel = df['com.docker.compose.service'] == label
 		X = df['time'][sel]
 		X = np.array(X, dtype='datetime64[ns]')
