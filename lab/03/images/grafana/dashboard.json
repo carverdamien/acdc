@@ -1,24 +1,8 @@
 {
   "__inputs": [
     {
-      "name": "DS_DOCKERSTATS",
-      "label": "dockerstats",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "influxdb",
-      "pluginName": "InfluxDB"
-    },
-    {
-      "name": "DS_SYSBENCHSTATS",
-      "label": "sysbenchstats",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "influxdb",
-      "pluginName": "InfluxDB"
-    },
-    {
-      "name": "DS_IDLEMEMSTATS",
-      "label": "idlememstats",
+      "name": "DS_ACDC",
+      "label": "acdc",
       "description": "",
       "type": "datasource",
       "pluginId": "influxdb",
@@ -75,7 +59,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_DOCKERSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 1,
           "legend": {
@@ -224,7 +208,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_DOCKERSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 3,
           "legend": {
@@ -385,7 +369,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_SYSBENCHSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 2,
           "legend": {
@@ -415,7 +399,7 @@
               "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "online",
+              "measurement": "sysbench_stats",
               "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
@@ -442,7 +426,7 @@
               "alias": "mysqlb",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "online",
+              "measurement": "sysbench_stats",
               "orderByTime": "ASC",
               "policy": "default",
               "refId": "B",
@@ -507,7 +491,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_SYSBENCHSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 6,
           "legend": {
@@ -537,7 +521,7 @@
               "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "online",
+              "measurement": "sysbench_stats",
               "orderByTime": "ASC",
               "policy": "default",
               "refId": "A",
@@ -564,7 +548,7 @@
               "alias": "mysqlb",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "online",
+              "measurement": "sysbench_stats",
               "orderByTime": "ASC",
               "policy": "default",
               "refId": "B",
@@ -641,7 +625,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_DOCKERSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 5,
           "legend": {
@@ -763,7 +747,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_DOCKERSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 7,
           "legend": {
@@ -897,7 +881,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_DOCKERSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 4,
           "legend": {
@@ -1019,7 +1003,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_DOCKERSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 8,
           "legend": {
@@ -1151,7 +1135,7 @@
         {
           "aliasColors": {},
           "bars": false,
-          "datasource": "${DS_IDLEMEMSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 9,
           "legend": {
@@ -1180,7 +1164,7 @@
               "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "idlememstats",
+              "measurement": "idlemem_stats",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -1206,7 +1190,7 @@
               "alias": "mysqlb",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "idlememstats",
+              "measurement": "idlemem_stats",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -1232,7 +1216,7 @@
               "alias": "cassandra",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "idlememstats",
+              "measurement": "idlemem_stats",
               "policy": "default",
               "refId": "C",
               "resultFormat": "time_series",
@@ -1293,7 +1277,7 @@
         {
           "aliasColors": {},
           "bars": false,
-          "datasource": "${DS_IDLEMEMSTATS}",
+          "datasource": "${DS_ACDC}",
           "fill": 1,
           "id": 10,
           "legend": {
@@ -1322,7 +1306,7 @@
               "alias": "mysqla",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "idlememstats",
+              "measurement": "idlemem_stats",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -1348,7 +1332,7 @@
               "alias": "mysqlb",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "idlememstats",
+              "measurement": "idlemem_stats",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -1374,7 +1358,7 @@
               "alias": "cassandra",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "idlememstats",
+              "measurement": "idlemem_stats",
               "policy": "default",
               "refId": "C",
               "resultFormat": "time_series",
@@ -1477,6 +1461,6 @@
     ]
   },
   "timezone": "browser",
-  "title": "New dashboard Copy",
-  "version": 3
+  "title": "dashboard",
+  "version": 1
 }
