@@ -42,7 +42,7 @@ def wait_for_server_to_start():
         print('Waiting for %s to start' % (host))
         time.sleep(1)
         
-def prepare(args):
+def prepare(options, args):
     try:
         subprocess.check_call(mysql_call + ['-e', 'CREATE DATABASE %s' % dbname])
         subprocess.check_call(sysbench_call(args.dbsize) + ['prepare'])
@@ -55,11 +55,12 @@ def prepare(args):
             raise Exception('count != dbsize')
         #subprocess.check_call(mysql_call + ['-e', 'shutdown'])
 
-def run(args):
-    client = influxdb.InfluxDBClient(host='influxdb',
-                                     database='sysbenchstats')
-    client.create_database('sysbenchstats')
-    measurement = 'online'
+def run(options, args):
+    client = influxdb.InfluxDBClient(host=options.influxdbhost,
+                                    port=int(options.influxdbport),
+                                    database=options.influxdbname)
+    client.create_database(options.influxdbname)
+    measurement = 'sysbench_stats'
     tags = {
         'hostname' : subprocess.check_output(mysql_call + ['-BNe', 'select @@hostname;'])[:-1]
     }
@@ -101,14 +102,17 @@ def main():
     prepare_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
     prepare_parser.set_defaults(func=prepare)
     run_parser = main_subparsers.add_parser('run')
+    run_parser.add_option("--influxdbname", dest="influxdbname", type=str, nargs=1, default='acdc')
+    run_parser.add_option("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='influxdb')
+    run_parser.add_option("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
     run_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
     run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 
-    args = main_parser.parse_args()
+    (options, args) = main_parser.parse_args()
     
     wait_for_server_to_start()
-    args.func(args)
+    args.func(options, args)
 
 main()
