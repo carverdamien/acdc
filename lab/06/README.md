@@ -1,8 +1,7 @@
 # Goal
 
-Provide a mechanism to update `nr_rotated` and `nr_scanned`.
-
-When user writes `4k*x` in `memory.force_scan`, the cgroup will be scanned and at least `x` pages will move in its LRUs. (But the cgroup will not lose the pages)
+Use `nr_rotated` and `nr_scanned` to update `memory.priority`.
+Use `memory.force_scan` to update the `nr_rotated` and `nr_scanned`.
 
 ## scripts
 
