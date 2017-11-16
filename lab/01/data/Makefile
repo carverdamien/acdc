@@ -1,9 +1,13 @@
 PY=$(wildcard *.py)
 PDF=$(PY:%.py=%.pdf)
+PNG=$(PY:%.py=%.png)
 
-all: $(PDF)
+all: $(PDF) $(PNG)
 
 %.pdf: %.py
+	python $< $@
+
+%.png: %.py
 	python $< $@
 
 clean:
