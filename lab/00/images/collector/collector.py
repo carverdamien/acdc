@@ -44,16 +44,16 @@ class SCAN_ROTATE_RATIO:
         if 'memory_stats' not in stat:
             return stat
         try:
-            recent_rotated_anon = float(stat['memory_stats']['recent_rotated_anon'])
-            recent_scanned_anon = float(stat['memory_stats']['recent_scanned_anon'])
-            recent_rotated_file = float(stat['memory_stats']['recent_rotated_file'])
-            recent_scanned_file = float(stat['memory_stats']['recent_scanned_file'])
+            recent_rotated_anon = float(stat['memory_stats']['stats']['recent_rotated_anon'])
+            recent_scanned_anon = float(stat['memory_stats']['stats']['recent_scanned_anon'])
+            recent_rotated_file = float(stat['memory_stats']['stats']['recent_rotated_file'])
+            recent_scanned_file = float(stat['memory_stats']['stats']['recent_scanned_file'])
             recent_ratio_anon  = recent_scanned_anon / (1+recent_rotated_anon)
             recent_ratio_file  = recent_scanned_file / (1+recent_rotated_file)
             recent_ratio_total = (recent_scanned_anon + recent_scanned_file) / (1+recent_rotated_anon+recent_rotated_file)
-            stat['memory_stats']['recent_ratio_anon']  = recent_ratio_anon
-            stat['memory_stats']['recent_ratio_file']  = recent_ratio_file
-            stat['memory_stats']['recent_ratio_total'] = recent_ratio_total
+            stat['memory_stats']['stats']['recent_ratio_anon']  = recent_ratio_anon
+            stat['memory_stats']['stats']['recent_ratio_file']  = recent_ratio_file
+            stat['memory_stats']['stats']['recent_ratio_total'] = recent_ratio_total
         except Exception as e:
             print(e)
         return stat
