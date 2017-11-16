@@ -1,0 +1,10 @@
+# mem
+![mem](https://image.ibb.co/hV6XOR/mem.png "mem")
+# priority
+![priority](https://image.ibb.co/bKy1Hm/priority.png "priority")
+# ratio
+![ratio](https://image.ibb.co/cbwXOR/ratio.png "ratio")
+# rtps
+![rtps](https://image.ibb.co/c8agHm/rtps.png "rtps")
+# trps
+![trps](https://image.ibb.co/eCoOV6/trps.png "trps")
