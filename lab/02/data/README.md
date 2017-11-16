@@ -1,0 +1,14 @@
+# mem
+![mem](https://image.ibb.co/kiPmiR/mem.png "mem")
+# pglost
+![pglost](https://image.ibb.co/gbie3R/pglost.png "pglost")
+# pgstolen
+![pgstolen](https://image.ibb.co/e5jK3R/pgstolen.png "pgstolen")
+# priority
+![priority](https://image.ibb.co/gX7vcm/priority.png "priority")
+# ratio
+![ratio](https://image.ibb.co/iDCiV6/ratio.png "ratio")
+# rtps
+![rtps](https://image.ibb.co/f14xq6/rtps.png "rtps")
+# trps
+![trps](https://image.ibb.co/h5Je3R/trps.png "trps")
