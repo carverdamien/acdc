@@ -75,7 +75,7 @@ services:
   idlememstat:
     build: images/idlememstat
     privileged: true
-    command: [ "-d", "10", "--influxdbhost", "influxdb", "--updateMemoryPriority", "--cgroup", "/rootfs/sys/fs/cgroup/memory/consolidate" ]
+    command: [ "-d", "10", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--updateMemoryPriority", "--cgroup", "/rootfs/sys/fs/cgroup/memory/consolidate" ]
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
       - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup

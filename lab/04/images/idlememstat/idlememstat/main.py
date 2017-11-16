@@ -157,7 +157,7 @@ def idlemem_info(idlemem_tracker):
 def tracker_to_influx_points(idlemem_tracker):
     def to_record(read, tags, total, idle):
         return {
-            "measurement" : 'idlememstats',
+            "measurement" : 'idlemem_stats',
             "time" : read,
             "tags" : tags,
             "fields": {
