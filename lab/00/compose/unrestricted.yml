@@ -34,7 +34,7 @@ services:
     image: influxdb:latest
   collector:
     build: images/collector
-    command: [ "--influx", "--influxdbhost=influxdb" ]
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     links:
