@@ -29,6 +29,14 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
+# Get containers id
+mysqla=$(${RUN} ps -q mysqla)
+mysqlb=$(${RUN} ps -q mysqlb)
+cassandra=$(${RUN} ps -q cassandra)
+# Start scanners
+${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/consolidate/${mysqla} 1 1
+${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/consolidate/${mysqlb} 1 1
+${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/consolidate/${cassandra} 1 1
 ${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 300
 ${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
 sleep 120
