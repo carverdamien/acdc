@@ -37,6 +37,27 @@ def influx_format(stat, tags={}):
         }
         yield point
 
+class SCAN_ROTATE_RATIO:
+    def __init__(self):
+        pass
+    def update(self, stat):
+        if 'memory_stats' not in stat:
+            return stat
+        try:
+            recent_rotated_anon = float(stat['recent_rotated_anon'])
+            recent_scanned_anon = float(stat['recent_scanned_anon'])
+            recent_rotated_file = float(stat['recent_rotated_file'])
+            recent_scanned_file = float(stat['recent_scanned_file'])
+            recent_ratio_anon  = recent_scanned_anon / (1+recent_rotated_anon)
+            recent_ratio_file  = recent_scanned_file / (1+recent_rotated_file)
+            recent_ratio_total = (recent_scanned_anon + recent_scanned_file) / (1+recent_rotated_anon+recent_rotated_file)
+            stat['recent_ratio_anon']  = recent_ratio_anon
+            stat['recent_ratio_file']  = recent_ratio_file
+            stat['recent_ratio_total'] = recent_ratio_total
+        except Exception as e:
+            print(e)
+        return stat
+
 class CPU_PERCENT_USAGE:
     def __init__(self):
         self.system_cpu_usage_old = None
@@ -119,9 +140,11 @@ class IO_USAGE:
 def statsonthefly(stats):
     cpu = CPU_PERCENT_USAGE()
     io = IO_USAGE()
+    srr = SCAN_ROTATE_RATIO()
     for stat in stats:
         stat = cpu.update(stat)
         stat = io.update(stat)
+        stat = srr.update(stat)
         yield stat
 
 def loop(clt, callbacks, Id, buffering):
