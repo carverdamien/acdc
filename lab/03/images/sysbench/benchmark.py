@@ -56,10 +56,11 @@ def prepare(args):
         #subprocess.check_call(mysql_call + ['-e', 'shutdown'])
 
 def run(args):
-    client = influxdb.InfluxDBClient(host='influxdb',
-                                     database='sysbenchstats')
-    client.create_database('sysbenchstats')
-    measurement = 'online'
+    client = influxdb.InfluxDBClient(host=args.influxdbhost,
+                                    port=int(args.influxdbport),
+                                    database=args.influxdbname)
+    client.create_database(args.influxdbname)
+    measurement = 'sysbench_stats'
     tags = {
         'hostname' : subprocess.check_output(mysql_call + ['-BNe', 'select @@hostname;'])[:-1]
     }
@@ -101,6 +102,9 @@ def main():
     prepare_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
     prepare_parser.set_defaults(func=prepare)
     run_parser = main_subparsers.add_parser('run')
+    run_parser.add_argument("--influxdbname", dest="influxdbname", type=str, nargs=1, default='acdc')
+    run_parser.add_argument("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='influxdb')
+    run_parser.add_argument("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
     run_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
     run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
     run_parser.set_defaults(func=run)
