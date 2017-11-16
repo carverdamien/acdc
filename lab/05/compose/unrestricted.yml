@@ -30,6 +30,11 @@ services:
       - data-mysqlb:/var/lib/mysql
   cassandra:
     build: images/cassandra
+  scanner:
+    build: images/scanner
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
   influxdb:
     image: influxdb:latest
   collector:

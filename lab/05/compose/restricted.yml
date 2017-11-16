@@ -63,6 +63,11 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '27mb'
+  scanner:
+    build: images/scanner
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
   influxdb:
     image: influxdb:latest
   collector:
