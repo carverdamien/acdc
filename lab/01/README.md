@@ -11,3 +11,16 @@ Provide a feedback metric to observe the reclaim decisions during consolidation.
 * `build.sh` builds the kernel in a docker container and put the files in `./build/kernel/`
 * `install.sh` installs the kernel on the host.
 * `reboot.sh` reboots the machine on this kernel.
+
+### mem
+![mem](https://image.ibb.co/b4EDV6/mem.png "mem")
+### pglost
+![pglost](https://image.ibb.co/j2sdxm/pglost.png "pglost")
+### pgstolen
+![pgstolen](https://image.ibb.co/cjNdxm/pgstolen.png "pgstolen")
+### ratio
+![ratio](https://image.ibb.co/de9fA6/ratio.png "ratio")
+### rtps
+![rtps](https://image.ibb.co/kjNYV6/rtps.png "rtps")
+### trps
+![trps](https://image.ibb.co/gXFnq6/trps.png "trps")
