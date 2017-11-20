@@ -42,7 +42,7 @@ See [wikipedia](https://en.wikipedia.org/wiki/Page_replacement_algorithm "Page r
 
 ## Simplified call stack
 
-Browse Linux v6.0 on [elixir.free-electrons.com](https://elixir.free-electrons.com/linux/v4.6 "Linux source code indexer and cross-referencer")
+Browse Linux v6.0 on [elixir.free-electrons.com](https://elixir.free-electrons.com/linux/v4.6/source "Linux source code indexer and cross-referencer")
 
 ```
 try_charge                        # Checks if usage is below limit before triggering the PFRA (see mm/memcontrol.c)
