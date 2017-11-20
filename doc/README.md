@@ -44,14 +44,25 @@ If it fails to free memory, the Out-Of-Memory killer will select a process from 
 
 Call stack
 ```
-try_charge
-└─ try_to_free_mem_cgroup_pages
-   └─ do_try_to_free_pages
-      └─ shrink_zones
-         └─ shrink_zone
-            └─ shrink_zone_memcg
-               └─ shrink_list
-                  └─ shrink_active_list
-                  └─ shrink_inactive_list
-                     └─ shrink_page_list
+try_charge                       # Checks if usage is below limit
+└─ try_to_free_mem_cgroup_pages  # Configures the struct scan_control sc
+   └─ do_try_to_free_pages       # Increases the amount of page scanned if the first iterations were unsuccessful
+      └─ shrink_zones            # Loops over memory zones
+         └─ shrink_zone          # Loops over cgroups
+            └─ shrink_zone_memcg #
+               ├─ get_scan_count # Loops over {active,inactive}{anon,cache} lists
+               └─ shrink_list    # Shrinks active if inactive list is low
+                  ├─ inactive_list_is_low            # Heuristics
+                  ├─ shrink_active_list              # Isolates and loops over pages
+                  │  ├─ isolate_lru_pages            # Removes pages from the the active list
+                  │  ├─ page_referenced              # Check ACCES bit
+                  │  └─ move_active_pages_to_lru     # add pages to inactive list (in some rare cases put them in active list)
+                  └─ shrink_inactive_list            # 
+                     ├─ isolate_lru_pages            # Removes pages from the the inactive list
+                     ├─ shrink_page_list             # Loops over isolated pages
+                     │  ├─ page_check_references     # Decides to activate, keep or reclaim a page
+                     │  │  └─ page_referenced        #
+                     │  ├─ mem_cgroup_uncharge_list  # Update cgroup accounting
+                     │  └─ free_hot_cold_page_list   # Send pages to the free lists (see mm/page_alloc.c)
+                     └─ putback_inactive_pages       # add unreclaimed pages to active or inactive list
 ```
