@@ -71,3 +71,5 @@ try_charge                        # Checks if usage is below limit before trigge
                      │  └─ free_hot_cold_page_list   # Send pages to the free lists (see mm/page_alloc.c)
                      └─ putback_inactive_pages       # Add unreclaimed pages to active or inactive list
 ```
+
+## Tracking pages movements in lists
