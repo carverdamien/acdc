@@ -38,31 +38,36 @@ If it fails to free memory, the Out-Of-Memory killer will select a process from 
 
 # The Page Frame Reclaiming Algorithm (PFRA)
 
-![wikipedia](https://en.wikipedia.org/wiki/Page_replacement_algorithm "Page replacement algorithm")
+See [wikipedia](https://en.wikipedia.org/wiki/Page_replacement_algorithm "Page replacement algorithm") for a quick introduction.
 
-![elixir](https://elixir.free-electrons.com/linux/v4.6 "Linux source code indexer and cross-referencer")
+## Simplified call stack
 
-Call stack
+Browse Linux v6.0 on [elixir.free-electrons.com](https://elixir.free-electrons.com/linux/v4.6 "Linux source code indexer and cross-referencer")
+
 ```
-try_charge                       # Checks if usage is below limit
-└─ try_to_free_mem_cgroup_pages  # Configures the struct scan_control sc
-   └─ do_try_to_free_pages       # Increases the amount of page scanned if the first iterations were unsuccessful
-      └─ shrink_zones            # Loops over memory zones
-         └─ shrink_zone          # Loops over cgroups
-            └─ shrink_zone_memcg #
-               ├─ get_scan_count # Loops over {active,inactive}{anon,cache} lists
-               └─ shrink_list    # Shrinks active if inactive list is low
-                  ├─ inactive_list_is_low            # Heuristics
-                  ├─ shrink_active_list              # Isolates and loops over pages
-                  │  ├─ isolate_lru_pages            # Removes pages from the the active list
-                  │  ├─ page_referenced              # Check ACCES bit
-                  │  └─ move_active_pages_to_lru     # add pages to inactive list (in some rare cases put them in active list)
-                  └─ shrink_inactive_list            # 
+try_charge                        # Checks if usage is below limit before triggering the PFRA (see mm/memcontrol.c)
+│
+└─ try_to_free_mem_cgroup_pages   # Configures the struct scan_control sc
+   └─ do_try_to_free_pages        # Increases the amount of page scanned if the first iterations were unsuccessful
+      └─ shrink_zones             # Loops over memory zones
+         └─ shrink_zone           # Loops over cgroups
+            │
+            └─ shrink_zone_memcg  # Loops over {active,inactive}{anon,cache} lists of a given cgroup
+               ├─ get_scan_count  # Heuristics to decide how many pages should be scanned in each list
+               └─ shrink_list     # Shrinks active if inactive list is low
+                  │
+                  ├─ inactive_list_is_low         # Heuristics to protect the active list
+                  ├─ shrink_active_list           # Isolates and loops over pages
+                  │  ├─ isolate_lru_pages         # Removes pages from the the active list
+                  │  ├─ page_referenced           # Check ACCES bit in the page table entries
+                  │  └─ move_active_pages_to_lru  # Add pages to inactive list (in some rare cases put them in active list)
+                  │
+                  └─ shrink_inactive_list
                      ├─ isolate_lru_pages            # Removes pages from the the inactive list
                      ├─ shrink_page_list             # Loops over isolated pages
                      │  ├─ page_check_references     # Decides to activate, keep or reclaim a page
-                     │  │  └─ page_referenced        #
+                     │  │  └─ page_referenced
                      │  ├─ mem_cgroup_uncharge_list  # Update cgroup accounting
                      │  └─ free_hot_cold_page_list   # Send pages to the free lists (see mm/page_alloc.c)
-                     └─ putback_inactive_pages       # add unreclaimed pages to active or inactive list
+                     └─ putback_inactive_pages       # Add unreclaimed pages to active or inactive list
 ```
