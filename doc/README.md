@@ -37,3 +37,21 @@ This process is called the Page Frame Reclaiming Algorithm and it is described i
 If it fails to free memory, the Out-Of-Memory killer will select a process from cgroup and will kill it.
 
 # The Page Frame Reclaiming Algorithm (PFRA)
+
+![wikipedia](https://en.wikipedia.org/wiki/Page_replacement_algorithm "Page replacement algorithm")
+
+![elixir](https://elixir.free-electrons.com/linux/v4.6 "Linux source code indexer and cross-referencer")
+
+Call stack
+```
+try_charge
+└─ try_to_free_mem_cgroup_pages
+   └─ do_try_to_free_pages
+      └─ shrink_zones
+         └─ shrink_zone
+            └─ shrink_zone_memcg
+               └─ shrink_list
+                  └─ shrink_active_list
+                  └─ shrink_inactive_list
+                     └─ shrink_page_list
+```
