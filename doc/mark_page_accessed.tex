@@ -1,5 +1,4 @@
 \documentclass{article}
-
 \usepackage{pgf}
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata}
@@ -20,7 +19,6 @@
 }
 \lstset{escapechar=@,style=customc}
 \begin{document}
-\lstinputlisting[caption=mark\_page\_accessed, style=customc]{./mark_page_accessed.c}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
                     semithick]
   \tikzstyle{every state}=[rectangle,draw,align=left]
@@ -33,11 +31,12 @@
   \node[state] (NI) [right of=IL] {Not idle};
 
   \path (IU) edge              node {} (IR)
-  		(IR) edge              node {} (AU)
-  		(AU) edge              node {} (AR)
-  		(AR) edge [loop below] node {} (AR)
-  		(IL) edge              node {} (NI)
-  		(NI) edge [loop above] node {} (NI);
+  		  (IR) edge              node {} (AU)
+  		  (AU) edge              node {} (AR)
+  		  (AR) edge [loop below] node {} (AR)
+  		  (IL) edge              node {} (NI)
+  		  (NI) edge [loop above] node {} (NI);
 
 \end{tikzpicture}
+\lstinputlisting[caption=mark\_page\_accessed, style=customc]{src/mark_page_accessed.c}
 \end{document}
