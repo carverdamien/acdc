@@ -21,3 +21,7 @@ Use IDLE_PAGE_TACKING to update `memory.priority`.
 ![rtps](https://image.ibb.co/daGoxm/rtps.png "rtps")
 ### trps
 ![trps](https://image.ibb.co/bKsTxm/trps.png "trps")
+### pglost
+![pglost](https://image.ibb.co/eWeU8R/pglost.png "pglost")
+### pgstolen
+![pgstolen](https://image.ibb.co/d51boR/pgstolen.png "pgstolen")

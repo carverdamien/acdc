@@ -20,3 +20,7 @@ Use `memory.force_scan` to update the `nr_rotated` and `nr_scanned`.
 ![rtps](https://image.ibb.co/c8agHm/rtps.png "rtps")
 ### trps
 ![trps](https://image.ibb.co/eCoOV6/trps.png "trps")
+### pglost
+![pglost](https://image.ibb.co/dZsXTR/pglost.png "pglost")
+### pgstolen
+![pgstolen](https://image.ibb.co/ifwRoR/pgstolen.png "pgstolen")
