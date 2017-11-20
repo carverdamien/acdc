@@ -34,28 +34,6 @@
   \node[state] (AR) [below of=IU] {Active \\ Referenced};
 
   \path
-  (IU) edge [loop above]                 node {$reclaim$}   (IU)
-  (IU) edge [bend  left]                 node {$keep$}            (IR)
-  (IR) edge [bend  left]                 node {$reclaim$} (IU)
-  (IR) edge [loop above]                 node {$keep$}            (IR)
-  (IR) edge [out=135,in=50,looseness=10] node {$activate$}      (IR);
-\end{tikzpicture}
-\end{center}
-\caption{Simplified Automata}
-\end{figure}
-\begin{figure}
-\begin{center}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
-                    semithick]
-
-  \tikzstyle{every state}=[rectangle,draw,align=left]
-
-  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
-  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
-  \node[state] (AU) [below of=IR] {Active \\ Unreferenced};
-  \node[state] (AR) [below of=IU] {Active \\ Referenced};
-
-  \path
   (IU) edge [loop above]                 node {$reclaim^{1,3}$}   (IU)
   (IU) edge [bend  left]                 node {$keep$}            (IR)
   (IU) edge [out=140,in=40,looseness=03] node {$activate^3$}      (IR)
@@ -70,17 +48,21 @@
 \caption{Automata}
 \end{figure}
 \begin{table}
+\begin{tabular}{|l|l|l|}
+\hline
+Transition & Condition & Rarity \\
+\hline
+$reclaim^1$  page & $VM\_LOCKED$                                     & Very Rare (mlock) \\
+$activate^1$ page & PageSwapBacked(page)                             & Heuristic??? to avoid swapping twice \\
+$activate^2$ page & $referenced\_ptes > 1$                           & Common??? (sharing btw threads) \\
+$activate^3$ page & $VM\_EXEC$                                       & Rare (compared to data) \\
+$keep$       page & $referenced\_ptes > 0$                           & Common \\
+$reclaim^2$  page & $referenced\_ptes = 0$ And !PageSwapBacked(page) & Heuristic??? to avoid writes \\
+$reclaim^3$  page & $referenced\_ptes = 0$                           & Very Common \\
+\hline
+\end{tabular}
+\\
 \begin{tabular}{|l|l|}
-\hline
-Transition & Condition \\
-\hline
-$reclaim^1$  page & $VM\_LOCKED$                                     \\
-$activate^1$ page & PageSwapBacked(page)                             \\
-$activate^2$ page & $referenced\_ptes > 1$                           \\
-$activate^3$ page & $VM\_EXEC$                                       \\
-$keep$       page & $referenced\_ptes > 0$                           \\
-$reclaim^2$  page & $referenced\_ptes = 0$ And !PageSwapBacked(page) \\
-$reclaim^3$  page & $referenced\_ptes = 0$                           \\
 \hline
 Condition               & Note \\
 \hline
@@ -88,8 +70,51 @@ $referenced\_ptes = 0$ & the page was not accessed through virtual memory addres
 $referenced\_ptes > 0$ & a page table entry access bit was set. \\
 $referenced\_ptes > 1$ & the page is shared and multiple access bits were set. \\
 \hline
-
 \end{tabular}
 \caption{Legend}
 \end{table}
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
+  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
+  \node[state] (AU) [below of=IR] {Active \\ Unreferenced};
+  \node[state] (AR) [below of=IU] {Active \\ Referenced};
+
+  \path
+  (IU) edge [loop above]                 node {$reclaim$}  (IU)
+  (IU) edge [bend  left]                 node {$keep$}     (IR)
+  (IR) edge [bend  left]                 node {$reclaim$}  (IU)
+  (IR) edge [loop above]                 node {$keep$}     (IR);
+\end{tikzpicture}
+\end{center}
+\caption{Simplified Automata for !mapped pages}
+\end{figure}
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
+  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
+  \node[state] (AU) [below of=IR] {Active \\ Unreferenced};
+  \node[state] (AR) [below of=IU] {Active \\ Referenced};
+
+  \path
+  (IU) edge [loop above]                 node {$reclaim$}  (IU)
+  (IU) edge [bend  left]                 node {$keep$}     (IR)
+  (IR) edge [bend  left]                 node {$reclaim$}  (IU)
+  (IR) edge [loop above]                 node {$keep$}     (IR)
+  (IU) edge [out=135,in=50,looseness=10] node {$activate$} (IU)
+  (IR) edge [bend  left=90]              node {$activate$} (IU);
+\end{tikzpicture}
+\end{center}
+\caption{Simplified Automata for mapped pages}
+\end{figure}
 \end{document}
