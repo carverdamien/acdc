@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage[margin=1in]{geometry}
 \usepackage{pgf}
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata}
@@ -26,32 +27,14 @@
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
-  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
-  \node[initial,state] (AU) [below of=IR] {Active \\ Unreferenced};
-  \node[initial,state] (AR) [below of=IU] {Active \\ Referenced};
-
-  \path (IU) edge [bend  left] node {} (IR)
-        (IR) edge [bend  left] node {} (AU)
-        (AU) edge [bend  left] node {} (AR)
-        (AR) edge [loop below] node {} (AR);
-\end{tikzpicture}
-\caption{Classic}
-\end{figure}
-\begin{figure}
-\center
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
-                    semithick]
-
-  \tikzstyle{every state}=[rectangle,draw,align=left]
-
   \node[initial,state] (IL)               {Idle};
   \node[initial,state] (NI) [right of=IL] {Not idle};
 
   \path (IL) edge [bend  left] node {} (NI)
-        (NI) edge [loop above] node {} (NI);
+        (NI) edge [loop above] node {} (NI)
+        (IL) edge [loop above] node {} (IL);
 \end{tikzpicture}
-\caption{Idle page tracking}
+\caption{Idle page tracking (TODO: young bit!)}
 \end{figure}
-\lstinputlisting[caption=mark\_page\_accessed, style=customc]{src/mark_page_accessed.c}
+\lstinputlisting[caption=page\_referenced, style=customc]{src/page_referenced.c}
 \end{document}

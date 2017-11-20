@@ -20,17 +20,19 @@
 }
 \lstset{escapechar=@,style=customc}
 \begin{document}
+\begin{figure}
+\center
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
                     semithick]
+
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[state] (IU)               {Inactive \\ Unreferenced};
-  \node[state] (IR) [right of=IU] {Inactive \\ Referenced};
+  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
+  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
   \node[state] (AU) [below of=IR] {Active \\ Unreferenced};
   \node[state] (AR) [below of=IU] {Active \\ Referenced};
-  \node[state] (IL) [above of=IU] {Idle};
-  \node[state] (NI) [right of=IL] {Not idle};
-
 \end{tikzpicture}
+\caption{Classic}
+\end{figure}
 \lstinputlisting[caption=page\_check\_references, style=customc]{src/page_check_references.c}
 \end{document}
