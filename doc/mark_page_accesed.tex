@@ -16,6 +16,13 @@
   \node[state] (IL) [above of=IU] {Idle};
   \node[state] (NI) [right of=IL] {Not idle};
 
+  \path (IU) edge              node {} (IR)
+  		(IR) edge              node {} (AU)
+  		(AU) edge              node {} (AR)
+  		(AR) edge [loop below] node {} (AR)
+  		(IL) edge              node {} (NI)
+  		(NI) edge [loop above] node {} (NI);
+
 \end{tikzpicture}
 
 \end{document}
