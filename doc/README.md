@@ -73,3 +73,49 @@ try_charge                        # Checks if usage is below limit before trigge
 ```
 
 ## Tracking pages movements in lists
+
+```
+arch/mips/mm/gup.c:		SetPageReferenced(page);
+arch/mips/mm/gup.c:	SetPageReferenced(page);
+arch/x86/mm/gup.c:		SetPageReferenced(page);
+arch/x86/mm/gup.c:	SetPageReferenced(page);
+arch/x86/mm/gup.c:		SetPageReferenced(page);
+mm/filemap.c:			__SetPageReferenced(page);
+mm/migrate.c:		SetPageReferenced(newpage);
+mm/shmem.c:			__SetPageReferenced(page);
+mm/swap.c: * __SetPageReferenced(page) may be substituted for mark_page_accessed(page).
+mm/swap.c:		SetPageReferenced(page);
+mm/vmscan.c:		SetPageReferenced(page);
+arch/x86/mm/gup.c:		ClearPageReferenced(page);
+fs/proc/task_mmu.c:		ClearPageReferenced(page);
+fs/proc/task_mmu.c:		ClearPageReferenced(page);
+mm/swap.c:		ClearPageReferenced(page);
+mm/swap.c:	ClearPageReferenced(page);
+mm/swap.c:		ClearPageReferenced(page);
+mm/vmscan.c:	referenced_page = TestClearPageReferenced(page);
+include/linux/page-flags.h:	SetPageActive(page);
+mm/filemap.c:			SetPageActive(page);
+mm/migrate.c:		SetPageActive(newpage);
+mm/migrate.c:			SetPageActive(page);
+mm/swap.c:		SetPageActive(page);
+mm/swap.c:			SetPageActive(page);
+mm/swap.c:		SetPageActive(page);
+mm/vmscan.c:		SetPageActive(page);
+include/linux/mm_inline.h:			__ClearPageActive(page);
+include/linux/page-flags.h:	__ClearPageActive(page);
+include/linux/page-flags.h:	ClearPageActive(page);
+mm/filemap.c:			ClearPageActive(page);
+mm/memory-failure.c:		ClearPageActive(p);
+mm/migrate.c:	if (TestClearPageActive(page)) {
+mm/migrate.c:		if (TestClearPageActive(new_page))
+mm/swap.c:		ClearPageActive(page);
+mm/swap.c:		ClearPageActive(page);
+mm/swap.c:	ClearPageActive(page);
+mm/swap.c:	ClearPageActive(page);
+mm/swap.c:		ClearPageActive(page);
+mm/swap.c:		__ClearPageActive(page);
+mm/vmscan.c:			ClearPageActive(page);
+mm/vmscan.c:			__ClearPageActive(page);
+mm/vmscan.c:			__ClearPageActive(page);
+mm/vmscan.c:		ClearPageActive(page);	/* we are de-activating */
+```
