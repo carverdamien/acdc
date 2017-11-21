@@ -72,18 +72,27 @@ try_charge                        # Checks if usage is below limit before trigge
                      └─ putback_inactive_pages       # Add unreclaimed pages to active or inactive list
 ```
 
-## Tracking pages movements in lists
+## Tracking page movements in lists
 
+`git grep -HnE 'SetPageReferenced|ClearPageReferenced|SetPageActive|ClearPageActive'`
+
+get_user_pages() is a function used in direct I/O operations to pin the userspace memory that is going to be transferred. [kernelnewbies.org](https://kernelnewbies.org/Linux_2_6_27 "Lockless get_user_pages_fast()")
 ```
-git grep -HnE 'SetPageReferenced|ClearPageReferenced|SetPageActive|ClearPageActive'
 arch/mips/mm/gup.c:53:		SetPageReferenced(page);
 arch/mips/mm/gup.c:68:	SetPageReferenced(page);
 arch/x86/mm/gup.c:73:		ClearPageReferenced(page);
 arch/x86/mm/gup.c:139:		SetPageReferenced(page);
 arch/x86/mm/gup.c:154:	SetPageReferenced(page);
 arch/x86/mm/gup.c:173:		SetPageReferenced(page);
+```
+
+Writing to `/proc/[pid]/clear_refs` clears the PG_Referenced and ACCESSED/YOUNG bits which provides a method to measure approximately how much memory a process is using.[man proc](http://man7.org/linux/man-pages/man5/proc.5.html "/proc/[pid]/clear_refs")
+```
 fs/proc/task_mmu.c:934:		ClearPageReferenced(page);
 fs/proc/task_mmu.c:962:		ClearPageReferenced(page);
+```
+
+```
 include/linux/mm_inline.h:75:			__ClearPageActive(page);
 include/linux/page-flags.h:652:	SetPageActive(page);
 include/linux/page-flags.h:658:	__ClearPageActive(page);
