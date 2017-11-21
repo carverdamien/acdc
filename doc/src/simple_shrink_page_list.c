@@ -24,6 +24,7 @@ static unsigned long shrink_page_list(struct list_head *page_list) {
 			; /* try to reclaim the page below */
 		}
 
+		nr_reclaimed++;
 		list_add(&page->lru, &free_pages);
 		continue;
 
