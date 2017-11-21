@@ -75,47 +75,47 @@ try_charge                        # Checks if usage is below limit before trigge
 ## Tracking pages movements in lists
 
 ```
-arch/mips/mm/gup.c:		SetPageReferenced(page);
-arch/mips/mm/gup.c:	SetPageReferenced(page);
-arch/x86/mm/gup.c:		SetPageReferenced(page);
-arch/x86/mm/gup.c:	SetPageReferenced(page);
-arch/x86/mm/gup.c:		SetPageReferenced(page);
-mm/filemap.c:			__SetPageReferenced(page);
-mm/migrate.c:		SetPageReferenced(newpage);
-mm/shmem.c:			__SetPageReferenced(page);
-mm/swap.c: * __SetPageReferenced(page) may be substituted for mark_page_accessed(page).
-mm/swap.c:		SetPageReferenced(page);
-mm/vmscan.c:		SetPageReferenced(page);
-arch/x86/mm/gup.c:		ClearPageReferenced(page);
-fs/proc/task_mmu.c:		ClearPageReferenced(page);
-fs/proc/task_mmu.c:		ClearPageReferenced(page);
-mm/swap.c:		ClearPageReferenced(page);
-mm/swap.c:	ClearPageReferenced(page);
-mm/swap.c:		ClearPageReferenced(page);
-mm/vmscan.c:	referenced_page = TestClearPageReferenced(page);
-include/linux/page-flags.h:	SetPageActive(page);
-mm/filemap.c:			SetPageActive(page);
-mm/migrate.c:		SetPageActive(newpage);
-mm/migrate.c:			SetPageActive(page);
-mm/swap.c:		SetPageActive(page);
-mm/swap.c:			SetPageActive(page);
-mm/swap.c:		SetPageActive(page);
-mm/vmscan.c:		SetPageActive(page);
-include/linux/mm_inline.h:			__ClearPageActive(page);
-include/linux/page-flags.h:	__ClearPageActive(page);
-include/linux/page-flags.h:	ClearPageActive(page);
-mm/filemap.c:			ClearPageActive(page);
-mm/memory-failure.c:		ClearPageActive(p);
-mm/migrate.c:	if (TestClearPageActive(page)) {
-mm/migrate.c:		if (TestClearPageActive(new_page))
-mm/swap.c:		ClearPageActive(page);
-mm/swap.c:		ClearPageActive(page);
-mm/swap.c:	ClearPageActive(page);
-mm/swap.c:	ClearPageActive(page);
-mm/swap.c:		ClearPageActive(page);
-mm/swap.c:		__ClearPageActive(page);
-mm/vmscan.c:			ClearPageActive(page);
-mm/vmscan.c:			__ClearPageActive(page);
-mm/vmscan.c:			__ClearPageActive(page);
-mm/vmscan.c:		ClearPageActive(page);	/* we are de-activating */
+arch/mips/mm/gup.c:53:		SetPageReferenced(page);
+arch/mips/mm/gup.c:68:	SetPageReferenced(page);
+arch/x86/mm/gup.c:139:		SetPageReferenced(page);
+arch/x86/mm/gup.c:154:	SetPageReferenced(page);
+arch/x86/mm/gup.c:173:		SetPageReferenced(page);
+mm/filemap.c:1207:			__SetPageReferenced(page);
+mm/migrate.c:539:		SetPageReferenced(newpage);
+mm/shmem.c:1282:			__SetPageReferenced(page);
+mm/swap.c:359: * __SetPageReferenced(page) may be substituted for mark_page_accessed(page).
+mm/swap.c:381:		SetPageReferenced(page);
+mm/vmscan.c:826:		SetPageReferenced(page);
+arch/x86/mm/gup.c:73:		ClearPageReferenced(page);
+fs/proc/task_mmu.c:934:		ClearPageReferenced(page);
+fs/proc/task_mmu.c:962:		ClearPageReferenced(page);
+mm/swap.c:377:		ClearPageReferenced(page);
+mm/swap.c:535:	ClearPageReferenced(page);
+mm/swap.c:569:		ClearPageReferenced(page);
+mm/vmscan.c:800:	referenced_page = TestClearPageReferenced(page);
+include/linux/page-flags.h:652:	SetPageActive(page);
+mm/filemap.c:718:			SetPageActive(page);
+mm/migrate.c:544:		SetPageActive(newpage);
+mm/migrate.c:1812:			SetPageActive(page);
+mm/swap.c:266:		SetPageActive(page);
+mm/swap.c:343:			SetPageActive(page);
+mm/swap.c:474:		SetPageActive(page);
+mm/vmscan.c:1219:		SetPageActive(page);
+include/linux/mm_inline.h:75:			__ClearPageActive(page);
+include/linux/page-flags.h:658:	__ClearPageActive(page);
+include/linux/page-flags.h:664:	ClearPageActive(page);
+mm/filemap.c:721:			ClearPageActive(page);
+mm/memory-failure.c:536:		ClearPageActive(p);
+mm/migrate.c:542:	if (TestClearPageActive(page)) {
+mm/migrate.c:1811:		if (TestClearPageActive(new_page))
+mm/swap.c:406:		ClearPageActive(page);
+mm/swap.c:413:		ClearPageActive(page);
+mm/swap.c:451:	ClearPageActive(page);
+mm/swap.c:534:	ClearPageActive(page);
+mm/swap.c:568:		ClearPageActive(page);
+mm/swap.c:768:		__ClearPageActive(page);
+mm/vmscan.c:1258:			ClearPageActive(page);
+mm/vmscan.c:1531:			__ClearPageActive(page);
+mm/vmscan.c:1751:			__ClearPageActive(page);
+mm/vmscan.c:1843:		ClearPageActive(page);	/* we are de-activating */
 ```
