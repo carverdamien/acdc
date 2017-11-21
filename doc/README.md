@@ -76,7 +76,41 @@ try_charge                        # Checks if usage is below limit before trigge
 
 `git grep -HnE 'SetPageReferenced|ClearPageReferenced|SetPageActive|ClearPageActive'`
 
-get_user_pages() is a function used in direct I/O operations to pin the userspace memory that is going to be transferred. [kernelnewbies.org](https://kernelnewbies.org/Linux_2_6_27 "Lockless get_user_pages_fast()")
+```
+include/linux/mm_inline.h:75:       __ClearPageActive(page);
+include/linux/page-flags.h:652:  SetPageActive(page);
+include/linux/page-flags.h:658:  __ClearPageActive(page);
+include/linux/page-flags.h:664:  ClearPageActive(page);
+mm/filemap.c:718:       SetPageActive(page);
+mm/filemap.c:721:       ClearPageActive(page);
+mm/filemap.c:1207:         __SetPageReferenced(page);
+mm/shmem.c:1282:        __SetPageReferenced(page);
+mm/swap.c:266:    SetPageActive(page);
+mm/swap.c:343:       SetPageActive(page);
+mm/swap.c:359: * __SetPageReferenced(page) may be substituted for mark_page_accessed(page).
+mm/swap.c:377:    ClearPageReferenced(page);
+mm/swap.c:381:    SetPageReferenced(page);
+mm/swap.c:406:    ClearPageActive(page);
+mm/swap.c:413:    ClearPageActive(page);
+mm/swap.c:451: ClearPageActive(page);
+mm/swap.c:474:    SetPageActive(page);
+mm/swap.c:534: ClearPageActive(page);
+mm/swap.c:535: ClearPageReferenced(page);
+mm/swap.c:568:    ClearPageActive(page);
+mm/swap.c:569:    ClearPageReferenced(page);
+mm/swap.c:768:    __ClearPageActive(page);
+mm/vmscan.c:800:  referenced_page = TestClearPageReferenced(page);
+mm/vmscan.c:826:     SetPageReferenced(page);
+mm/vmscan.c:1219:    SetPageActive(page);
+mm/vmscan.c:1258:       ClearPageActive(page);
+mm/vmscan.c:1531:       __ClearPageActive(page);
+mm/vmscan.c:1751:       __ClearPageActive(page);
+mm/vmscan.c:1843:    ClearPageActive(page);  /* we are de-activating */
+```
+
+### Unrelated grep results
+
+`get_user_pages()` is a function used in direct I/O operations to pin the userspace memory that is going to be transferred. [kernelnewbies.org](https://kernelnewbies.org/Linux_2_6_27 "Lockless get_user_pages_fast()")
 ```
 arch/mips/mm/gup.c:53:		SetPageReferenced(page);
 arch/mips/mm/gup.c:68:	SetPageReferenced(page);
@@ -86,46 +120,22 @@ arch/x86/mm/gup.c:154:	SetPageReferenced(page);
 arch/x86/mm/gup.c:173:		SetPageReferenced(page);
 ```
 
-Writing to `/proc/[pid]/clear_refs` clears the PG_Referenced and ACCESSED/YOUNG bits which provides a method to measure approximately how much memory a process is using.[man proc](http://man7.org/linux/man-pages/man5/proc.5.html "/proc/[pid]/clear_refs")
+Writing to `/proc/[pid]/clear_refs` clears the PG_Referenced and ACCESSED/YOUNG bits which provides a method to measure approximately how much memory a process is using. [man proc](http://man7.org/linux/man-pages/man5/proc.5.html "/proc/[pid]/clear_refs")
 ```
 fs/proc/task_mmu.c:934:		ClearPageReferenced(page);
 fs/proc/task_mmu.c:962:		ClearPageReferenced(page);
 ```
 
+Page migration.
 ```
-include/linux/mm_inline.h:75:			__ClearPageActive(page);
-include/linux/page-flags.h:652:	SetPageActive(page);
-include/linux/page-flags.h:658:	__ClearPageActive(page);
-include/linux/page-flags.h:664:	ClearPageActive(page);
-mm/filemap.c:718:			SetPageActive(page);
-mm/filemap.c:721:			ClearPageActive(page);
-mm/filemap.c:1207:			__SetPageReferenced(page);
-mm/memory-failure.c:536:		ClearPageActive(p);
-mm/migrate.c:539:		SetPageReferenced(newpage);
-mm/migrate.c:542:	if (TestClearPageActive(page)) {
-mm/migrate.c:544:		SetPageActive(newpage);
-mm/migrate.c:1811:		if (TestClearPageActive(new_page))
-mm/migrate.c:1812:			SetPageActive(page);
-mm/shmem.c:1282:			__SetPageReferenced(page);
-mm/swap.c:266:		SetPageActive(page);
-mm/swap.c:343:			SetPageActive(page);
-mm/swap.c:359: * __SetPageReferenced(page) may be substituted for mark_page_accessed(page).
-mm/swap.c:377:		ClearPageReferenced(page);
-mm/swap.c:381:		SetPageReferenced(page);
-mm/swap.c:406:		ClearPageActive(page);
-mm/swap.c:413:		ClearPageActive(page);
-mm/swap.c:451:	ClearPageActive(page);
-mm/swap.c:474:		SetPageActive(page);
-mm/swap.c:534:	ClearPageActive(page);
-mm/swap.c:535:	ClearPageReferenced(page);
-mm/swap.c:568:		ClearPageActive(page);
-mm/swap.c:569:		ClearPageReferenced(page);
-mm/swap.c:768:		__ClearPageActive(page);
-mm/vmscan.c:800:	referenced_page = TestClearPageReferenced(page);
-mm/vmscan.c:826:		SetPageReferenced(page);
-mm/vmscan.c:1219:		SetPageActive(page);
-mm/vmscan.c:1258:			ClearPageActive(page);
-mm/vmscan.c:1531:			__ClearPageActive(page);
-mm/vmscan.c:1751:			__ClearPageActive(page);
-mm/vmscan.c:1843:		ClearPageActive(page);	/* we are de-activating */
+mm/migrate.c:539:    SetPageReferenced(newpage);
+mm/migrate.c:542: if (TestClearPageActive(page)) {
+mm/migrate.c:544:    SetPageActive(newpage);
+mm/migrate.c:1811:      if (TestClearPageActive(new_page))
+mm/migrate.c:1812:         SetPageActive(page);
+```
+
+High level machine check handler. Handles pages reported by the hardware as being corrupted usually due to a multi-bit ECC memory or cache failure.
+```
+mm/memory-failure.c:536:      ClearPageActive(p);
 ```
