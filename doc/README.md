@@ -77,6 +77,29 @@ try_charge                        # Checks if usage is below limit before trigge
 `git grep -HnE 'SetPageReferenced|ClearPageReferenced|SetPageActive|ClearPageActive'`
 
 ```
+mm/vmscan.c:
+
+page_check_references:
+800:  referenced_page = TestClearPageReferenced(page);
+826:     SetPageReferenced(page);
+
+shrink_page_list:
+1219:    SetPageActive(page);
+
+reclaim_clean_pages_from_list:        # Unrelated PFRA entrypoint
+1258:       ClearPageActive(page);
+
+putback_inactive_pages:               # if (put_page_testzero(page))
+1531:       __ClearPageActive(page);
+
+move_active_pages_to_lru:             # if (put_page_testzero(page))
+1751:       __ClearPageActive(page);
+
+shrink_active_list:
+1843:    ClearPageActive(page);  /* we are de-activating */
+```
+
+```
 include/linux/mm_inline.h:75:       __ClearPageActive(page);
 include/linux/page-flags.h:652:  SetPageActive(page);
 include/linux/page-flags.h:658:  __ClearPageActive(page);
@@ -99,13 +122,6 @@ mm/swap.c:535: ClearPageReferenced(page);
 mm/swap.c:568:    ClearPageActive(page);
 mm/swap.c:569:    ClearPageReferenced(page);
 mm/swap.c:768:    __ClearPageActive(page);
-mm/vmscan.c:800:  referenced_page = TestClearPageReferenced(page);
-mm/vmscan.c:826:     SetPageReferenced(page);
-mm/vmscan.c:1219:    SetPageActive(page);
-mm/vmscan.c:1258:       ClearPageActive(page);
-mm/vmscan.c:1531:       __ClearPageActive(page);
-mm/vmscan.c:1751:       __ClearPageActive(page);
-mm/vmscan.c:1843:    ClearPageActive(page);  /* we are de-activating */
 ```
 
 ### Unrelated grep results
