@@ -106,4 +106,32 @@ $reclaim$  & !vmlocked \&\& !referenced\_ptes                                 \\
 \caption{File LRU Automata Legend}
 \end{table}
 
+\begin{figure}
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (IUU)                {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) [right of=IUU] {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state]         (AUU) [below of=IRU] {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) [below of=IUU] {Active   \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (IUA) [above of=IUU] {Inactive \\ Unreferenced \\ Accessed  };
+  \node[initial,state] (IRA) [right of=IUA] {Inactive \\ Referenced   \\ Accessed  };
+
+  \path
+  (IUA) edge [out=90,in=0,looseness=3] node {$activate$} (AUU)
+  (IRA) edge [out=0,in=0,looseness=1]  node {$activate$} (AUU)
+
+  (IUU) edge [out=200,in=240,looseness=5,swap] node {$vmlocked$ $\vert$ $reclaim$} (IUU)
+  (IRU) edge [out=230,in=315,looseness=1     ] node {$vmlocked$ $\vert$ $reclaim$} (IUU)
+
+  (IUA) edge [out=270,in=90,looseness=0] node {$vmlocked$} (IUU)
+  (IRA) edge [out=270,in=90,looseness=0]  node {$vmlocked$} (IUU)
+  ;
+\end{tikzpicture}
+\caption{Anon LRU Automata}
+\end{figure}
+
 \end{document}
