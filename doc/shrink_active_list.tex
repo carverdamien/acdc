@@ -1,0 +1,92 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+\lstset{escapechar=@,style=customc}
+
+\begin{document}
+
+\lstinputlisting[caption=shrink\_active\_list, style=customc]{src/shrink_active_list.c}
+\newpage
+
+\begin{figure}
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (AUU)                {Active \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (ARU) [right of=AUU] {Active \\ Referenced   \\ Unaccessed};
+
+  \node[initial,state] (AUA) [below of=AUU] {Active \\ Unreferenced \\ Accessed  };
+  \node[initial,state] (ARA) [right of=AUA] {Active \\ Referenced   \\ Accessed  };
+
+  \node[state]         (IUU) [below of=AUA] {Inactive   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (IRU) [right of=IUU] {Inactive   \\ Referenced   \\ Unaccessed};
+
+  \path
+  (AUU) edge [in=160,out=200,looseness=1,swap] node {$deactivate$} (IUU)
+  (AUA) edge [in=160,out=200,looseness=1] node {$deactivate$} (IUU)
+  
+  (ARA) edge [in=20,out=340,looseness=1,swap] node {$deactivate$} (IRU)
+  (ARU) edge [in=20,out=340,looseness=1] node {$deactivate$} (IRU)
+
+  ;
+
+\end{tikzpicture}
+\caption{Anon LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (AUU)                {Active \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (ARU) [right of=AUU] {Active \\ Referenced   \\ Unaccessed};
+
+  \node[initial,state] (AUA) [below of=AUU] {Active \\ Unreferenced \\ Accessed  };
+  \node[initial,state] (ARA) [right of=AUA] {Active \\ Referenced   \\ Accessed  };
+
+  \node[state]         (IUU) [below of=AUA] {Inactive   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (IRU) [right of=IUU] {Inactive   \\ Referenced   \\ Unaccessed};
+
+  \node[initial,state] (UAE) [above of=AUU] {Active \\ Unreferenced \\ Accessed \\ VM\_EXEC};
+  \node[initial,state] (RAE) [above of=ARU] {Active \\ Referenced   \\ Accessed \\ VM\_EXEC};
+
+  \path
+  (AUU) edge [in=160,out=200,looseness=1,swap] node {$deactivate$} (IUU)
+  (AUA) edge [in=160,out=200,looseness=1] node {$deactivate$} (IUU)
+  
+  (ARA) edge [in=20,out=340,looseness=1,swap] node {$deactivate$} (IRU)
+  (ARU) edge [in=20,out=340,looseness=1] node {$deactivate$} (IRU)
+
+  (UAE) edge [in=160,out=200,looseness=1,swap] node {$keep$} (AUU)
+  (RAE) edge [in=20,out=340,looseness=1] node {$keep$} (ARU)
+
+  ;
+
+\end{tikzpicture}
+\caption{File LRU Automata}
+\end{figure}
+
+\end{document}
