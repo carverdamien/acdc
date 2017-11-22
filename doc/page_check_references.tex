@@ -45,9 +45,6 @@
   \node[state]         (AUU) [below of=IUA] {Active   \\ Unreferenced \\ Unaccessed};
   \node[state]         (ARU) [right of=AUU] {Active   \\ Referenced   \\ Unaccessed};
 
-  \node[initial,state] (IAA) [below of=AUU] {Inactive \\ Accessed $>$ 1};
-  \node[initial,state] (IAE) [right of=IAA] {Inactive \\ VM\_EXEC \\ Accessed};
-
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
   (IUU) edge [out=160,in=120,looseness=5]     node {$reclaim$} (IUU)
