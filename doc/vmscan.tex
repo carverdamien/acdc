@@ -39,6 +39,9 @@
   \node[state]         (AUU) [below of=IUA] {Active   \\ Unreferenced \\ Unaccessed};
   \node[state]         (ARU) [right of=AUU] {Active   \\ Referenced   \\ Unaccessed};
 
+  \node[state] (AUA) [above of=LCK] {Active \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) [right of=AUA] {Active \\ Referenced   \\ Accessed};
+
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (IUU)
   (IUU) edge [out=160,in=120,looseness=5]     node {$shrink\_inactive$} (IUU)
@@ -74,6 +77,8 @@
   \node[state] (IAA) [below of=AUU] {Inactive \\ Accessed $>$ 1};
   \node[state] (IAE) [right of=IAA] {Inactive \\ VM\_EXEC \\ Accessed};
 
+  \node[state] (AUA) [above of=LCK] {Active \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) [right of=AUA] {Active \\ Referenced   \\ Accessed};
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (IUU)
