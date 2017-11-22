@@ -46,6 +46,9 @@
 
   (IUA) edge [out=270,in=90,looseness=0,swap] node {$shrink\_inactive$} (AUU)
   (IRA) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (AUU)
+
+  (AUU) edge [out=160,in=200,looseness=1]     node {$shrink\_active$} (IUU)
+  (ARU) edge [out=20,in=340,looseness=1,swap] node {$shrink\_active$} (IRU)
   ;
 \end{tikzpicture}
 \caption{Anon LRU Automata}
@@ -78,10 +81,14 @@
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrink\_inactive$} (IUU)
 
   (IUA) edge [in=270,out=30,looseness=0,swap] node {$shrink\_inactive$} (IRU)
-  (IRA) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (ARU)
+  (IRA) edge [out=270,in=90,looseness=0,swap] node {$shrink\_inactive$} (ARU)
 
   (IAA) edge [out=90,in=270,looseness=0]      node {$shrink\_inactive$} (ARU)
   (IAE) edge [out=90,in=270,looseness=0,swap] node {$shrink\_inactive$} (ARU)
+
+  (AUU) edge [out=160,in=200,looseness=1]     node {$shrink\_active$} (IUU)
+  (ARU) edge [out=20,in=340,looseness=1,swap] node {$shrink\_active$} (IRU)
+
   ;
 \end{tikzpicture}
 \caption{File LRU Automata}
