@@ -24,7 +24,7 @@
 
 \begin{figure}
 \center
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=3cm,
                     semithick]
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
@@ -43,18 +43,18 @@
   \node[state] (ARA) [right of=AUA] {Active \\ Referenced   \\ Accessed};
 
   \path
-  (LCK) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (IUU)
-  (IUU) edge [loop below]     node {$shrink\_inactive$} (IUU)
-  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrink\_inactive$} (IUU)
+  (LCK) edge [out=270,in=90,looseness=0,swap]      node {$shrk\_i$} (IUU)
+  (IUU) edge [loop below]     node {$shrk\_i$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
 
-  (IUA) edge [out=270,in=90,looseness=0,swap] node {$shrink\_inactive$} (AUU)
-  (IRA) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (AUU)
+  (IUA) edge [out=270,in=90,looseness=0,swap] node {$shrk\_i$} (AUU)
+  (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (AUU)
 
-  (AUU) edge [out=160,in=200,looseness=1]     node {$shrink\_active$} (IUU)
-  (ARU) edge [out=20,in=340,looseness=1,swap] node {$shrink\_active$} (IRU)
+  (AUU) edge [out=160,in=200,looseness=1]     node {$shrk\_a$} (IUU)
+  (ARU) edge [out=20,in=340,looseness=1,swap] node {$shrk\_a$} (IRU)
 
-  (AUA) edge [in=160,out=200,looseness=1,swap] node {$shrink\_active$} (IUU)
-  (ARA) edge [in=20,out=340,looseness=1]       node {$shrink\_active$} (IRU)
+  (AUA) edge [in=160,out=200,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (ARA) edge [in=20,out=340,looseness=1]       node {$shrk\_a$} (IRU)
   ;
 \end{tikzpicture}
 \caption{Anon LRU Automata}
@@ -62,7 +62,7 @@
 
 \begin{figure}
 \center
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=3cm,
                     semithick]
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
@@ -83,22 +83,28 @@
   \node[state] (AUA) [above of=LCK] {Active \\ Unreferenced \\ Accessed};
   \node[state] (ARA) [right of=AUA] {Active \\ Referenced   \\ Accessed};
 
+  \node[state] (AUAE) [below of=IAA] {Active \\ Unreferenced \\ Accessed \\ VM\_EXEC};
+  \node[state] (ARAE) [right of=AUAE] {Active \\ Referenced   \\ Accessed \\ VM\_EXEC};
+
   \path
-  (LCK) edge [out=270,in=90,looseness=0]      node {$shrink\_inactive$} (IUU)
-  (IUU) edge [loop below]     node {$shrink\_inactive$} (IUU)
-  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrink\_inactive$} (IUU)
+  (LCK) edge [out=270,in=90,looseness=0,swap]      node {$shrk\_i$} (IUU)
+  (IUU) edge [loop below]     node {$shrk\_i$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
 
-  (IUA) edge [in=270,out=30,looseness=0,swap] node {$shrink\_inactive$} (IRU)
-  (IRA) edge [out=270,in=90,looseness=0,swap] node {$shrink\_inactive$} (ARU)
+  (IUA) edge [in=270,out=30,looseness=0,swap] node {$shrk\_i$} (IRU)
+  (IRA) edge [out=270,in=90,looseness=0,swap] node {$shrk\_i$} (ARU)
 
-  (IAA) edge [out=90,in=270,looseness=0]      node {$shrink\_inactive$} (ARU)
-  (IAE) edge [out=90,in=270,looseness=0,swap] node {$shrink\_inactive$} (ARU)
+  (IAA) edge [out=90,in=270,looseness=0]      node {$shrk\_i$} (ARU)
+  (IAE) edge [out=90,in=270,looseness=0,swap] node {$shrk\_i$} (ARU)
 
-  (AUU) edge [out=160,in=200,looseness=1]     node {$shrink\_active$} (IUU)
-  (ARU) edge [out=20,in=340,looseness=1,swap] node {$shrink\_active$} (IRU)
+  (AUU) edge [out=160,in=200,looseness=1]     node {$shrk\_a$} (IUU)
+  (ARU) edge [out=20,in=340,looseness=1,swap] node {$shrk\_a$} (IRU)
 
-  (AUA) edge [in=160,out=200,looseness=1,swap] node {$shrink\_active$} (IUU)
-  (ARA) edge [in=20,out=340,looseness=1]       node {$shrink\_active$} (IRU)
+  (AUA) edge [in=160,out=200,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (ARA) edge [in=20,out=340,looseness=1]       node {$shrk\_a$} (IRU)
+
+  (AUAE) edge [out=160,in=200,looseness=1]     node {$shrk\_a$} (AUU)
+  (ARAE) edge [out=20,in=340,looseness=1,swap] node {$shrk\_a$} (ARU)
   ;
 \end{tikzpicture}
 \caption{File LRU Automata}
