@@ -35,84 +35,6 @@
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
-  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
-  \node[state]         (AU) [below of=IR] {Active \\ Unreferenced};
-  \node[state]         (AR) [below of=IU] {Active \\ Referenced};
-
-  \path
-  (IU) edge [out=160,in=120,looseness=5,align=left]      node {$vmlocked$ $\vert$ $reclaim$} (IU)
-  (IR) edge [out=130,in=45,looseness=1,swap,align=left]  node {$vmlocked$ $\vert$ $reclaim$} (IU)
-
-  (IU) edge [bend right]   node {$activate$} (AU)
-  (IR) edge [bend left=90] node {$activate$} (AU)
-  ;
-
-\end{tikzpicture}
-\caption{Anon LRU Automata}
-\end{figure}
-
-\begin{table}
-\center
-\begin{tabular}{|l|l|}
-\hline
-Transition & Condition                        \\
-\hline
-$vmlocked$ & vm\_flags \&\& VM\_LOCKED        \\
-$activate$ & !vmlocked \&\&  referenced\_ptes \\
-$reclaim$  & !vmlocked \&\& !referenced\_ptes \\
-\hline
-\end{tabular}
-\caption{Anon LRU Automata Legend}
-\end{table}
-
-\begin{figure}
-\center
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
-                    semithick]
-
-  \tikzstyle{every state}=[rectangle,draw,align=left]
-
-  \node[initial,state] (IU)               {Inactive \\ Unreferenced};
-  \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
-  \node[state]         (AU) [below of=IR] {Active \\ Unreferenced};
-  \node[state]         (AR) [below of=IU] {Active \\ Referenced};
-
-  \path
-  (IU) edge [out=160,in=120,looseness=5,align=left]       node {$vmlocked$ $\vert$ $reclaim$} (IU)
-  (IR) edge [out=100,in=75,looseness=1.5,align=left,swap] node {$vmlocked$ $\vert$ $reclaim$} (IU)
-  (IU) edge [in=130,out=45,looseness=1,align=left]        node {$keep$} (IR)
-
-  (IR) edge [bend left]       node {$keep$ $\vert$ $sharing$ $\vert$ $vmexec$} (AR)
-  (IU) edge [bend right,swap] node {$sharing$ $\vert$ $vmexec$} (AR)
-  ;
-\end{tikzpicture}
-\caption{File LRU Automata}
-\end{figure}
-
-\begin{table}
-\center
-\begin{tabular}{|l|l|}
-\hline
-Transition & Condition \\
-\hline
-$vmlocked$ &                                       vm\_flags \&\& VM\_LOCKED  \\
-$keep$     & !vmlocked \&\& referenced\_ptes                                  \\
-$vmexec$   & $keep$    \&\&                        vm\_flags \&\& VM\_EXEC    \\
-$sharing$  & $keep$    \&\& referenced\_ptes $>$ 1                            \\
-$reclaim$  & !vmlocked \&\& !referenced\_ptes                                 \\
-\hline
-\end{tabular}
-\caption{File LRU Automata Legend}
-\end{table}
-
-\begin{figure}
-\center
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
-                    semithick]
-
-  \tikzstyle{every state}=[rectangle,draw,align=left]
-
   \node[initial,state] (IUU)                {Inactive \\ Unreferenced \\ Unaccessed};
   \node[initial,state] (IRU) [right of=IUU] {Inactive \\ Referenced   \\ Unaccessed};
   \node[initial,state] (LCK) [above of=IUU] {Inactive \\ VM\_LOCKED};
@@ -162,7 +84,7 @@ $reclaim$  & !vmlocked \&\& !referenced\_ptes                                 \\
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
   (IUU) edge [out=160,in=120,looseness=5]     node {$reclaim$} (IUU)
-  (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
 
   (IUA) edge [in=270,out=30,looseness=0,swap] node {$keep$} (IRU)
   (IRA) edge [out=270,in=90,looseness=0]      node {$activate$} (ARU)
