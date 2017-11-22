@@ -99,29 +99,69 @@ shrink_active_list:
 1843:    ClearPageActive(page);  /* we are de-activating */
 ```
 
+
 ```
-include/linux/mm_inline.h:75:       __ClearPageActive(page);
-include/linux/page-flags.h:652:  SetPageActive(page);
-include/linux/page-flags.h:658:  __ClearPageActive(page);
-include/linux/page-flags.h:664:  ClearPageActive(page);
-mm/filemap.c:718:       SetPageActive(page);
-mm/filemap.c:721:       ClearPageActive(page);
+add_to_page_cache_lru:
+mm/filemap.c:718:       SetPageActive(page);     # if   (shadow && workingset_refault(shadow))
+mm/filemap.c:721:       ClearPageActive(page);   # if (!(shadow && workingset_refault(shadow)))
+
+pagecache_get_page:
+                 :no_page:
+                 :
+                 :      /* Init accessed so avoid atomic mark_page_accessed later */
+                 :      if (fgp_flags & FGP_ACCESSED)
 mm/filemap.c:1207:         __SetPageReferenced(page);
+```
+
+```
+shmem_getpage_gfp:
+               :      page = shmem_alloc_page(gfp, info, index);
+               :
+               :      if (sgp == SGP_WRITE)
 mm/shmem.c:1282:        __SetPageReferenced(page);
+```
+
+```
+__activate_page:
 mm/swap.c:266:    SetPageActive(page);
+
+__lru_cache_activate_page:
 mm/swap.c:343:       SetPageActive(page);
+
+mark_page_accessed:
+               * When a newly allocated page is not yet visible, so safe for non-atomic ops,
 mm/swap.c:359: * __SetPageReferenced(page) may be substituted for mark_page_accessed(page).
 mm/swap.c:377:    ClearPageReferenced(page);
 mm/swap.c:381:    SetPageReferenced(page);
+
+lru_cache_add_anon:
 mm/swap.c:406:    ClearPageActive(page);
+
+lru_cache_add_file
 mm/swap.c:413:    ClearPageActive(page);
+
+add_page_to_unevictable_list:
 mm/swap.c:451: ClearPageActive(page);
+
+lru_cache_add_active_or_unevictable:
 mm/swap.c:474:    SetPageActive(page);
+
+lru_deactivate_file_fn:
 mm/swap.c:534: ClearPageActive(page);
 mm/swap.c:535: ClearPageReferenced(page);
+
+lru_deactivate_fn:
 mm/swap.c:568:    ClearPageActive(page);
 mm/swap.c:569:    ClearPageReferenced(page);
+
+release_pages:
 mm/swap.c:768:    __ClearPageActive(page);
+```
+
+```
+release_pages:
+page_off_lru:
+include/linux/mm_inline.h:75:       __ClearPageActive(page);
 ```
 
 ### Unrelated grep results
@@ -154,4 +194,11 @@ mm/migrate.c:1812:         SetPageActive(page);
 High level machine check handler. Handles pages reported by the hardware as being corrupted usually due to a multi-bit ECC memory or cache failure.
 ```
 mm/memory-failure.c:536:      ClearPageActive(p);
+```
+
+PageSlabPfmemalloc
+```
+include/linux/page-flags.h:652:  SetPageActive(page);
+include/linux/page-flags.h:658:  __ClearPageActive(page);
+include/linux/page-flags.h:664:  ClearPageActive(page);
 ```
