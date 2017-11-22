@@ -37,21 +37,15 @@
 
   \node[initial,state] (IU)               {Inactive \\ Unreferenced};
   \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
-  \node[state] (AU) [below of=IR] {Active \\ Unreferenced};
-  \node[state] (AR) [below of=IU] {Active \\ Referenced};
+  \node[state]         (AU) [below of=IR] {Active \\ Unreferenced};
+  \node[state]         (AR) [below of=IU] {Active \\ Referenced};
 
   \path
-  %(IU) edge [out=160,in=120,looseness=5]      node {$vmlocked$} (IU)
-  %(IU) edge [in=240,out=200,looseness=5,swap] node {$reclaim$}  (IU)
   (IU) edge [out=160,in=120,looseness=5,align=left]      node {$vmlocked$ $\vert$ $reclaim$} (IU)
-
-  %(IR) edge [out=130,in=45,looseness=1,swap]  node {$vmlocked$} (IU)
-  %(IR) edge [bend left]                       node {$reclaim$}  (IU)
   (IR) edge [out=130,in=45,looseness=1,swap,align=left]  node {$vmlocked$ $\vert$ $reclaim$} (IU)
 
   (IU) edge [bend right]   node {$activate$} (AU)
   (IR) edge [bend left=90] node {$activate$} (AU)
-  
   ;
 
 \end{tikzpicture}
@@ -81,17 +75,15 @@ $reclaim$  & !vmlocked \&\& !referenced\_ptes \\
 
   \node[initial,state] (IU)               {Inactive \\ Unreferenced};
   \node[initial,state] (IR) [right of=IU] {Inactive \\ Referenced};
-  \node[state] (AU) [below of=IR] {Active \\ Unreferenced};
-  \node[state] (AR) [below of=IU] {Active \\ Referenced};
+  \node[state]         (AU) [below of=IR] {Active \\ Unreferenced};
+  \node[state]         (AR) [below of=IU] {Active \\ Referenced};
 
   \path
-  (IU) edge [out=160,in=120,looseness=5,align=left]      node {$vmlocked$ $\vert$ $reclaim$} (IU)
+  (IU) edge [out=160,in=120,looseness=5,align=left]       node {$vmlocked$ $\vert$ $reclaim$} (IU)
+  (IR) edge [out=100,in=75,looseness=1.5,align=left,swap] node {$vmlocked$ $\vert$ $reclaim$} (IU)
+  (IU) edge [in=130,out=45,looseness=1,align=left]        node {$keep$} (IR)
 
-  (IR) edge [out=100,in=75,looseness=1.5,align=left,swap]  node {$vmlocked$ $\vert$ $reclaim$} (IU)
-  (IU) edge [in=130,out=45,looseness=1,align=left] node {$keep$} (IR)
-
-  (IR) edge [bend left] node {$keep$ $\vert$ $sharing$ $\vert$ $vmexec$} (AR)
-  
+  (IR) edge [bend left]       node {$keep$ $\vert$ $sharing$ $\vert$ $vmexec$} (AR)
   (IU) edge [bend right,swap] node {$sharing$ $\vert$ $vmexec$} (AR)
   ;
 \end{tikzpicture}
@@ -102,13 +94,13 @@ $reclaim$  & !vmlocked \&\& !referenced\_ptes \\
 \center
 \begin{tabular}{|l|l|}
 \hline
-Transition & Condition                        \\
+Transition & Condition \\
 \hline
-$vmlocked$ & vm\_flags \&\& VM\_LOCKED        \\
-$keep$     & !vmlocked \&\& referenced\_ptes   \\
-$vmexec$   & $keep$ \&\& vm\_flags \&\& VM\_EXEC \\
-$sharing$ & $keep$ \&\&  referenced\_ptes $>$ 1 \\
-$reclaim$  & !vmlocked \&\& !referenced\_ptes \\
+$vmlocked$ &                                       vm\_flags \&\& VM\_LOCKED  \\
+$keep$     & !vmlocked \&\& referenced\_ptes                                  \\
+$vmexec$   & $keep$    \&\&                        vm\_flags \&\& VM\_EXEC    \\
+$sharing$  & $keep$    \&\& referenced\_ptes $>$ 1                            \\
+$reclaim$  & !vmlocked \&\& !referenced\_ptes                                 \\
 \hline
 \end{tabular}
 \caption{File LRU Automata Legend}
