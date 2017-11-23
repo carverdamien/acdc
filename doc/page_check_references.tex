@@ -47,7 +47,7 @@
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
-  (IUU) edge [out=160,in=120,looseness=5]     node {$reclaim$} (IUU)
+  (IUU) edge [loop below]     node {$reclaim$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim$} (IUU)
 
   (IUA) edge [out=270,in=90,looseness=0,swap] node {$activate$} (AUU)
@@ -74,23 +74,78 @@
   \node[state]         (AUU) [below of=IUA] {Active   \\ Unreferenced \\ Unaccessed};
   \node[state]         (ARU) [right of=AUU] {Active   \\ Referenced   \\ Unaccessed};
 
-  \node[initial,state] (IAA) [below of=AUU] {Inactive \\ Accessed $>$ 1};
-  \node[initial,state] (IAE) [right of=IAA] {Inactive \\ VM\_EXEC \\ Accessed};
+  \path
+  (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
+  (IUU) edge [loop below]     node {$reclaim$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
 
+  (IUA) edge [in=270,out=30,looseness=0,swap] node {$keep$} (IRU)
+  (IRA) edge [out=270,in=90,looseness=0]      node {$activate$} (ARU)
+  ;
+\end{tikzpicture}
+\caption{File LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (IUU)                {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) [right of=IUU] {Inactive \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (LCK) [above of=IUU] {Inactive \\ VM\_LOCKED};
+
+  \node[initial,state] (IUA) [below of=IUU] {Inactive \\ Unreferenced \\ Accessed  };
+  \node[initial,state] (IRA) [right of=IUA] {Inactive \\ Referenced   \\ Accessed  };
+
+  \node[state]         (AUU) [below of=IUA] {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) [right of=AUU] {Active   \\ Referenced   \\ Unaccessed};
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
-  (IUU) edge [out=160,in=120,looseness=5]     node {$reclaim$} (IUU)
+  (IUU) edge [loop below]     node {$reclaim$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
+
+  (IRA) edge [out=270,in=90,looseness=0]      node {$activate$} (ARU)
+
+  (IUA) edge [in=90,out=270,looseness=0,swap] node {$activate$} (ARU)
+  ;
+\end{tikzpicture}
+\caption{VM\_EXEC File LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[initial,state] (IUU)                {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) [right of=IUU] {Inactive \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (LCK) [above of=IUU] {Inactive \\ VM\_LOCKED};
+
+  \node[initial,state] (IUA) [below of=IUU] {Inactive \\ Unreferenced \\ Accessed};
+  \node[initial,state] (IRA) [right of=IUA] {Inactive \\ Referenced   \\ Accessed};
+  \node[initial,state] (IAA) [left  of=IUA] {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+
+  \node[state]         (AUU) [below of=IUA] {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) [right of=AUU] {Active   \\ Referenced   \\ Unaccessed};
+
+  \path
+  (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
+  (IUU) edge [loop below]     node {$reclaim$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
 
   (IUA) edge [in=270,out=30,looseness=0,swap] node {$keep$} (IRU)
   (IRA) edge [out=270,in=90,looseness=0]      node {$activate$} (ARU)
 
-  (IAA) edge [out=90,in=270,looseness=0]      node {$activate$} (ARU)
-  (IAE) edge [out=90,in=270,looseness=0,swap] node {$activate$} (ARU)
+  (IAA) edge [in=90,out=270,looseness=0,swap]      node {$activate$} (ARU)
   ;
 \end{tikzpicture}
-\caption{File LRU Automata}
+\caption{Shmem LRU Automata}
 \end{figure}
 
 \end{document}
