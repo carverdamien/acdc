@@ -1,12 +1,83 @@
 digraph G {
+
 NYA [label="Not Idle\nYoung\nAccesed"];
 IYA [label="Idle\nYoung\nAccesed"];
 NNA [label="Not Idle\nNot Young\nAccesed"];
 INA [label="Idle\nNot Young\nAccesed"];
+
 NYU [label="Not Idle\nYoung\nUnaccesed"];
 IYU [label="Idle\nYoung\nUnaccesed"];
 NNU [label="Not Idle\nNot Young\nUnaccesed"];
 INU [label="Idle\nNot Young\nUnaccesed"];
+
+
+/* Accessed Unaccesed*/
+/*
+subgraph cluster_0 {
+NYA [label="Not Idle\nYoung\nAccesed"];
+IYA [label="Idle\nYoung\nAccesed"];
+NNA [label="Not Idle\nNot Young\nAccesed"];
+INA [label="Idle\nNot Young\nAccesed"];
+}
+subgraph cluster_1 {
+NYU [label="Not Idle\nYoung\nUnaccesed"];
+IYU [label="Idle\nYoung\nUnaccesed"];
+NNU [label="Not Idle\nNot Young\nUnaccesed"];
+INU [label="Idle\nNot Young\nUnaccesed"];
+}
+*/
+/* Idle Not Idle*/
+/*
+subgraph cluster_0 {
+IYU [label="Idle\nYoung\nUnaccesed"];
+INU [label="Idle\nNot Young\nUnaccesed"];
+IYA [label="Idle\nYoung\nAccesed"];
+INA [label="Idle\nNot Young\nAccesed"];
+}
+subgraph cluster_1 {
+NYA [label="Not Idle\nYoung\nAccesed"];
+NNA [label="Not Idle\nNot Young\nAccesed"];
+NYU [label="Not Idle\nYoung\nUnaccesed"];
+NNU [label="Not Idle\nNot Young\nUnaccesed"];
+}
+*/
+/* Young Not Young*/
+/*
+subgraph cluster_0 {
+NYA [label="Not Idle\nYoung\nAccesed"];
+NYU [label="Not Idle\nYoung\nUnaccesed"];
+IYU [label="Idle\nYoung\nUnaccesed"];
+IYA [label="Idle\nYoung\nAccesed"];
+}
+subgraph cluster_1 {
+NNA [label="Not Idle\nNot Young\nAccesed"];
+NNU [label="Not Idle\nNot Young\nUnaccesed"];
+INU [label="Idle\nNot Young\nUnaccesed"];
+INA [label="Idle\nNot Young\nAccesed"];
+}
+/*
+/*
+{
+rank=same
+NYA [label="Not Idle\nYoung\nAccesed"];
+IYA [label="Idle\nYoung\nAccesed"];
+}
+{
+rank=same
+NNA [label="Not Idle\nNot Young\nAccesed"];
+INA [label="Idle\nNot Young\nAccesed"];
+}
+{
+rank=same
+NYU [label="Not Idle\nYoung\nUnaccesed"];
+IYU [label="Idle\nYoung\nUnaccesed"];
+}
+{
+rank=same
+NNU [label="Not Idle\nNot Young\nUnaccesed"];
+INU [label="Idle\nNot Young\nUnaccesed"];
+}
+*/
 
 NYA -> IYU [label="write"];
 IYA -> IYU [label="write"];

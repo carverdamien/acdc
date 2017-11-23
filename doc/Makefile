@@ -9,7 +9,7 @@ all: $(TARGET)
 	pdflatex $<
 
 %.pdf:%.dot
-	dot -Tpdf -o$@ $<
+	circo -Tpdf -o$@ $<
 
 clean:
 	rm -f $(CLEAN)
