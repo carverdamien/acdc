@@ -37,15 +37,14 @@
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[initial,state] (IUU) at (0,0)      {Inactive \\ Unreferenced \\ Unaccessed};
-  \node[initial,state] (IRU) at (\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
-  \node[initial,state] (LCK) at (0,\D)     {Inactive \\ VM\_LOCKED};
-
-  \node[initial,state] (IUA) at (0,-\D)    {Inactive \\ Unreferenced \\ Accessed  };
-  \node[initial,state] (IRA) at (\D,-\D)   {Inactive \\ Referenced   \\ Accessed  };
-
-  \node[state]         (AUU) at (0,-2*\D)  {Active   \\ Unreferenced \\ Unaccessed};
-  \node[state]         (ARU) at (\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[initial,state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[initial,state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  %\node[initial,state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state]         (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
@@ -66,15 +65,14 @@
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[initial,state] (IUU) at (0,0)      {Inactive \\ Unreferenced \\ Unaccessed};
-  \node[initial,state] (IRU) at (\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
-  \node[initial,state] (LCK) at (0,\D)     {Inactive \\ VM\_LOCKED};
-
-  \node[initial,state] (IUA) at (0,-\D)    {Inactive \\ Unreferenced \\ Accessed  };
-  \node[initial,state] (IRA) at (\D,-\D)   {Inactive \\ Referenced   \\ Accessed  };
-
-  \node[state]         (AUU) at (0,-2*\D)  {Active   \\ Unreferenced \\ Unaccessed};
-  \node[state]         (ARU) at (\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[initial,state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[initial,state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  %\node[initial,state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state]         (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
@@ -95,15 +93,14 @@
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[initial,state] (IUU) at (0,0)      {Inactive \\ Unreferenced \\ Unaccessed};
-  \node[initial,state] (IRU) at (\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
-  \node[initial,state] (LCK) at (0,\D)     {Inactive \\ VM\_LOCKED};
-
-  \node[initial,state] (IUA) at (0,-\D)    {Inactive \\ Unreferenced \\ Accessed  };
-  \node[initial,state] (IRA) at (\D,-\D)   {Inactive \\ Referenced   \\ Accessed  };
-
-  \node[state]         (AUU) at (0,-2*\D)  {Active   \\ Unreferenced \\ Unaccessed};
-  \node[state]         (ARU) at (\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[initial,state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[initial,state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  %\node[initial,state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state]         (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
@@ -125,16 +122,14 @@
 
   \tikzstyle{every state}=[rectangle,draw,align=left]
 
-  \node[initial,state] (IUU) at (0,0)      {Inactive \\ Unreferenced \\ Unaccessed};
-  \node[initial,state] (IRU) at (\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
-  \node[initial,state] (LCK) at (0,\D)     {Inactive \\ VM\_LOCKED};
-
-  \node[initial,state] (IUA) at (0,-\D)    {Inactive \\ Unreferenced \\ Accessed};
-  \node[initial,state] (IRA) at (\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
-  \node[initial,state] (IAA) at (-\D,-\D)  {Inactive \\ Unreferenced \\ Accessed $>$ 1};
-
-  \node[state]         (AUU) at (0,-2*\D)  {Active   \\ Unreferenced \\ Unaccessed};
-  \node[state]         (ARU) at (\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[initial,state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[initial,state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[initial,state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[initial,state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  \node[initial,state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state]         (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state]         (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
