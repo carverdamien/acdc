@@ -210,8 +210,8 @@ include/linux/page-flags.h:664:  ClearPageActive(page);
 page_idle_bitmap_{read,write}:
 page_idle_clear_pte_refs:
 page_idle_clear_pte_refs_one:
-mm/page_idle.c:79:    clear_page_idle(page);
-mm/page_idle.c:85:    set_page_young(page);
+mm/page_idle.c:79:    clear_page_idle(page); # if (referenced)
+mm/page_idle.c:85:    set_page_young(page);  # if (referenced)
 
 page_idle_bitmap_write:
 mm/page_idle.c:187:       set_page_idle(page);
