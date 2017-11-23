@@ -1,0 +1,43 @@
+digraph G {
+NYA [label="Not Idle\nYoung\nAccesed"];
+IYA [label="Idle\nYoung\nAccesed"];
+NNA [label="Not Idle\nNot Young\nAccesed"];
+INA [label="Idle\nNot Young\nAccesed"];
+NYU [label="Not Idle\nYoung\nUnaccesed"];
+IYU [label="Idle\nYoung\nUnaccesed"];
+NNU [label="Not Idle\nNot Young\nUnaccesed"];
+INU [label="Idle\nNot Young\nUnaccesed"];
+
+NYA -> IYU [label="write"];
+IYA -> IYU [label="write"];
+NNA -> IYU [label="write"];
+INA -> IYU [label="write"];
+IYU -> IYU [label="write"];
+NYU -> IYU [label="write"];
+NNU -> INU [label="write"];
+INU -> INU [label="write"];
+
+NYA -> NYU [label="read"];
+IYA -> NYU [label="read"];
+NNA -> NNA [label="read"];
+INA -> NYU [label="read"];
+IYU -> IYU [label="read"];
+NYU -> NYU [label="read"];
+NNU -> NNU [label="read"];
+INU -> INU [label="read"];
+
+NYA -> NNU [label="shrink"];
+IYA -> NNU [label="shrink"];
+INA -> NNU [label="shrink"];
+NNA -> NNU [label="shrink"];
+NYU -> NNU [label="shrink"];
+IYU -> INU [label="shrink"];
+INU -> INU [label="shrink"];
+NNU -> NNU [label="shrink"];
+
+IYA -> NYA [label="mpa"];
+INA -> NNA [label="mpa"];
+IYU -> NYU [label="mpa"];
+INU -> NNU [label="mpa"];
+}
+

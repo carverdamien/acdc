@@ -1,11 +1,15 @@
-SRC=$(wildcard *.tex)
-TARGET=$(SRC:%.tex=%.pdf)
-CLEAN=$(foreach src,$(SRC),$(foreach ext,log aux,$(src:%.tex=%).$(ext)))
+DOT=$(wildcard *.dot)
+TEX=$(wildcard *.tex)
+TARGET=$(TEX:%.tex=%.pdf) $(DOT:%.dot=%.pdf) 
+CLEAN=$(foreach tex,$(TEX),$(foreach ext,log aux,$(tex:%.tex=%).$(ext)))
 
 all: $(TARGET)
 
 %.pdf:%.tex
 	pdflatex $<
+
+%.pdf:%.dot
+	dot -Tpdf -o$@ $<
 
 clean:
 	rm -f $(CLEAN)
