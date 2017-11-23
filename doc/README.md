@@ -202,3 +202,32 @@ include/linux/page-flags.h:652:  SetPageActive(page);
 include/linux/page-flags.h:658:  __ClearPageActive(page);
 include/linux/page-flags.h:664:  ClearPageActive(page);
 ```
+
+# Idle Page Trackingfs/proc/task_mmu.c:933:		test_and_clear_page_young(page);
+`git grep -HnE 'set_page_idle|set_page_young|clear_page_idle|clear_page_young'`
+
+```
+fs/proc/task_mmu.c:961:		test_and_clear_page_young(page);
+include/linux/page_idle.h:16:static inline void set_page_young(struct page *page)
+include/linux/page_idle.h:21:static inline bool test_and_clear_page_young(struct page *page)
+include/linux/page_idle.h:31:static inline void set_page_idle(struct page *page)
+include/linux/page_idle.h:36:static inline void clear_page_idle(struct page *page)
+include/linux/page_idle.h:52:static inline void set_page_young(struct page *page)
+include/linux/page_idle.h:57:static inline bool test_and_clear_page_young(struct page *page)
+include/linux/page_idle.h:68:static inline void set_page_idle(struct page *page)
+include/linux/page_idle.h:73:static inline void clear_page_idle(struct page *page)
+include/linux/page_idle.h:86:static inline void set_page_young(struct page *page)
+include/linux/page_idle.h:90:static inline bool test_and_clear_page_young(struct page *page)
+include/linux/page_idle.h:100:static inline void set_page_idle(struct page *page)
+include/linux/page_idle.h:104:static inline void clear_page_idle(struct page *page)
+mm/huge_memory.c:3148:		set_page_young(page_tail);
+mm/huge_memory.c:3150:		set_page_idle(page_tail);
+mm/migrate.c:557:		set_page_young(newpage);
+mm/migrate.c:559:		set_page_idle(newpage);
+mm/page_idle.c:79:		clear_page_idle(page);
+mm/page_idle.c:85:		set_page_young(page);
+mm/page_idle.c:187:				set_page_idle(page);
+mm/rmap.c:931:		clear_page_idle(page);
+mm/rmap.c:932:	if (test_and_clear_page_young(page))
+mm/swap.c:384:		clear_page_idle(page);
+```
