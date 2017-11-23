@@ -47,7 +47,7 @@
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
-  (IUU) edge [loop below]     node {$reclaim$} (IUU)
+  (IUU) edge [loop below]                     node {$reclaim$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim$} (IUU)
 
   (IUA) edge [out=270,in=90,looseness=0,swap] node {$activate$} (AUU)
@@ -76,7 +76,7 @@
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
-  (IUU) edge [loop below]     node {$reclaim$} (IUU)
+  (IUU) edge [loop below]                     node {$reclaim$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
 
   (IUA) edge [in=270,out=30,looseness=0,swap] node {$keep$} (IRU)
@@ -105,7 +105,7 @@
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
-  (IUU) edge [loop below]     node {$reclaim$} (IUU)
+  (IUU) edge [loop below]                     node {$reclaim$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
 
   (IRA) edge [out=270,in=90,looseness=0]      node {$activate$} (ARU)
@@ -136,13 +136,13 @@
 
   \path
   (LCK) edge [out=270,in=90,looseness=0]      node {$reclaim$} (IUU)
-  (IUU) edge [loop below]     node {$reclaim$} (IUU)
+  (IUU) edge [loop below]                     node {$reclaim$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$reclaim\_clean$} (IUU)
 
   (IUA) edge [in=270,out=30,looseness=0,swap] node {$keep$} (IRU)
   (IRA) edge [out=270,in=90,looseness=0]      node {$activate$} (ARU)
 
-  (IAA) edge [in=90,out=270,looseness=0,swap]      node {$activate$} (ARU)
+  (IAA) edge [in=90,out=270,looseness=0,swap] node {$activate$} (ARU)
   ;
 \end{tikzpicture}
 \caption{Shmem LRU Automata}
