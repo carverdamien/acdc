@@ -207,8 +207,38 @@ include/linux/page-flags.h:664:  ClearPageActive(page);
 `git grep -HnE 'set_page_idle|set_page_young|clear_page_idle|clear_page_young'`
 
 ```
+page_idle_bitmap_{read,write}:
+page_idle_clear_pte_refs:
+page_idle_clear_pte_refs_one:
+mm/page_idle.c:79:    clear_page_idle(page);
+mm/page_idle.c:85:    set_page_young(page);
+
+page_idle_bitmap_write:
+mm/page_idle.c:187:       set_page_idle(page);
+```
+
+From PFRA:
+```
+page_referenced_one:
+mm/rmap.c:931:    clear_page_idle(page);
+mm/rmap.c:932:  if (test_and_clear_page_young(page))
+```
+
+```
+mark_page_accessed:
+mm/swap.c:384:    clear_page_idle(page);
+```
+
+### Unrelated grep results
+
+`/proc/[pid]/clear_refs`
+```
 fs/proc/task_mmu.c:933: test_and_clear_page_young(page);
 fs/proc/task_mmu.c:961:		test_and_clear_page_young(page);
+```
+
+inline.
+```
 include/linux/page_idle.h:16:static inline void set_page_young(struct page *page)
 include/linux/page_idle.h:21:static inline bool test_and_clear_page_young(struct page *page)
 include/linux/page_idle.h:31:static inline void set_page_idle(struct page *page)
@@ -221,14 +251,17 @@ include/linux/page_idle.h:86:static inline void set_page_young(struct page *page
 include/linux/page_idle.h:90:static inline bool test_and_clear_page_young(struct page *page)
 include/linux/page_idle.h:100:static inline void set_page_idle(struct page *page)
 include/linux/page_idle.h:104:static inline void clear_page_idle(struct page *page)
+```
+
+page split.
+```
 mm/huge_memory.c:3148:		set_page_young(page_tail);
 mm/huge_memory.c:3150:		set_page_idle(page_tail);
+```
+
+migration.
+```
 mm/migrate.c:557:		set_page_young(newpage);
 mm/migrate.c:559:		set_page_idle(newpage);
-mm/page_idle.c:79:		clear_page_idle(page);
-mm/page_idle.c:85:		set_page_young(page);
-mm/page_idle.c:187:				set_page_idle(page);
-mm/rmap.c:931:		clear_page_idle(page);
-mm/rmap.c:932:	if (test_and_clear_page_young(page))
-mm/swap.c:384:		clear_page_idle(page);
 ```
+
