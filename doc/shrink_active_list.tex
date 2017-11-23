@@ -34,11 +34,11 @@
 
   \node[state]         (IU)               {Inactive \\ Unaccessed};
   \node[initial,state] (AU) [above of=IU] {Active   \\ Unaccessed};
-  \node[initial,state] (AA) [below of=IU] {Active   \\ Accessed  };
+  \node[initial,state] (AA) [right of=AU] {Active   \\ Accessed  };
 
   \path
   (AU) edge [in=90,out=270,looseness=0,swap] node {$deactivate$} (IU)
-  (AA) edge [out=90,in=270,looseness=0]      node {$deactivate$} (IU)
+  (AA) edge [in=90,out=270,looseness=0]      node {$deactivate$} (IU)
   ;
 
 \end{tikzpicture}
@@ -54,16 +54,33 @@
 
   \node[state]         (IU)               {Inactive \\ Unaccessed};
   \node[initial,state] (AU) [above of=IU] {Active   \\ Unaccessed};
-  \node[initial,state] (AA) [below of=IU] {Active   \\ Accessed  };
-  \node[initial,state] (AE) [above of=AU] { Active   \\ Accessed   \\ VM\_EXEC };
+  \node[initial,state] (AA) [right of=AU] {Active   \\ Accessed  };
 
   \path
-  (AE) edge [in=90,out=270,looseness=0,swap] node {$keep$} (AU)
   (AU) edge [in=90,out=270,looseness=0,swap] node {$deactivate$} (IU)
-  (AA) edge [out=90,in=270,looseness=0]      node {$deactivate$} (IU)
+  (AA) edge [in=90,out=270,looseness=0]      node {$deactivate$} (IU)
   ;
 \end{tikzpicture}
 \caption{File LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state]         (IU)               {Inactive \\ Unaccessed};
+  \node[initial,state] (AU) [above of=IU] {Active   \\ Unaccessed};  
+  \node[initial,state] (AA) [right of=AU] {Active   \\ Accessed};
+
+  \path
+  (AA) edge [in=90,out=90,looseness=1,swap] node {$keep$} (AU)
+  (AU) edge [in=90,out=270,looseness=0,swap] node {$deactivate$} (IU)
+  ;
+\end{tikzpicture}
+\caption{VM\_EXEC File LRU Automata}
 \end{figure}
 
 \end{document}
