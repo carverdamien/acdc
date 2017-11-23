@@ -203,10 +203,11 @@ include/linux/page-flags.h:658:  __ClearPageActive(page);
 include/linux/page-flags.h:664:  ClearPageActive(page);
 ```
 
-# Idle Page Trackingfs/proc/task_mmu.c:933:		test_and_clear_page_young(page);
+# Idle Page Tracking
 `git grep -HnE 'set_page_idle|set_page_young|clear_page_idle|clear_page_young'`
 
 ```
+fs/proc/task_mmu.c:933: test_and_clear_page_young(page);
 fs/proc/task_mmu.c:961:		test_and_clear_page_young(page);
 include/linux/page_idle.h:16:static inline void set_page_young(struct page *page)
 include/linux/page_idle.h:21:static inline bool test_and_clear_page_young(struct page *page)
