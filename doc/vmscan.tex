@@ -49,6 +49,12 @@
 
   (IUA) edge [out=270,in=90,looseness=0,swap] node {$shrk\_i$} (AUU)
   (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (AUU)
+
+  (AUU) edge [in=180,out=180,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (AUA) edge [in=180,out=180,looseness=1]      node {$shrk\_a$} (IUU)
+
+  (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
+  (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (IRU)
   ;
 \end{tikzpicture}
 \caption{Anon LRU Automata}
