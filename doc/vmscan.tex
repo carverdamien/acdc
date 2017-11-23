@@ -126,6 +126,12 @@
   (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (ARU)
 
   (IUA) edge [in=90,out=270,looseness=0,swap] node {$shrk\_i$} (ARU)
+
+  (AUU) edge [in=180,out=180,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (AUA) edge [in=180,out=180,looseness=1]      node {$shrk\_a$} (AUU)
+
+  (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
+  (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (ARU)
   ;
 \end{tikzpicture}
 \caption{VM\_EXEC File LRU Automata}
