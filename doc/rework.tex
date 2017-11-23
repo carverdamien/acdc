@@ -87,7 +87,7 @@
   \draw node at (.5*\D - 2*\D,2*\D) {Reclaimable};
   \draw[-,dashed] (.5*\D - \D, -0.75*\D) -- (.5*\D - \D, 2.25*\D);
 
-
+  \node[state] (IAA) at (0*\D, .5*\D) {Inactive \\ Unreferenced \\ Accessed $>$ 1};
   \node[state] (IUA) at (0*\D, 2*\D)  {Inactive \\ Unreferenced \\ Accessed};
   \node[state] (IRA) at (1*\D, 2*\D)  {Inactive \\ Referenced   \\ Accessed};
   \node[state] (AUA) at (2*\D, 2*\D)  {Active   \\ Unreferenced \\ Accessed};
@@ -107,6 +107,7 @@
   ;
   
   \path
+  (IAA) edge [out=0,in=90,looseness=1,pos=0.2] node {$shrink$} (ARU)
   (IUA) edge [out=270,in=90,looseness=1,pos=0.1] node {$shrink$} (IRU)
   (IRA) edge [out=270,in=90,looseness=1,pos=0.1] node {$shrink$} (ARU)
 
