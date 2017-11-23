@@ -1,0 +1,227 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+\lstset{escapechar=@,style=customc}
+
+\newcommand\D{4}
+\newcommand\scale{.8}
+
+\begin{document}
+
+\begin{figure}
+\center
+\scalebox{\scale}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=\D{}cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  %\node[state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state] (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state] (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[state] (AUA) at (0,-3*\D)    {Active   \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) at (2*\D,-3*\D)  {Active   \\ Referenced   \\ Accessed};
+
+  \path
+  (LCK) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (IUU)
+  (IUU) edge [loop below]                     node {$shrk\_i$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
+
+  (IUA) edge [out=270,in=90,looseness=0,swap] node {$shrk\_i$} (AUU)
+  (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (AUU)
+
+  (AUU) edge [in=180,out=180,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (AUA) edge [in=180,out=180,looseness=1]      node {$shrk\_a$} (IUU)
+
+  (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
+  (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (IRU)
+
+  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [bend  left] node {$mpa$} (AUU)
+  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
+  (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
+  (IRA) edge [bend  left] node {$mpa$} (AUA)
+  %(IAA) edge [bend left] node {$mpa$} ()
+  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [loop below] node {$mpa$} (ARU)
+  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [loop below] node {$mpa$} (ARA)
+  ;
+\end{tikzpicture}
+}
+\caption{Anon LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\scalebox{\scale}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=\D{}cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  %\node[state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state] (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state] (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[state] (AUA) at (0,-3*\D)    {Active   \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) at (2*\D,-3*\D)  {Active   \\ Referenced   \\ Accessed};
+
+  \path
+  (LCK) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (IUU)
+  (IUU) edge [loop below]                     node {$shrk\_i$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
+
+  (IUA) edge [in=270,out=30,looseness=0,swap] node {$shrk\_i$} (IRU)
+  (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (ARU)
+
+  (AUU) edge [in=180,out=180,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (AUA) edge [in=180,out=180,looseness=1]      node {$shrk\_a$} (IUU)
+
+  (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
+  (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (IRU)
+
+  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [bend  left] node {$mpa$} (AUU)
+  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
+  (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
+  (IRA) edge [bend  left] node {$mpa$} (AUA)
+  %(IAA) edge [bend left] node {$mpa$} ()
+  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [loop below] node {$mpa$} (ARU)
+  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [loop below] node {$mpa$} (ARA)
+  ;
+\end{tikzpicture}
+}
+\caption{File LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\scalebox{\scale}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=\D{}cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  %\node[state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state] (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state] (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[state] (AUA) at (0,-3*\D)    {Active   \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) at (2*\D,-3*\D)  {Active   \\ Referenced   \\ Accessed};
+
+  \path
+  (LCK) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (IUU)
+  (IUU) edge [loop below]                     node {$shrk\_i$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
+
+  (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (ARU)
+
+  (IUA) edge [in=90,out=270,looseness=0,swap] node {$shrk\_i$} (ARU)
+
+  (AUU) edge [in=180,out=180,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (AUA) edge [in=180,out=180,looseness=1]      node {$shrk\_a$} (AUU)
+
+  (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
+  (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (ARU)
+
+  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [bend  left] node {$mpa$} (AUU)
+  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
+  (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
+  (IRA) edge [bend  left] node {$mpa$} (AUA)
+  %(IAA) edge [bend left] node {$mpa$} ()
+  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [loop below] node {$mpa$} (ARU)
+  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [loop below] node {$mpa$} (ARA)
+  ;
+\end{tikzpicture}
+}
+\caption{VM\_EXEC File LRU Automata}
+\end{figure}
+
+\begin{figure}
+\center
+\scalebox{\scale}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=\D{}cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state] (IUU) at (0,0)        {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[state] (IRU) at (2*\D,0)     {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state] (LCK) at (0,\D)       {Inactive \\ VM\_LOCKED};
+  \node[state] (IUA) at (0,-\D)      {Inactive \\ Unreferenced \\ Accessed};
+  \node[state] (IRA) at (2*\D,-\D)   {Inactive \\ Referenced   \\ Accessed};
+  \node[state] (IAA) at (\D,-\D)     {Inactive \\ Unreferenced \\ Accessed $>$ 1};
+  \node[state] (AUU) at (0,-2*\D)    {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state] (ARU) at (2*\D,-2*\D) {Active   \\ Referenced   \\ Unaccessed};
+  \node[state] (AUA) at (0,-3*\D)    {Active   \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) at (2*\D,-3*\D)  {Active   \\ Referenced   \\ Accessed};
+
+  \path
+  (LCK) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (IUU)
+  (IUU) edge [loop below]                     node {$shrk\_i$} (IUU)
+  (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
+
+  (IUA) edge [in=270,out=30,looseness=0,swap] node {$shrk\_i$} (IRU)
+  (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (ARU)
+
+  (IAA) edge [in=90,out=270,looseness=0,swap] node {$shrk\_i$} (ARU)
+
+  (AUU) edge [in=180,out=180,looseness=1,swap] node {$shrk\_a$} (IUU)
+  (AUA) edge [in=180,out=180,looseness=1]      node {$shrk\_a$} (IUU)
+
+  (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
+  (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (IRU)
+
+  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [bend  left] node {$mpa$} (AUU)
+  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
+  (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
+  (IRA) edge [bend  left] node {$mpa$} (AUA)
+  %(IAA) edge [bend left] node {$mpa$} ()
+  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [loop below] node {$mpa$} (ARU)
+  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [loop below] node {$mpa$} (ARA)
+  ;
+\end{tikzpicture}
+}
+\caption{Shmem File LRU Automata}
+\end{figure}
+
+\end{document}
