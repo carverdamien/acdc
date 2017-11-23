@@ -69,4 +69,120 @@
 \caption{Anon LRU Automata}
 \end{figure}
 \end{landscape}
+
+\begin{landscape}
+\begin{figure}
+\center
+\scalebox{\scale}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=\D{}cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state] (IUU) at (0*\D - 2*\D,0)  {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[state] (IRU) at (1*\D - 2*\D,0)  {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state] (AUU) at (2*\D - 2*\D,0)  {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state] (ARU) at (3*\D - 2*\D,0)  {Active   \\ Referenced   \\ Unaccessed};
+
+  \draw node at (.5*\D - 2*\D,2*\D) {Reclaimable};
+  \draw[-,dashed] (.5*\D - \D, -0.75*\D) -- (.5*\D - \D, 2.25*\D);
+
+
+  \node[state] (IUA) at (0*\D, 2*\D)  {Inactive \\ Unreferenced \\ Accessed};
+  \node[state] (IRA) at (1*\D, 2*\D)  {Inactive \\ Referenced   \\ Accessed};
+  \node[state] (AUA) at (2*\D, 2*\D)  {Active   \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) at (3*\D, 2*\D)  {Active   \\ Referenced   \\ Accessed};
+
+
+  \path
+  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [out=0,in=180,looseness=0] node {$mpa$} (AUU)
+  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [loop right] node {$mpa$} (ARU)
+
+  (IUA) edge [out=0,in=180,looseness=0] node {$mpa$} (IRA)
+  (IRA) edge [out=0,in=180,looseness=0] node {$mpa$} (AUA)
+  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [loop right] node {$mpa$} (ARA)
+  ;
+  
+  \path
+  (IUA) edge [out=270,in=90,looseness=1,pos=0.1] node {$shrink$} (IRU)
+  (IRA) edge [out=270,in=90,looseness=1,pos=0.1] node {$shrink$} (ARU)
+
+  (IUU) edge [loop below]                        node {$shrink$} (IUU)
+  (IRU) edge [out=230,in=315,looseness=1,swap]   node {$shrink$} (IUU)
+  ;
+
+  \path
+  (AUA) edge [in=90,out=270,looseness=.8,pos=0.1] node {$shrink$} (IUU)
+  (ARA) edge [in=90,out=270,looseness=.8,pos=0.1] node {$shrink$} (IRU)
+
+  (AUU) edge [out=230,in=315,looseness=1] node {$shrink$} (IUU)
+  (ARU) edge [out=230,in=315,looseness=1] node {$shrink$} (IRU)
+  ;
+
+\end{tikzpicture}
+}
+\caption{File LRU Automata}
+\end{figure}
+\end{landscape}
+
+\begin{landscape}
+\begin{figure}
+\center
+\scalebox{\scale}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=\D{}cm,
+                    semithick]
+
+  \tikzstyle{every state}=[rectangle,draw,align=left]
+
+  \node[state] (IUU) at (0*\D - 2*\D,0)  {Inactive \\ Unreferenced \\ Unaccessed};
+  \node[state] (IRU) at (1*\D - 2*\D,0)  {Inactive \\ Referenced   \\ Unaccessed};
+  \node[state] (AUU) at (2*\D - 2*\D,0)  {Active   \\ Unreferenced \\ Unaccessed};
+  \node[state] (ARU) at (3*\D - 2*\D,0)  {Active   \\ Referenced   \\ Unaccessed};
+
+  \draw node at (.5*\D - 2*\D,2*\D) {Reclaimable};
+  \draw[-,dashed] (.5*\D - \D, -0.75*\D) -- (.5*\D - \D, 2.25*\D);
+
+
+  \node[state] (IUA) at (0*\D, 2*\D)  {Inactive \\ Unreferenced \\ Accessed};
+  \node[state] (IRA) at (1*\D, 2*\D)  {Inactive \\ Referenced   \\ Accessed};
+  \node[state] (AUA) at (2*\D, 2*\D)  {Active   \\ Unreferenced \\ Accessed};
+  \node[state] (ARA) at (3*\D, 2*\D)  {Active   \\ Referenced   \\ Accessed};
+
+
+  \path
+  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [out=0,in=180,looseness=0] node {$mpa$} (AUU)
+  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [loop right] node {$mpa$} (ARU)
+
+  (IUA) edge [out=0,in=180,looseness=0] node {$mpa$} (IRA)
+  (IRA) edge [out=0,in=180,looseness=0] node {$mpa$} (AUA)
+  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [loop right] node {$mpa$} (ARA)
+  ;
+  
+  \path
+  (IUA) edge [out=270,in=90,looseness=1,pos=0.1] node {$shrink$} (ARU)
+  (IRA) edge [out=270,in=90,looseness=1,pos=0.1] node {$shrink$} (ARU)
+
+  (IUU) edge [loop below]                        node {$shrink$} (IUU)
+  (IRU) edge [out=230,in=315,looseness=1,swap]   node {$shrink$} (IUU)
+  ;
+
+  \path
+  (AUA) edge [in=90,out=270,looseness=.8,pos=0.1] node {$shrink$} (AUU)
+  (ARA) edge [in=90,out=270,looseness=.8,pos=0.1] node {$shrink$} (ARU)
+
+  (AUU) edge [out=230,in=315,looseness=1] node {$shrink$} (IUU)
+  (ARU) edge [out=230,in=315,looseness=1] node {$shrink$} (IRU)
+  ;
+
+\end{tikzpicture}
+}
+\caption{VM\_EXEC File LRU Automata}
+\end{figure}
+\end{landscape}
 \end{document}
