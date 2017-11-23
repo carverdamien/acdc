@@ -22,6 +22,7 @@
 
 \newcommand\D{4}
 \newcommand\scale{.8}
+\newcommand\linewidthmpa{1.1pt}
 
 \begin{document}
 
@@ -59,11 +60,9 @@
   (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (IRU)
 
   (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
-  (IRU) edge [bend  left] node {$mpa$} (AUU)
-  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
+  (IRU) edge [bend  right] node {$mpa$} (AUU)
   (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
   (IRA) edge [bend  left] node {$mpa$} (AUA)
-  %(IAA) edge [bend left] node {$mpa$} ()
   (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
   (ARU) edge [loop below] node {$mpa$} (ARU)
   (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
@@ -158,11 +157,9 @@
   (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (ARU)
 
   (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
-  (IRU) edge [bend  left] node {$mpa$} (AUU)
-  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
+  (IRU) edge [bend  right] node {$mpa$} (AUU)
   (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
   (IRA) edge [bend  left] node {$mpa$} (AUA)
-  %(IAA) edge [bend left] node {$mpa$} ()
   (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
   (ARU) edge [loop below] node {$mpa$} (ARU)
   (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
@@ -197,7 +194,8 @@
   (IUU) edge [loop below]                     node {$shrk\_i$} (IUU)
   (IRU) edge [out=130,in=45,looseness=1,swap] node {$shrk\_i$} (IUU)
 
-  (IUA) edge [in=270,out=30,looseness=0,swap] node {$shrk\_i$} (IRU)
+  (IUA) edge [in=270,out=90,looseness=1] node {$shrk\_i$} (IRU)
+
   (IRA) edge [out=270,in=90,looseness=0]      node {$shrk\_i$} (ARU)
 
   (IAA) edge [in=90,out=270,looseness=0,swap] node {$shrk\_i$} (ARU)
@@ -208,16 +206,15 @@
   (ARU) edge [in=0,out=0,looseness=1]          node {$shrk\_a$} (IRU)
   (ARA) edge [in=0,out=0,looseness=1,swap]     node {$shrk\_a$} (IRU)
 
-  (IUU) edge [out=0,in=180,looseness=0] node {$mpa$} (IRU)
-  (IRU) edge [bend  left] node {$mpa$} (AUU)
-  %(IUA) edge [out=315,in=225,looseness=1,swap] node {$mpa$} (IRA)
-  (IUA) edge [out=0,in=180,looseness=0,swap] node {$mpa$} (IRA)
-  (IRA) edge [bend  left] node {$mpa$} (AUA)
-  %(IAA) edge [bend left] node {$mpa$} ()
-  (AUU) edge [out=0,in=180,looseness=0] node {$mpa$} (ARU)
-  (ARU) edge [loop below] node {$mpa$} (ARU)
-  (AUA) edge [out=0,in=180,looseness=0] node {$mpa$} (ARA)
-  (ARA) edge [loop below] node {$mpa$} (ARA)
+  (IUU) edge [line width=\linewidthmpa,out=0,in=180,looseness=0] node {$mpa$} (IRU)
+  (IRU) edge [line width=\linewidthmpa,bend  left]               node {$mpa$} (AUU)
+  (IUA) edge [line width=\linewidthmpa,bend left]                node {$mpa$} (IRA)
+  (IRA) edge [line width=\linewidthmpa,bend  left]               node {$mpa$} (AUA)
+  (IAA) edge [line width=\linewidthmpa,out=0,in=180,looseness=0] node {$mpa$} (IRA)
+  (AUU) edge [line width=\linewidthmpa,out=0,in=180,looseness=0] node {$mpa$} (ARU)
+  (ARU) edge [line width=\linewidthmpa,loop below]               node {$mpa$} (ARU)
+  (AUA) edge [line width=\linewidthmpa,out=0,in=180,looseness=0] node {$mpa$} (ARA)
+  (ARA) edge [line width=\linewidthmpa,loop below]               node {$mpa$} (ARA)
   ;
 \end{tikzpicture}
 }
