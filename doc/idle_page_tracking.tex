@@ -6,7 +6,7 @@
 \usepackage[latin1]{inputenc}
 
 
-\newcommand\D{4}
+\newcommand\D{5}
 \newcommand\scale{.8}
 \newcommand\linewidthmpa{1.1pt}
 
@@ -52,6 +52,25 @@
 
   (NNU) edge [loop below] node {$read$} (NNU)
   (INU) edge [loop below] node {$read$} (INU)
+  ;
+
+  \path
+  (NYA) edge [pos=.9] node {$shrink$} (NNU)
+  (IYA) edge [pos=.9] node {$shrink$} (NNU)
+  (INA) edge [pos=.9] node {$shrink$} (NNU)
+  (NNA) edge [pos=.9] node {$shrink$} (NNU)  
+
+  (NYU) edge [] node {$shrink$} (NNU)
+  (IYU) edge [] node {$shrink$} (INU)
+  (INU) edge [loop left] node {$shrink$} (INU)
+  (NNU) edge [loop left] node {$shrink$} (NNU)  
+  ;
+
+  \path
+  (IYA) edge [] node {$mpa$} (NYA)
+  (INA) edge [] node {$mpa$} (NNA)
+  (IYU) edge [] node {$mpa$} (NYU)
+  (INU) edge [] node {$mpa$} (NNU)
   ;
 
  \end{tikzpicture}
