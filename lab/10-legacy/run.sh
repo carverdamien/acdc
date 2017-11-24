@@ -31,14 +31,14 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec memtiera job -- memtier_benchmark -s redisa --test-time 300
-${RUN} exec memtierb job -- memtier_benchmark -s redisb --test-time 60
+${RUN} exec memtiera job run -- memtier_benchmark -s redisa --test-time 300
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb --test-time 60
 sleep 120
 ${RUN} exec cassandra job start
 sleep 60
 ${RUN} exec cassandra job stop
 sleep 60
-${RUN} exec memtierb job -- memtier_benchmark -s redisb --test-time 60
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb --test-time 60
 sleep 60
 
 # Report
