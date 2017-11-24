@@ -5,6 +5,8 @@ import parse
 import influxdb
 import datetime
 
+"""[RUN #1 100%,  10 secs]  0 threads:      768875 ops,   75412 (avg:   76884) ops/sec, 2.80MB/sec (avg: 2.85MB/sec),  0.66 (avg:  0.65) msec latency"""
+
 def run(args):
     client = influxdb.InfluxDBClient(host=args.influxdbhost,
                                     port=int(args.influxdbport),
