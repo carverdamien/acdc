@@ -77,8 +77,6 @@ try_charge                        # Checks if usage is below limit before trigge
 `git grep -HnE 'SetPageLRU|ClearPageLRU'`
 
 ```
-mm/memcontrol.c:2094:   ClearPageLRU(page);
-mm/memcontrol.c:2110:   SetPageLRU(page);
 mm/mlock.c:109:   ClearPageLRU(page);
 mm/swap.c:65:   __ClearPageLRU(page);
 mm/swap.c:453:  SetPageLRU(page);
@@ -91,7 +89,21 @@ mm/vmscan.c:1520:   SetPageLRU(page);
 mm/vmscan.c:1530:     __ClearPageLRU(page);
 mm/vmscan.c:1742:   SetPageLRU(page);
 mm/vmscan.c:1750:     __ClearPageLRU(page);
+```
 
+### Unrelated grep results
+
+`mem_cgroup_commit_charge(lrucare=True):` In some cases, SwapCache and FUSE(splice_buf->radixtree), the page
+may already be on some other mem_cgroup's LRU. Take care of it.
+```
+mm/memcontrol.c: commit_charge:
+
+lock_page_lru:
+2094:   ClearPageLRU(page); #if (PageLRU(page))
+
+unlock_page_lru:
+2110:   SetPageLRU(page);
+2111:   add_page_to_lru_list(page, lruvec, page_lru(page));
 ```
 
 ## Tracking page movements in lists
