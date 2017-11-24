@@ -1,3 +1,0 @@
-[submodule "lab/10-legacy/images/memtier_benchmark"]
-	path = lab/10-legacy/images/memtier_benchmark
-	url = https://github.com/RedisLabs/memtier_benchmark
