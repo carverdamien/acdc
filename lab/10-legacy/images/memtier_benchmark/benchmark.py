@@ -16,6 +16,7 @@ def run(args):
         client.write_points([p for p in influxformat(measurement, fields, tags=tags)])
 
     call = args.call
+    print(call)
     p = subprocess.Popen(call, stdout=subprocess.PIPE)
     for line in p.stdout:
         print(line)
