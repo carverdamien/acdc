@@ -104,12 +104,24 @@ __pagevec_lru_add_fn:
 ```
 
 ```
-mm/vmscan.c:1338:   ClearPageLRU(page);
-mm/vmscan.c:1449:     ClearPageLRU(page);
-mm/vmscan.c:1520:   SetPageLRU(page);
-mm/vmscan.c:1530:     __ClearPageLRU(page);
-mm/vmscan.c:1742:   SetPageLRU(page);
-mm/vmscan.c:1750:     __ClearPageLRU(page);
+mm/vmscan.c:
+__isolate_lru_page:
+1338:   ClearPageLRU(page);
+
+isolate_lru_page:
+1449:     ClearPageLRU(page);
+
+putback_inactive_pages:
+1520:   SetPageLRU(page);
+
+putback_inactive_pages:
+1530:     __ClearPageLRU(page); # if (put_page_testzero(page))
+
+move_active_pages_to_lru:
+1742:   SetPageLRU(page);
+
+move_active_pages_to_lru:
+1750:     __ClearPageLRU(page); # if (put_page_testzero(page))
 ```
 
 ### Unrelated grep results
