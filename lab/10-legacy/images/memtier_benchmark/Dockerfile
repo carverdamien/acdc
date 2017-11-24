@@ -1,8 +1,9 @@
 FROM ubuntu:16.04 as builder
 RUN apt-get update
 RUN apt-get install -yy build-essential autoconf automake libpcre3-dev libevent-dev pkg-config zlib1g-dev git libboost-all-dev cmake flex
-RUN git clone https://github.com/RedisLabs/memtier_benchmark.git
 WORKDIR /memtier_benchmark
+COPY libmemcached_protocol ./libmemcached_protocol
+COPY CHANGES COPYING Dockerfile JSON_handler.cpp JSON_handler.h Makefile.am README.import README.md client.cpp client.h config_types.cpp config_types.h configure.ac file_io.cpp file_io.h item.cpp item.h memtier_benchmark.1 memtier_benchmark.cpp memtier_benchmark.h obj_gen.cpp obj_gen.h protocol.cpp protocol.h ./
 RUN autoreconf -ivf && ./configure && make && make install
 
 FROM ubuntu:16.04
