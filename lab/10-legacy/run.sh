@@ -18,7 +18,7 @@ ${PRE} build
 ${PRE} create
 ${PRE} up -d
 
-${PRE} exec memtiera run memtier_benchmark -s redisa -test_time 10
+${PRE} exec memtiera run -- memtier_benchmark -s redisa --test-time 10
 exit
 
 ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
