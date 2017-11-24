@@ -26,7 +26,7 @@ def run(args):
         if res == None:
             print(line)
         else:
-            print(res.named)
+            callback(res.named)
 
 def influxformat(measurement, fields, tags={}):
     t = datetime.datetime.utcfromtimestamp(int(fields['timestamp']))
