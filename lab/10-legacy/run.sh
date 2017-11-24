@@ -19,10 +19,8 @@ ${PRE} create
 ${PRE} up -d
 
 ${PRE} exec memtiera run -- memtier_benchmark -s redisa --test-time 10
-exit
+${PRE} exec memtierb run -- memtier_benchmark -s redisb --test-time 10
 
-${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
-${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
@@ -33,18 +31,18 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 300
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
+${RUN} exec memtiera job -- memtier_benchmark -s redisa --test-time 300
+${RUN} exec memtierb job -- memtier_benchmark -s redisb --test-time 60
 sleep 120
 ${RUN} exec cassandra job start
 sleep 60
 ${RUN} exec cassandra job stop
 sleep 60
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
+${RUN} exec memtierb job -- memtier_benchmark -s redisb --test-time 60
 sleep 60
 
 # Report
-for m in memory_stats blkio_stats networks cpu_stats sysbench_stats
+for m in memory_stats blkio_stats networks cpu_stats memtier_stats
 do
 	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$m.csv
 done

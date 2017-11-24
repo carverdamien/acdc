@@ -15,26 +15,13 @@ services:
       - influxdb
   redisa:
     image: redis:latest
-  sysbencha:
-    build: images/sysbench
+  memtierb:
+    build: images/memtier_benchmark
     links:
-      - mysqla:mysql
+      - redisb
       - influxdb
-  sysbenchb:
-    build: images/sysbench
-    links:
-      - mysqlb:mysql
-      - influxdb
-  mysqla:
-    build: images/mysql
-    hostname: mysqla
-    volumes:
-      - data-mysqla:/var/lib/mysql
-  mysqlb:
-    build: images/mysql
-    hostname: mysqlb
-    volumes:
-      - data-mysqlb:/var/lib/mysql
+  redisb:
+    image: redis:latest
   cassandra:
     build: images/cassandra
   influxdb:
@@ -57,10 +44,6 @@ services:
     links:
       - influxdb
 volumes:
-  data-mysqla:
-    external: true
-  data-mysqlb:
-    external: true
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
