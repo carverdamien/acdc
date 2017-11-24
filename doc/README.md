@@ -77,12 +77,33 @@ try_charge                        # Checks if usage is below limit before trigge
 `git grep -HnE 'SetPageLRU|ClearPageLRU'`
 
 ```
-mm/mlock.c:109:   ClearPageLRU(page);
-mm/swap.c:65:   __ClearPageLRU(page);
-mm/swap.c:453:  SetPageLRU(page);
-mm/swap.c:763:      __ClearPageLRU(page);
-mm/swap.c:812:    SetPageLRU(page_tail);
-mm/swap.c:848:  SetPageLRU(page);
+mm/swap.c:
+
+__put_page or release_pages:
+__page_cache_release:
+65:   __ClearPageLRU(page);
+66:   del_page_from_lru_list(page, lruvec, page_off_lru(page));
+
+add_page_to_unevictable_list:
+453:  SetPageLRU(page);
+454:  add_page_to_lru_list(page, lruvec, LRU_UNEVICTABLE);
+
+release_pages:
+763:      __ClearPageLRU(page);
+764:      del_page_from_lru_list(page, lruvec, page_off_lru(page));
+
+lru_add_page_tail:              # used by __split_huge_page_refcount() ifdef CONFIG_TRANSPARENT_HUGEPAGE
+812:    SetPageLRU(page_tail);
+
+lru_add_drain_cpu or __lru_cache_add:
+__pagevec_lru_add:
+pagevec_lru_move_fn(__pagevec_lru_add_fn;
+__pagevec_lru_add_fn:
+848:  SetPageLRU(page);
+849:  add_page_to_lru_list(page, lruvec, lru);
+```
+
+```
 mm/vmscan.c:1338:   ClearPageLRU(page);
 mm/vmscan.c:1449:     ClearPageLRU(page);
 mm/vmscan.c:1520:   SetPageLRU(page);
@@ -105,6 +126,15 @@ lock_page_lru:
 unlock_page_lru:
 2110:   SetPageLRU(page);
 2111:   add_page_to_lru_list(page, lruvec, page_lru(page));
+```
+
+```
+mm/mlock.c:
+
+munlock_vma_page or munlock_vma_pages_range:
+__munlock_isolate_lru_page:
+109:   ClearPageLRU(page);   #if (PageLRU(page))
+110:   del_page_from_lru_list(page, lruvec, page_lru(page));
 ```
 
 ## Tracking page movements in lists
