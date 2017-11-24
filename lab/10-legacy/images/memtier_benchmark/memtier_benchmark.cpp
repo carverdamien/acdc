@@ -889,8 +889,14 @@ run_stats run_benchmark(int run_id, benchmark_config* cfg, object_generator* obj
         else
             progress = 100.0 * (duration / 1000000.0)/cfg->test_time;
         
-        fprintf(stderr, "[RUN #%u %.0f%%, %3u secs] %2u threads: %11lu ops, %7lu (avg: %7lu) ops/sec, %s/sec (avg: %s/sec), %5.2f (avg: %5.2f) msec latency\r",
-            run_id, progress, (unsigned int) (duration / 1000000), active_threads, total_ops, cur_ops_sec, ops_sec, cur_bytes_str, bytes_str, cur_latency, avg_latency);
+        {
+            struct timeval b;
+            gettimeofday(&b, NULL);
+            unsigned long long timestamp = b.tv_sec * 1000000 + b.tv_usec;
+
+            fprintf(stdout, "[RUN #%u %.0f%%, %3u secs] %llu: %2u threads: %11lu ops, %7lu (avg: %7lu) ops/sec, %s/sec (avg: %s/sec), %5.2f (avg: %5.2f) msec latency\n",
+                run_id, progress, (unsigned int) (duration / 1000000), timestamp, active_threads, total_ops, cur_ops_sec, ops_sec, cur_bytes_str, bytes_str, cur_latency, avg_latency);
+        }
     } while (active_threads > 0);
 
     fprintf(stderr, "\n\n");

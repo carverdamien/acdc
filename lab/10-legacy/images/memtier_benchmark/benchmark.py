@@ -5,7 +5,7 @@ import parse
 import influxdb
 import datetime
 
-expected_output = """[{}] {threads} threads: {ops} ops, {opsps} (avg: {avgopsps}) ops/sec, {bw}MB/sec (avg: {avgbw}MB/sec), {lat} (avg: {avglat}) msec latency"""
+expected_output = """[{}] {timestamp}: {threads} threads: {ops} ops, {opsps} (avg: {avgopsps}) ops/sec, {bw}MB/sec (avg: {avgbw}MB/sec), {lat} (avg: {avglat}) msec latency"""
 output_parser = parse.compile(expected_output)
 
 def run(args):
