@@ -8,6 +8,13 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
+  memtiera:
+    build: images/memtier_benchmark
+    links:
+      - redisa
+      - influxdb
+  redisa:
+    image: redis:latest
   sysbencha:
     build: images/sysbench
     cpuset: 2,3,6,7
