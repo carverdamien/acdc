@@ -19,7 +19,7 @@ services:
     image: redis:latest
     cpuset: 2,3,6,7
     cgroup_parent: consolidate
-    mem_limit: 1G
+    mem_limit: 2G
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -45,7 +45,7 @@ services:
     image: redis:latest
     cpuset: 0,4,1,5
     cgroup_parent: consolidate
-    mem_limit: 1G
+    mem_limit: 2G
   cassandra:
     build: images/cassandra
     cgroup_parent: consolidate
