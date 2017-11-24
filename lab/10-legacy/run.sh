@@ -17,6 +17,10 @@ ${PRE} down
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
+
+${PRE} exec memtiera run memtier_benchmark -s redisa -test_time 10
+exit
+
 ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'

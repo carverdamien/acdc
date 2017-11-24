@@ -42,7 +42,6 @@ def main():
     run_parser.add_argument('call', metavar='N', type=str, nargs='+')
 
     args = main_parser.parse_args()
-    
-    print(args)
+    run(args)
 
 main()
