@@ -5,7 +5,8 @@ import parse
 import influxdb
 import datetime
 
-"""[RUN #1 100%,  10 secs]  0 threads:      768875 ops,   75412 (avg:   76884) ops/sec, 2.80MB/sec (avg: 2.85MB/sec),  0.66 (avg:  0.65) msec latency"""
+expected_output = """[{}] {threads} threads: {ops} ops, {opsps} (avg: {avgopsps}) ops/sec, {bw}MB/sec (avg: {avgbw}MB/sec), {lat} (avg: {avglat}) msec latency"""
+output_parser = parse.compile(expected_output)
 
 def run(args):
     client = influxdb.InfluxDBClient(host=args.influxdbhost,
@@ -21,7 +22,11 @@ def run(args):
     print(call)
     p = subprocess.Popen(call, stdout=subprocess.PIPE)
     for line in p.stdout:
-        print(line)
+        res = output_parser.search(line)
+        if res == None:
+            print(line)
+        else:
+            print(line)
 
 def influxformat(measurement, fields, tags={}):
     t = datetime.datetime.utcfromtimestamp(int(fields['timestamp']))
