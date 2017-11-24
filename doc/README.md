@@ -100,6 +100,7 @@ mm/memcontrol.c: commit_charge:
 
 lock_page_lru:
 2094:   ClearPageLRU(page); #if (PageLRU(page))
+2095:   del_page_from_lru_list(page, lruvec, page_lru(page));
 
 unlock_page_lru:
 2110:   SetPageLRU(page);
