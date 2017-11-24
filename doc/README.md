@@ -72,6 +72,28 @@ try_charge                        # Checks if usage is below limit before trigge
                      └─ putback_inactive_pages       # Add unreclaimed pages to active or inactive list
 ```
 
+## Tracking page insertions and removals in lists
+
+`git grep -HnE 'SetPageLRU|ClearPageLRU'`
+
+```
+mm/memcontrol.c:2094:   ClearPageLRU(page);
+mm/memcontrol.c:2110:   SetPageLRU(page);
+mm/mlock.c:109:   ClearPageLRU(page);
+mm/swap.c:65:   __ClearPageLRU(page);
+mm/swap.c:453:  SetPageLRU(page);
+mm/swap.c:763:      __ClearPageLRU(page);
+mm/swap.c:812:    SetPageLRU(page_tail);
+mm/swap.c:848:  SetPageLRU(page);
+mm/vmscan.c:1338:   ClearPageLRU(page);
+mm/vmscan.c:1449:     ClearPageLRU(page);
+mm/vmscan.c:1520:   SetPageLRU(page);
+mm/vmscan.c:1530:     __ClearPageLRU(page);
+mm/vmscan.c:1742:   SetPageLRU(page);
+mm/vmscan.c:1750:     __ClearPageLRU(page);
+
+```
+
 ## Tracking page movements in lists
 
 `git grep -HnE 'SetPageReferenced|ClearPageReferenced|SetPageActive|ClearPageActive'`
