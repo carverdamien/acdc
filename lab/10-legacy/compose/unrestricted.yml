@@ -9,6 +9,7 @@ services:
     volumes:
       - /:/rootfs
   memtiera:
+    hostname: memtiera
     build: images/memtier_benchmark
     links:
       - redisa
@@ -16,6 +17,7 @@ services:
   redisa:
     image: redis:latest
   memtierb:
+    hostname: memtierb
     build: images/memtier_benchmark
     links:
       - redisb

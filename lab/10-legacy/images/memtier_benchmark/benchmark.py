@@ -4,6 +4,7 @@ import argparse
 import parse
 import influxdb
 import datetime
+import os
 
 expected_output = """[{}] {timestamp}: {threads} threads: {ops} ops, {opsps} (avg: {avgopsps}) ops/sec, {bw}MB/sec (avg: {avgbw}MB/sec), {lat} (avg: {avglat}) msec latency"""
 output_parser = parse.compile(expected_output)
@@ -14,7 +15,9 @@ def run(args):
                                     database=args.influxdbname)
     client.create_database(args.influxdbname)
     measurement = 'memtier_stats'
-    tags = {}
+    tags = {
+        'hostname' : os.environ['HOSTNAME'],
+    }
     def callback(fields):
         client.write_points([p for p in influxformat(measurement, fields, tags=tags)])
 

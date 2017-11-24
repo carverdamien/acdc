@@ -17,10 +17,8 @@ ${PRE} down
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-
-${PRE} exec memtiera run -- memtier_benchmark -s redisa --test-time 10
-${PRE} exec memtierb run -- memtier_benchmark -s redisb --test-time 10
-
+# ${PRE} exec memtiera run -- memtier_benchmark -s redisa --test-time 10
+# ${PRE} exec memtierb run -- memtier_benchmark -s redisb --test-time 10
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
