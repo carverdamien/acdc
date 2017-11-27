@@ -8,12 +8,12 @@ RUN autoreconf -ivf && ./configure && make && make install
 
 FROM ubuntu:16.04
 LABEL Description="memtier_benchmark"
-COPY --from=builder /usr/local/bin/memtier_benchmark /usr/local/bin/memtier_benchmark
 RUN apt-get update
 RUN apt-get install -yy \
     libevent-dev \
     python-pip \
     inotify-tools
+COPY --from=builder /usr/local/bin/memtier_benchmark /usr/local/bin/memtier_benchmark
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY benchmark.py .
