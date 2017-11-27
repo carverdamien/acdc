@@ -9,7 +9,7 @@ source kernel
 
 SIZE=$((2**12)) # 512MB max
 REQUESTS=$((2*189841)) #$((2**30/${SIZE}/2))
-EXTRAINIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
+EXTRAINIT="-p 11211 -P memcache_text -d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
 
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
@@ -30,17 +30,17 @@ ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolid
 #exit #debug
 ${PRE} down
 
-EXTRA="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=1:10 -c 1 -t 1"
+EXTRA="-p 11211 -P memcache_text -d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=1:10 -c 1 -t 1"
 
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec redisa redis-cli config set maxmemory 2gb
-${RUN} exec redisa redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisa redis-cli config set appendonly no
-${RUN} exec redisb redis-cli config set maxmemory 2gb
-${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisb redis-cli config set appendonly no
+#${RUN} exec redisa redis-cli config set maxmemory 2gb
+#${RUN} exec redisa redis-cli config set maxmemory-policy allkeys-lru
+#${RUN} exec redisa redis-cli config set appendonly no
+#${RUN} exec redisb redis-cli config set maxmemory 2gb
+#${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
+#${RUN} exec redisb redis-cli config set appendonly no
 ${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRAINIT}
 ${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRAINIT}
 ${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA} --test-time 300

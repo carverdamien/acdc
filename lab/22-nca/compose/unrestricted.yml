@@ -15,7 +15,8 @@ services:
       - redisa
       - influxdb
   redisa:
-    image: redis:latest
+    image: memcached:latest
+    command: [ "memcached" , "-m", "2048" ]
   memtierb:
     hostname: memtierb
     build: images/memtier_benchmark
@@ -23,7 +24,8 @@ services:
       - redisb
       - influxdb
   redisb:
-    image: redis:latest
+    image: memcached:latest
+    command: [ "memcached" , "-m", "2048" ]
   cassandra:
     build: images/cassandra
   influxdb:
