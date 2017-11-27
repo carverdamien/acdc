@@ -897,7 +897,7 @@ run_stats run_benchmark(int run_id, benchmark_config* cfg, object_generator* obj
             //unsigned long long timestamp = b.tv_sec * 1000000 + b.tv_usec;
 	    unsigned long long timestamp = b.tv_sec;
 
-            fprintf(stdout, "[RUN #%u %.0f%%, %3u secs] %llu: %2u threads: %11lu ops, %7lu (avg: %7lu) ops/sec, %lu/sec (avg: %lu/sec), %5.2f (avg: %5.2f) msec latency\n",
+            fprintf(stdout, "[RUN #%u %.0f%%, %3u secs] %llu timestamp: %2u threads: %11lu ops, %7lu (avg: %7lu) ops/sec, %lu/sec (avg: %lu/sec), %5.2f (avg: %5.2f) msec latency\n",
                 run_id, progress, (unsigned int) (duration / 1000000), timestamp, active_threads, total_ops, cur_ops_sec, ops_sec, cur_bytes_sec, bytes_sec, cur_latency, avg_latency);
         }
     } while (active_threads > 0);
