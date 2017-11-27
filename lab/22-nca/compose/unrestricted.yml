@@ -1,0 +1,53 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
+    links:
+      - redisa
+      - influxdb
+  redisa:
+    image: memcached:latest
+    command: [ "memcached" , "-m", "2048" ]
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
+    links:
+      - redisb
+      - influxdb
+  redisb:
+    image: memcached:latest
+    command: [ "memcached" , "-m", "2048" ]
+  cassandra:
+    build: images/cassandra
+  influxdb:
+    image: influxdb:latest
+  collector:
+    build: images/collector
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
