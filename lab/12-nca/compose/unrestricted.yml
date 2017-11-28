@@ -16,6 +16,8 @@ services:
       - influxdb
   redisa:
     image: redis:latest
+    volumes:
+      - data-redisa:/data
   memtierb:
     hostname: memtierb
     build: images/memtier_benchmark
@@ -24,6 +26,8 @@ services:
       - influxdb
   redisb:
     image: redis:latest
+    volumes:
+      - data-redisb:/data
   memtierc:
     hostname: memtierc
     build: images/memtier_benchmark
@@ -32,6 +36,8 @@ services:
       - influxdb
   redisc:
     image: redis:latest
+    volumes:
+      - data-redisc:/data
   influxdb:
     image: influxdb:latest
   collector:
@@ -74,3 +80,9 @@ volumes:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
+  data-redisa:
+    external: true
+  data-redisb:
+    external: true
+  data-redisc:
+    external: true

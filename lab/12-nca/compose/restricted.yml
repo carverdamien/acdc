@@ -17,6 +17,8 @@ services:
       - influxdb
   redisa:
     image: redis:latest
+    volumes:
+      - data-redisa:/data
     cpuset: 2,3,6,7
     cgroup_parent: consolidate
     mem_limit: 2G
@@ -43,6 +45,8 @@ services:
       - influxdb
   redisb:
     image: redis:latest
+    volumes:
+      - data-redisb:/data
     cpuset: 0,4,1,5
     cgroup_parent: consolidate
     mem_limit: 2G
@@ -62,6 +66,8 @@ services:
       - influxdb
   redisc:
     image: redis:latest
+    volumes:
+      - data-redisc:/data
     cpuset: 0,4,1,5
     cgroup_parent: consolidate
     mem_limit: 2G
@@ -107,3 +113,9 @@ volumes:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
+  data-redisa:
+    external: true
+  data-redisb:
+    external: true
+  data-redisc:
+    external: true

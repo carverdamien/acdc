@@ -47,10 +47,10 @@ ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || r
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
 ${PRE} exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/consolidate/memory.use_hierarchy'
 ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolidate/memory.limit_in_bytes"
-${PRE} stop
+${PRE} down
 
 # Run
-${RUN} start
+${RUN} up -d
 
 ${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
