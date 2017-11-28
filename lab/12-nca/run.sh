@@ -51,6 +51,7 @@ ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolid
 ${PRE} down
 
 # Run
+${RUN} create
 ${RUN} up -d
 ${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
 ${PRE} exec redisa redis-cli save
