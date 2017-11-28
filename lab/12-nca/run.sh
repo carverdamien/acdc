@@ -19,28 +19,29 @@ PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 
 # Prepare
 ${RUN} down
+docker volume rm data-redisa data-redisb data-redisc
 ${PRE} down
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
 
-${RUN} exec redisc redis-cli config set maxmemory 2gb
-${RUN} exec redisc redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisc redis-cli config set appendonly no
-${RUN} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
-${RUN} exec redisc redis-cli save
+#${PRE} exec redisc redis-cli config set maxmemory 2gb
+#${PRE} exec redisc redis-cli config set maxmemory-policy allkeys-lru
+#${PRE} exec redisc redis-cli config set appendonly no
+#${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
+#${PRE} exec redisc redis-cli save
 
-${RUN} exec redisa redis-cli config set maxmemory 2gb
-${RUN} exec redisa redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisa redis-cli config set appendonly no
-${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
-${RUN} exec redisa redis-cli save
+#${PRE} exec redisa redis-cli config set maxmemory 2gb
+#${PRE} exec redisa redis-cli config set maxmemory-policy allkeys-lru
+#${PRE} exec redisa redis-cli config set appendonly no
+#${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+#${PRE} exec redisa redis-cli save
 
-${RUN} exec redisb redis-cli config set maxmemory 2gb
-${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisb redis-cli config set appendonly no
-${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
-${RUN} exec redisb redis-cli save
+#${PRE} exec redisb redis-cli config set maxmemory 2gb
+#${PRE} exec redisb redis-cli config set maxmemory-policy allkeys-lru
+#${PRE} exec redisb redis-cli config set appendonly no
+#${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+#${PRE} exec redisb redis-cli save
 
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
@@ -51,13 +52,19 @@ ${PRE} down
 
 # Run
 ${RUN} up -d
-
+${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+${PRE} exec redisa redis-cli save
+${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+${PRE} exec redisb redis-cli save
+sleep 60
 ${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 120
-${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
+#${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
+${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
+${PRE} exec redisc redis-cli save
 sleep 120
-${RUN} exec memtierb job run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 60
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 60
 
 # Report
