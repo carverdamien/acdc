@@ -5,7 +5,7 @@ source kernel
 [ -n "${KERNEL}" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${MEMORY:=$((2*2*2**30+640*2**20))}
+: ${MEMORY:=$((4*2**30))}
 
 SIZE=$((2**12)) # 512MB max
 REQUESTS=$((2*189841)) #$((2**30/${SIZE}/2))
@@ -32,7 +32,6 @@ ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolid
 ${PRE} down
 
 EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
-EXTRA_FIT="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 90 / 100)) --ratio=0:1 -c 1 -t 1"
 EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t 1"
 
 # Run
@@ -57,19 +56,21 @@ ${RUN} exec redisb redis-cli config set appendonly no
 ${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
 ${RUN} exec redisb redis-cli save
 
-${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 30
+#-----
+#-+---
+#---+-
+
+${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_LOW} --test-time 300
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 60
+${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 180
+sleep 60
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
-${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 120
-sleep 30
-${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_FIT} --test-time 270
-sleep 30
+sleep 60
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 180
 sleep 60
 ${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
 sleep 60
-${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 120
-sleep 60
-${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
+${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 60
 sleep 60
 
 # Report
