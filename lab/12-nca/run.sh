@@ -48,6 +48,7 @@ ${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 60
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 180
+sleep 60
 ${RUN} exec cassandra job start
 sleep 60
 ${RUN} exec cassandra job stop
