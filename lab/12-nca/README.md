@@ -1,3 +1,8 @@
+nca should not be able to make the difference between
+
+A active and fits in memory
+B inactive
+
 ## scripts
 
 * `run.sh` runs the experiment.
