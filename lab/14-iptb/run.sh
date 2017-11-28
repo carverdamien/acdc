@@ -5,7 +5,7 @@ source kernel
 [ -n "${KERNEL}" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${MEMORY:=$((2*2*2**30))}
+: ${MEMORY:=$((2*2*2**30+512*2**20))}
 
 SIZE=$((2**12)) # 512MB max
 REQUESTS=$((2*189841)) #$((2**30/${SIZE}/2))
