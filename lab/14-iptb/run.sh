@@ -9,7 +9,7 @@ source kernel
 
 SIZE=$((2**12)) # 512MB max
 REQUESTS=$((2*189841)) #$((2**30/${SIZE}/2))
-EXTRAINIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
+EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
 
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
@@ -20,8 +20,8 @@ ${PRE} down
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-#${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRAINIT} #debug
-#${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRAINIT} #debug
+#${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT} #debug
+#${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT} #debug
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
@@ -30,7 +30,8 @@ ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolid
 #exit #debug
 ${PRE} down
 
-EXTRA="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=1:10 -c 1 -t 1"
+EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
+EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 20 / 100)) --ratio=0:1 -c 1 -t 1"
 
 # Run
 ${RUN} create
@@ -41,16 +42,17 @@ ${RUN} exec redisa redis-cli config set appendonly no
 ${RUN} exec redisb redis-cli config set maxmemory 2gb
 ${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
 ${RUN} exec redisb redis-cli config set appendonly no
-${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRAINIT}
-${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRAINIT}
-${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA} --test-time 300
-${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA} --test-time 60
-sleep 120
+${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
+sleep 60
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 180
 ${RUN} exec cassandra job start
 sleep 60
 ${RUN} exec cassandra job stop
 sleep 60
-${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA} --test-time 60
+${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 60
 
 # Report

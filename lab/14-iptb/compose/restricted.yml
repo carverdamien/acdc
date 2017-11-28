@@ -23,10 +23,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '54mb'
+          rate: '75mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '54mb'
+          rate: '75mb'
   memtierb:
     hostname: memtierb
     build: images/memtier_benchmark
@@ -34,10 +34,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '54mb'
+          rate: '75mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '54mb'
+          rate: '75mb'
     links:
       - redisa
       - influxdb
@@ -55,10 +55,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '54mb'
+          rate: '75mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '54mb'
+          rate: '75mb'
   influxdb:
     image: influxdb:latest
   collector:
