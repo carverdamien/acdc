@@ -46,11 +46,9 @@ services:
     cpuset: 0,4,1,5
     cgroup_parent: consolidate
     mem_limit: 2G
-  cassandra:
-    build: images/cassandra
-    cgroup_parent: consolidate
-    mem_limit: 2516901888
-    mem_swappiness: 0
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
     cpuset: 0,4,1,5
     blkio_config:
       device_read_bps:
@@ -59,6 +57,14 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '75mb'
+    links:
+      - redisc
+      - influxdb
+  redisc:
+    image: redis:latest
+    cpuset: 0,4,1,5
+    cgroup_parent: consolidate
+    mem_limit: 2G
   influxdb:
     image: influxdb:latest
   collector:
@@ -66,6 +72,25 @@ services:
     command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  idlememstat:
+    build: images/idlememstat
+    privileged: true
+    command: [ "-d", "10", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--cgroup", "/rootfs/sys/fs/cgroup/memory/consolidate" ]
+    environment:
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
     links:
       - influxdb
   grafana:
