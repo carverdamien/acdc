@@ -43,6 +43,9 @@ ${RUN} exec redisa redis-cli config set appendonly no
 ${RUN} exec redisb redis-cli config set maxmemory 2gb
 ${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
 ${RUN} exec redisb redis-cli config set appendonly no
+${RUN} exec redisc redis-cli config set maxmemory 2gb
+${RUN} exec redisc redis-cli config set maxmemory-policy allkeys-lru
+${RUN} exec redisc redis-cli config set appendonly no
 ${RUN} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
 ${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
 ${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
