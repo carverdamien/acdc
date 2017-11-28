@@ -46,11 +46,9 @@ services:
     cpuset: 0,4,1,5
     cgroup_parent: consolidate
     mem_limit: 2G
-  cassandra:
-    build: images/cassandra
-    cgroup_parent: consolidate
-    mem_limit: 2516901888
-    mem_swappiness: 0
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
     cpuset: 0,4,1,5
     blkio_config:
       device_read_bps:
@@ -59,6 +57,14 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '75mb'
+    links:
+      - redisc
+      - influxdb
+  redisc:
+    image: redis:latest
+    cpuset: 0,4,1,5
+    cgroup_parent: consolidate
+    mem_limit: 2G
   influxdb:
     image: influxdb:latest
   collector:

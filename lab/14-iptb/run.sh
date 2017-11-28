@@ -22,6 +22,7 @@ ${PRE} create
 ${PRE} up -d
 #${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT} #debug
 #${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT} #debug
+#${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT} #debug
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
@@ -42,16 +43,16 @@ ${RUN} exec redisa redis-cli config set appendonly no
 ${RUN} exec redisb redis-cli config set maxmemory 2gb
 ${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
 ${RUN} exec redisb redis-cli config set appendonly no
+${RUN} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
 ${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
 ${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
 ${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 60
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 180
-${RUN} exec cassandra job start
 sleep 60
-${RUN} exec cassandra job stop
-sleep 60
+${RUN} exec memtierc job run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
+sleep 120
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 60
 

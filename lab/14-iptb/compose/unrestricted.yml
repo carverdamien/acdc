@@ -24,8 +24,14 @@ services:
       - influxdb
   redisb:
     image: redis:latest
-  cassandra:
-    build: images/cassandra
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
+    links:
+      - redisc
+      - influxdb
+  redisc:
+    image: redis:latest
   influxdb:
     image: influxdb:latest
   collector:
