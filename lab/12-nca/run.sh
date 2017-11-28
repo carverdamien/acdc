@@ -31,7 +31,7 @@ ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/consolid
 ${PRE} down
 
 EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
-EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 1 / 1000)) --ratio=0:1 -c 1 -t 1"
+EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 20 / 100)) --ratio=0:1 -c 1 -t 1"
 
 # Run
 ${RUN} create
