@@ -37,21 +37,25 @@ EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 20 / 100)) -
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec redisa redis-cli config set maxmemory 2gb
-${RUN} exec redisa redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisa redis-cli config set appendonly no
-${RUN} exec redisb redis-cli config set maxmemory 2gb
-${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
-${RUN} exec redisb redis-cli config set appendonly no
+
 ${RUN} exec redisc redis-cli config set maxmemory 2gb
 ${RUN} exec redisc redis-cli config set maxmemory-policy allkeys-lru
 ${RUN} exec redisc redis-cli config set appendonly no
 ${RUN} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
-${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
-${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
-${RUN} exec redisa redis-cli save
-${RUN} exec redisb redis-cli save
 ${RUN} exec redisc redis-cli save
+
+${RUN} exec redisa redis-cli config set maxmemory 2gb
+${RUN} exec redisa redis-cli config set maxmemory-policy allkeys-lru
+${RUN} exec redisa redis-cli config set appendonly no
+${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+${RUN} exec redisa redis-cli save
+
+${RUN} exec redisb redis-cli config set maxmemory 2gb
+${RUN} exec redisb redis-cli config set maxmemory-policy allkeys-lru
+${RUN} exec redisb redis-cli config set appendonly no
+${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+${RUN} exec redisb redis-cli save
+
 ${RUN} exec memtiera job run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300
 ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
 sleep 60
