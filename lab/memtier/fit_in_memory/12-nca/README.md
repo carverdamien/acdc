@@ -1,7 +1,9 @@
-nca should not be able to make the difference between
+# Goal
 
-A active and fits in memory
-B inactive
+Show that nca should not be able to make the difference between
+
+* A active (max rqs/s) and fits in memory (no pgin/s)
+* B inactive (no rqs/s) (no pgin/s)
 
 ## scripts
 
