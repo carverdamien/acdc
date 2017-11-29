@@ -1079,7 +1079,7 @@
           "bars": false,
           "datasource": "${DS_ACDC}",
           "fill": 1,
-          "id": 7,
+          "id": 13,
           "legend": {
             "avg": false,
             "current": false,
@@ -1106,7 +1106,7 @@
               "alias": "redisa",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "blkio_stats",
+              "measurement": "memory_stats",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -1114,7 +1114,7 @@
                 [
                   {
                     "params": [
-                      "Rbps"
+                      "stats.pgstolen"
                     ],
                     "type": "field"
                   }
@@ -1132,7 +1132,7 @@
               "alias": "redisb",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "blkio_stats",
+              "measurement": "memory_stats",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -1140,7 +1140,7 @@
                 [
                   {
                     "params": [
-                      "Rbps"
+                      "stats.pgstolen"
                     ],
                     "type": "field"
                   }
@@ -1158,7 +1158,7 @@
               "alias": "redisc",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "blkio_stats",
+              "measurement": "memory_stats",
               "policy": "default",
               "refId": "C",
               "resultFormat": "time_series",
@@ -1166,7 +1166,7 @@
                 [
                   {
                     "params": [
-                      "Rbps"
+                      "stats.pgstolen"
                     ],
                     "type": "field"
                   }
@@ -1184,7 +1184,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "IO byteRead/s",
+          "title": "pgstolen",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1221,7 +1221,7 @@
           "bars": false,
           "datasource": "${DS_ACDC}",
           "fill": 1,
-          "id": 8,
+          "id": 14,
           "legend": {
             "avg": false,
             "current": false,
@@ -1248,7 +1248,7 @@
               "alias": "redisa",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "blkio_stats",
+              "measurement": "memory_stats",
               "policy": "default",
               "refId": "A",
               "resultFormat": "time_series",
@@ -1256,7 +1256,7 @@
                 [
                   {
                     "params": [
-                      "Wbps"
+                      "stats.pglost"
                     ],
                     "type": "field"
                   }
@@ -1274,7 +1274,7 @@
               "alias": "redisb",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "blkio_stats",
+              "measurement": "memory_stats",
               "policy": "default",
               "refId": "B",
               "resultFormat": "time_series",
@@ -1282,7 +1282,7 @@
                 [
                   {
                     "params": [
-                      "Wbps"
+                      "stats.pglost"
                     ],
                     "type": "field"
                   }
@@ -1300,7 +1300,7 @@
               "alias": "redisc",
               "dsType": "influxdb",
               "groupBy": [],
-              "measurement": "blkio_stats",
+              "measurement": "memory_stats",
               "policy": "default",
               "refId": "C",
               "resultFormat": "time_series",
@@ -1308,7 +1308,7 @@
                 [
                   {
                     "params": [
-                      "Wbps"
+                      "stats.pglost"
                     ],
                     "type": "field"
                   }
@@ -1326,7 +1326,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "IO byteWritten/s",
+          "title": "pgslost",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1839,6 +1839,302 @@
       "showTitle": false,
       "title": "Dashboard Row",
       "titleSize": "h6"
+    },
+    {
+      "collapse": false,
+      "height": 250,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "${DS_ACDC}",
+          "fill": 1,
+          "id": 7,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "redisa",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "blkio_stats",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "Rbps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "redisa"
+                }
+              ]
+            },
+            {
+              "alias": "redisb",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "blkio_stats",
+              "policy": "default",
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "Rbps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "redisb"
+                }
+              ]
+            },
+            {
+              "alias": "redisc",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "blkio_stats",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "Rbps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "redisc"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "IO byteRead/s",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "${DS_ACDC}",
+          "fill": 1,
+          "id": 8,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "redisa",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "blkio_stats",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "Wbps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "redisa"
+                }
+              ]
+            },
+            {
+              "alias": "redisb",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "blkio_stats",
+              "policy": "default",
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "Wbps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "redisb"
+                }
+              ]
+            },
+            {
+              "alias": "redisc",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "blkio_stats",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "Wbps"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "redisc"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "IO byteWritten/s",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Dashboard Row",
+      "titleSize": "h6"
     }
   ],
   "schemaVersion": 14,
@@ -1878,5 +2174,5 @@
   },
   "timezone": "browser",
   "title": "dashboard",
-  "version": 4
+  "version": 1
 }
