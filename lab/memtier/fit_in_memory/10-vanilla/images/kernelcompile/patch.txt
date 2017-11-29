@@ -9,6 +9,8 @@ index 8a839935b18c..0ea5d9071b32 100644
 +	if (IS_ENABLED(CONFIG_DEBUG_VM) && PageTransHuge(page))
 +		address &= HPAGE_PMD_MASK;
  	VM_BUG_ON_PAGE(page->index != linear_page_index(vma, address), page);
+ 
+ 	anon_vma = (void *) anon_vma + PAGE_MAPPING_ANON;
 diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
 index 1191d79..1ee27c7 100644
 --- a/include/linux/memcontrol.h
