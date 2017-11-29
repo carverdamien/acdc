@@ -81,8 +81,8 @@ volumes:
   data-grafana-var-log:
   data-grafana-etc:
   data-redisa:
-    external: true
+    external: false
   data-redisb:
-    external: true
+    external: false
   data-redisc:
-    external: true
+    external: false
