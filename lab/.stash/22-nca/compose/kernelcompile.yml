@@ -1,8 +1,0 @@
-version: '2.2'
-services:
-  kernelcompile:
-    build: images/kernelcompile
-    volumes:
-      - ./build/kernel/boot:/boot
-      - ./build/kernel/modules:/lib/modules
-
