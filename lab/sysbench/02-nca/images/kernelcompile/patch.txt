@@ -362,7 +362,7 @@ index 142cb61f4822..91c62dac3625 100644
 +						  MEM_CGROUP_EVENTS_PGLOSS,
 +						  sc->nr_reclaimed - reclaimed);
 +				mem_cgroup_events(sc->mem_charging,
-+						  MEM_CGROUP_EVENTS_PGGAIN,
++						  MEM_CGROUP_EVENTS_PGSTOLEN,
 +						  sc->nr_reclaimed - reclaimed);
 +			}
 +
