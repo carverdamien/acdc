@@ -8,14 +8,14 @@ import sys
 
 img = sys.argv[1]
 
-df = pd.read_csv('sysbench_stats.csv')
+df = pd.read_csv('memtier_stats.csv')
 
 plt.figure()
-for label in ['redisa', 'redisb']:
+for label in ['memtiera', 'memtierb']:
 	sel = df['hostname'] == label
 	X = df['time'][sel]
 	X = np.array(X, dtype='datetime64[ns]')
-	Y = df['rtps'][sel]
+	Y = df['lat'][sel]
 	plt.plot(X,Y,label=label)
 plt.legend()
 plt.savefig(img)
