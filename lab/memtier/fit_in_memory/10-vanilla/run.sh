@@ -19,7 +19,6 @@ PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 
 # Prepare
 ${RUN} down
-docker volume rm data-redisa data-redisb data-redisc
 ${PRE} down
 ${PRE} build
 ${PRE} create
