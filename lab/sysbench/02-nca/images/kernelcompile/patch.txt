@@ -28,7 +28,7 @@ index 1191d79aa495..7f80f8ebc8de 100644
  	MEM_CGROUP_EVENTS_PGFAULT,	/* # of page-faults */
  	MEM_CGROUP_EVENTS_PGMAJFAULT,	/* # of major page-faults */
 +	MEM_CGROUP_EVENTS_PGLOSS,	/* # of pages lost to others */
-+	MEM_CGROUP_EVENTS_PGGAIN,	/* # of pages gain from others */
++	MEM_CGROUP_EVENTS_PGSTOLEN,	/* # of pages stolen from others */
  	MEM_CGROUP_EVENTS_NSTATS,
  	/* default hierarchy events */
  	MEMCG_LOW = MEM_CGROUP_EVENTS_NSTATS,
@@ -80,7 +80,7 @@ index fe787f5c41bd..439c37c5c196 100644
  	"pgfault",
  	"pgmajfault",
 +	"pgloss",
-+	"pggain",
++	"pgstolen",
  };
  
  static const char * const mem_cgroup_lru_names[] = {
