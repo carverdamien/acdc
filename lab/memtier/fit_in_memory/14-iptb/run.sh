@@ -68,7 +68,7 @@ ${RUN} exec memtierb job run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test
 sleep 60
 
 # Report
-for m in memory_stats blkio_stats networks cpu_stats memtier_stats
+for m in memory_stats blkio_stats networks cpu_stats memtier_stats idlemem_stats
 do
 	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$m.csv
 done
