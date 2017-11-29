@@ -5,17 +5,17 @@
 * `install.sh` installs the kernel on the host.
 * `reboot.sh` reboots the machine on this kernel.
 
-###mem
+### mem
 ![mem](https://image.ibb.co/cYMFQG/mem.png "mem")
-###pglost
+### pglost
 ![pglost](https://image.ibb.co/fb2N5G/pglost.png "pglost")
-###pgstolen
+### pgstolen
 ![pgstolen](https://image.ibb.co/kuwRXw/pgstolen.png "pgstolen")
-###priority
+### priority
 ![priority](https://image.ibb.co/fHw4Kb/priority.png "priority")
-###ratio
+### ratio
 ![ratio](https://image.ibb.co/mDefsw/ratio.png "ratio")
-###rtps
+### rtps
 ![rtps](https://image.ibb.co/caijKb/rtps.png "rtps")
-###trps
+### trps
 ![trps](https://image.ibb.co/mr2N5G/trps.png "trps")
