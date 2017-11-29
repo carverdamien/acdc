@@ -11,7 +11,7 @@ img = sys.argv[1]
 df = pd.read_csv('memory_stats.csv')
 
 plt.figure()
-for label in ['mysqla', 'mysqlb', 'cassandra']:
+for label in ['redisa', 'redisb', 'redisc']:
 	for metric in ['stats.pglost']:
 		sel = df['com.docker.compose.service'] == label
 		X = df['time'][sel]
