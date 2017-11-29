@@ -40,7 +40,7 @@ index 1191d79aa495..7f80f8ebc8de 100644
  	MEM_CGROUP_EVENTS_PGPGOUT,	/* # of pages paged out */
  	MEM_CGROUP_EVENTS_PGFAULT,	/* # of page-faults */
  	MEM_CGROUP_EVENTS_PGMAJFAULT,	/* # of major page-faults */
-+	MEM_CGROUP_EVENTS_PGLOSS,	/* # of pages lost to others */
++	MEM_CGROUP_EVENTS_PGLOST,	/* # of pages lost to others */
 +	MEM_CGROUP_EVENTS_PGSTOLEN,	/* # of pages stolen from others */
  	MEM_CGROUP_EVENTS_NSTATS,
  	/* default hierarchy events */
@@ -92,7 +92,7 @@ index fe787f5c41bd..439c37c5c196 100644
  	"pgpgout",
  	"pgfault",
  	"pgmajfault",
-+	"pgloss",
++	"pglost",
 +	"pgstolen",
  };
  
@@ -372,7 +372,7 @@ index 142cb61f4822..91c62dac3625 100644
  
 +			if (sc->mem_charging && memcg != sc->mem_charging) {
 +				mem_cgroup_events(memcg,
-+						  MEM_CGROUP_EVENTS_PGLOSS,
++						  MEM_CGROUP_EVENTS_PGLOST,
 +						  sc->nr_reclaimed - reclaimed);
 +				mem_cgroup_events(sc->mem_charging,
 +						  MEM_CGROUP_EVENTS_PGSTOLEN,
