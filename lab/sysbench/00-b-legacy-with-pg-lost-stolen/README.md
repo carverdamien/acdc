@@ -5,6 +5,9 @@ Provide a feedback metric to observe the reclaim decisions during consolidation.
 `pglost` will account the total number of page lost by a cgroup because of another cgroup reaching the parent's limit.
 `pgstolen` will account the total number of page that this cgroup reclaimed in other cgroups.
 
+We need `pglost` and `pgstolen` when the diskIO bandwidth is high enough to hide the bad decisions by quickly recovering swapped pages.
+In this case, the system is paying in IO for its mistakes, but what if IO gets scarce, or write lifetime of disk gets shorter.
+
 ## scripts
 
 * `run.sh` runs the experiment.
