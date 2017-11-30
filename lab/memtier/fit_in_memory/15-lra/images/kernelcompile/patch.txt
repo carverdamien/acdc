@@ -1,18 +1,5 @@
-diff --git a/mm/rmap.c b/mm/rmap.c
-index 8a839935b18c..0ea5d9071b32 100644
---- a/mm/rmap.c
-+++ b/mm/rmap.c
-@@ -1098,6 +1098,8 @@ void page_move_anon_rmap(struct page *page,
- 
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
- 	VM_BUG_ON_VMA(!anon_vma, vma);
-+	if (IS_ENABLED(CONFIG_DEBUG_VM) && PageTransHuge(page))
-+		address &= HPAGE_PMD_MASK;
- 	VM_BUG_ON_PAGE(page->index != linear_page_index(vma, address), page);
- 
- 	anon_vma = (void *) anon_vma + PAGE_MAPPING_ANON;
 diff --git a/Makefile b/Makefile
-index 0f9cb36d45c2..3929599d2317 100644
+index 0f9cb36..0ca25fe 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,7 +1,7 @@
@@ -20,12 +7,12 @@ index 0f9cb36d45c2..3929599d2317 100644
  PATCHLEVEL = 6
  SUBLEVEL = 0
 -EXTRAVERSION =
-+EXTRAVERSION = .nca
++EXTRAVERSION = .lra
  NAME = Charred Weasel
  
  # *DOCUMENTATION*
 diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 1191d79aa495..7f80f8ebc8de 100644
+index 1191d79..8b343e2 100644
 --- a/include/linux/memcontrol.h
 +++ b/include/linux/memcontrol.h
 @@ -29,6 +29,7 @@
@@ -58,8 +45,16 @@ index 1191d79aa495..7f80f8ebc8de 100644
  	/*
  	 * Should the accounting and control be hierarchical, per subtree?
  	 */
+@@ -272,6 +281,7 @@ struct mem_cgroup {
+ };
+ 
+ extern struct mem_cgroup *root_mem_cgroup;
++extern atomic_long_t global_clock_page_demand;
+ 
+ static inline bool mem_cgroup_disabled(void)
+ {
 diff --git a/include/linux/swap.h b/include/linux/swap.h
-index ad220359f1b0..cda5ab5eb86b 100644
+index ad22035..cda5ab5 100644
 --- a/include/linux/swap.h
 +++ b/include/linux/swap.h
 @@ -320,9 +320,11 @@ extern unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
@@ -76,14 +71,14 @@ index ad220359f1b0..cda5ab5eb86b 100644
  						gfp_t gfp_mask, bool noswap,
  						struct zone *zone,
 diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index fe787f5c41bd..439c37c5c196 100644
+index fe787f5..f3cf0ee 100644
 --- a/mm/memcontrol.c
 +++ b/mm/memcontrol.c
 @@ -85,6 +85,8 @@ static bool cgroup_memory_nosocket;
  /* Kernel memory accounting disabled? */
  static bool cgroup_memory_nokmem;
  
-+static atomic_long_t global_clock_page_demand;
++atomic_long_t global_clock_page_demand;
 +
  /* Whether the swap controller is active */
  #ifdef CONFIG_MEMCG_SWAP
@@ -330,8 +325,38 @@ index fe787f5c41bd..439c37c5c196 100644
  				nr_reclaims--;
  			continue;
  		}
+diff --git a/mm/rmap.c b/mm/rmap.c
+index 307b555..3ebf9c4 100644
+--- a/mm/rmap.c
++++ b/mm/rmap.c
+@@ -1098,6 +1098,8 @@ void page_move_anon_rmap(struct page *page,
+ 
+ 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+ 	VM_BUG_ON_VMA(!anon_vma, vma);
++	if (IS_ENABLED(CONFIG_DEBUG_VM) && PageTransHuge(page))
++		address &= HPAGE_PMD_MASK;
+ 	VM_BUG_ON_PAGE(page->index != linear_page_index(vma, address), page);
+ 
+ 	anon_vma = (void *) anon_vma + PAGE_MAPPING_ANON;
+diff --git a/mm/swap.c b/mm/swap.c
+index 03aacbc..1aab9d2 100644
+--- a/mm/swap.c
++++ b/mm/swap.c
+@@ -270,6 +270,12 @@ static void __activate_page(struct page *page, struct lruvec *lruvec,
+ 
+ 		__count_vm_event(PGACTIVATE);
+ 		update_page_reclaim_stat(lruvec, file, 1);
++
++#ifdef CONFIG_MEMCG
++		if (page->mem_cgroup)
++			page->mem_cgroup->age_of_last_page_demand =
++				atomic_long_inc_return(&global_clock_page_demand);
++#endif
+ 	}
+ }
+ 
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 142cb61f4822..91c62dac3625 100644
+index 142cb61..2e928d0 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
 @@ -80,6 +80,11 @@ struct scan_control {
@@ -356,7 +381,19 @@ index 142cb61f4822..91c62dac3625 100644
  	unsigned int hibernation_mode:1;
  
  	/* One of the zones is ready for compaction */
-@@ -2411,6 +2419,9 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
+@@ -1231,6 +1239,11 @@ keep:
+ 
+ 	list_splice(&ret_pages, page_list);
+ 	count_vm_events(PGACTIVATE, pgactivate);
++#ifdef CONFIG_MEMCG
++		if (pgactivate && page->mem_cgroup)
++			page->mem_cgroup->age_of_last_page_demand =
++				atomic_long_inc_return(&global_clock_page_demand);
++#endif
+ 
+ 	*ret_nr_dirty += nr_dirty;
+ 	*ret_nr_congested += nr_congested;
+@@ -2411,6 +2424,9 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
  			unsigned long reclaimed;
  			unsigned long scanned;
  
@@ -366,7 +403,7 @@ index 142cb61f4822..91c62dac3625 100644
  			if (mem_cgroup_low(root, memcg)) {
  				if (!sc->may_thrash)
  					continue;
-@@ -2423,6 +2434,15 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
+@@ -2423,6 +2439,15 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
  			shrink_zone_memcg(zone, memcg, sc, &lru_pages);
  			zone_lru_pages += lru_pages;
  
@@ -382,7 +419,7 @@ index 142cb61f4822..91c62dac3625 100644
  			if (memcg && is_classzone)
  				shrink_slab(sc->gfp_mask, zone_to_nid(zone),
  					    memcg, sc->nr_scanned - scanned,
-@@ -2915,9 +2935,11 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
+@@ -2915,9 +2940,11 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
  }
  
  unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
@@ -395,7 +432,7 @@ index 142cb61f4822..91c62dac3625 100644
  {
  	struct zonelist *zonelist;
  	unsigned long nr_reclaimed;
-@@ -2927,10 +2949,12 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
+@@ -2927,10 +2954,12 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
  		.gfp_mask = (gfp_mask & GFP_RECLAIM_MASK) |
  				(GFP_HIGHUSER_MOVABLE & ~GFP_RECLAIM_MASK),
  		.target_mem_cgroup = memcg,
