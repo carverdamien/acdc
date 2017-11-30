@@ -356,7 +356,7 @@ index 03aacbc..1aab9d2 100644
  }
  
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 142cb61..2e928d0 100644
+index 142cb61..62831ef 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
 @@ -80,6 +80,11 @@ struct scan_control {
@@ -381,19 +381,35 @@ index 142cb61..2e928d0 100644
  	unsigned int hibernation_mode:1;
  
  	/* One of the zones is ready for compaction */
-@@ -1231,6 +1239,11 @@ keep:
+@@ -896,6 +904,7 @@ static unsigned long shrink_page_list(struct list_head *page_list,
+ 	unsigned long nr_reclaimed = 0;
+ 	unsigned long nr_writeback = 0;
+ 	unsigned long nr_immediate = 0;
++	struct mem_cgroup *mem_cgroup = NULL;
  
+ 	cond_resched();
+ 
+@@ -916,6 +925,8 @@ static unsigned long shrink_page_list(struct list_head *page_list,
+ 		if (!trylock_page(page))
+ 			goto keep;
+ 
++		mem_cgroup = page->mem_cgroup;
++
+ 		VM_BUG_ON_PAGE(PageActive(page), page);
+ 		VM_BUG_ON_PAGE(page_zone(page) != zone, page);
+ 
+@@ -1232,6 +1243,10 @@ keep:
  	list_splice(&ret_pages, page_list);
  	count_vm_events(PGACTIVATE, pgactivate);
-+#ifdef CONFIG_MEMCG
-+		if (pgactivate && page->mem_cgroup)
-+			page->mem_cgroup->age_of_last_page_demand =
-+				atomic_long_inc_return(&global_clock_page_demand);
-+#endif
  
++	if (pgactivate && mem_cgroup)
++		mem_cgroup->age_of_last_page_demand =
++			atomic_long_inc_return(&global_clock_page_demand);
++
  	*ret_nr_dirty += nr_dirty;
  	*ret_nr_congested += nr_congested;
-@@ -2411,6 +2424,9 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
+ 	*ret_nr_unqueued_dirty += nr_unqueued_dirty;
+@@ -2411,6 +2426,9 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
  			unsigned long reclaimed;
  			unsigned long scanned;
  
@@ -403,7 +419,7 @@ index 142cb61..2e928d0 100644
  			if (mem_cgroup_low(root, memcg)) {
  				if (!sc->may_thrash)
  					continue;
-@@ -2423,6 +2439,15 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
+@@ -2423,6 +2441,15 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
  			shrink_zone_memcg(zone, memcg, sc, &lru_pages);
  			zone_lru_pages += lru_pages;
  
@@ -419,7 +435,7 @@ index 142cb61..2e928d0 100644
  			if (memcg && is_classzone)
  				shrink_slab(sc->gfp_mask, zone_to_nid(zone),
  					    memcg, sc->nr_scanned - scanned,
-@@ -2915,9 +2940,11 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
+@@ -2915,9 +2942,11 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
  }
  
  unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
@@ -432,7 +448,7 @@ index 142cb61..2e928d0 100644
  {
  	struct zonelist *zonelist;
  	unsigned long nr_reclaimed;
-@@ -2927,10 +2954,12 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
+@@ -2927,10 +2956,12 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
  		.gfp_mask = (gfp_mask & GFP_RECLAIM_MASK) |
  				(GFP_HIGHUSER_MOVABLE & ~GFP_RECLAIM_MASK),
  		.target_mem_cgroup = memcg,
