@@ -13,14 +13,14 @@ Show that nca should not be able to make the difference between
 * `reboot.sh` reboots the machine on this kernel.
 
 ### mem
-![mem](https://image.ibb.co/iTH5QG/mem.png "mem")
+![mem](https://image.ibb.co/jhFP2w/mem.png "mem")
 ### pglost
-![pglost](https://image.ibb.co/dKsGXw/pglost.png "pglost")
+![pglost](https://image.ibb.co/fq0DvG/pglost.png "pglost")
 ### pgstolen
-![pgstolen](https://image.ibb.co/kQoqsw/pgstolen.png "pgstolen")
+![pgstolen](https://image.ibb.co/iTfP2w/pgstolen.png "pgstolen")
 ### ratio
-![ratio](https://image.ibb.co/iEPkQG/ratio.png "ratio")
+![ratio](https://image.ibb.co/eMXtvG/ratio.png "ratio")
 ### rtps
-![rtps](https://image.ibb.co/ecOOCw/rtps.png "rtps")
+![rtps](https://image.ibb.co/gJ3cNw/rtps.png "rtps")
 ### trps
-![trps](https://image.ibb.co/mUqQQG/trps.png "trps")
+![trps](https://image.ibb.co/jkQDvG/trps.png "trps")
