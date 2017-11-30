@@ -1,0 +1,121 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
+    cpuset: 2,3,6,7
+    links:
+      - redisa
+      - influxdb
+  redisa:
+    image: redis:latest
+    volumes:
+      - data-redisa:/data
+    cpuset: 2,3,6,7
+    cgroup_parent: consolidate
+    mem_limit: 2G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '128kb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '1gb'
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
+    cpuset: 0,4,1,5
+    links:
+      - redisa
+      - influxdb
+  redisb:
+    image: redis:latest
+    volumes:
+      - data-redisb:/data
+    cpuset: 0,4,1,5
+    cgroup_parent: consolidate
+    mem_limit: 2G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '1gb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '1gb'
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
+    cpuset: 0,4,1,5
+    links:
+      - redisc
+      - influxdb
+  redisc:
+    image: redis:latest
+    volumes:
+      - data-redisc:/data
+    cpuset: 0,4,1,5
+    cgroup_parent: consolidate
+    mem_limit: 2G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '1gb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '1gb'
+  influxdb:
+    image: influxdb:latest
+  collector:
+    build: images/collector
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  idlememstat:
+    build: images/idlememstat
+    privileged: true
+    command: [ "-d", "10", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--cgroup", "/rootfs/sys/fs/cgroup/memory/consolidate" ]
+    environment:
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
+  data-redisa:
+    external: false
+  data-redisb:
+    external: false
+  data-redisc:
+    external: false

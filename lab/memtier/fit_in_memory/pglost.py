@@ -8,7 +8,7 @@ import sys
 
 img = sys.argv[1]
 
-kernels = ['10-vanilla', '12-nca', '14-iptb']
+kernels = ['10-vanilla', '12-nca', '15-lra', '14-iptb']
 dfs = { kernel : pd.read_csv('%s/data/memory_stats.csv' % kernel) for kernel in kernels}
 
 plt.figure()
