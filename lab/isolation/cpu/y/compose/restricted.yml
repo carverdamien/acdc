@@ -16,8 +16,9 @@ services:
       - influxdb
   sysbenchb:
     build: images/sysbench
-    cpuset: 2,3
+    cpuset: "2"
     cpu_shares: 2
+    cgroup_parent: consolidate
     links:
       - influxdb
   mysqla:
@@ -27,7 +28,7 @@ services:
       - data-mysqla:/var/lib/mysql
     cgroup_parent: consolidate
     mem_limit: 1G
-    cpuset: 2,3
+    cpuset: "2"
     cpu_shares: 1024
   influxdb:
     image: influxdb:latest
