@@ -18,7 +18,6 @@ services:
     build: images/sysbench
     cpuset: 2,3
     links:
-      - mysqlb:mysql
       - influxdb
   mysqla:
     build: images/mysql
