@@ -69,7 +69,7 @@ def run(args):
     args.callback = callback
 
     call = sysbench_call(args.dbsize) + ['--report-interval=1',
-                            '--tx-rate=%d' % 0,
+                            '--tx-rate=%d' % args.txrate,
                             '--max-requests=0',
                             '--max-time=%d' % args.duration,
                             '--num-threads=%d' % 8,
@@ -107,6 +107,7 @@ def main():
     run_parser.add_argument("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
     run_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
     run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
+    run_parser.add_argument('--tx-rate', dest="txrate", type=int, nargs='?', default=0)
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 

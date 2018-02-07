@@ -28,7 +28,7 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 180
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 180 --tx-rate 1000
 sleep 60
 ${RUN} exec sysbenchb ./sysbench/sysbench --test=cpu --cpu-max-prime=20000 run
 sleep 60
