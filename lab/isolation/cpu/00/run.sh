@@ -18,7 +18,6 @@ ${PRE} build
 ${PRE} create
 ${PRE} up -d
 ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
-${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/consolidate ] || rmdir /rootfs/sys/fs/cgroup/memory/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/consolidate'
@@ -29,14 +28,9 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 300
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
-sleep 120
-${RUN} exec cassandra job start
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 180
 sleep 60
-${RUN} exec cassandra job stop
-sleep 60
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 60
+${RUN} exec sysbenchb ./sysbench/sysbench --test=cpu --cpu-max-prime=20000 run
 sleep 60
 
 # Report
