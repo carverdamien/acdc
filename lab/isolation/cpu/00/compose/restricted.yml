@@ -27,13 +27,6 @@ services:
     cgroup_parent: consolidate
     mem_limit: 1G
     cpuset: 2,3
-    blkio_config:
-      device_read_bps:
-        - path: /dev/sda
-          rate: '27mb'
-      device_write_bps:
-        - path: /dev/sda
-          rate: '27mb'
   influxdb:
     image: influxdb:latest
   collector:
