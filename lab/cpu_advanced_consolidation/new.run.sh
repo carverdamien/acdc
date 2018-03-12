@@ -45,7 +45,7 @@ ${RUN} up -d
 GO() {
 	TXRATE=$((MAXTXR * X / 10))
 	NREQ=$((TXRATE * CYCLE))
-	${RUN} exec sysbencha run --dbsize ${DBSIZE} --tx-rate ${TXRATE} --max-requests ${NREQ}	
+	${RUN} exec -T sysbencha run --dbsize ${DBSIZE} --tx-rate ${TXRATE} --max-requests ${NREQ}	
 }
 A() { for X in 1 1 2 4 8 4 2 1 1; do GO; done; }
 B() { for X in 2 4 8 4 2 1 1 1 1; do GO; done; }
