@@ -20,7 +20,7 @@ ${PRE} up -d
 ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchc prepare --dbsize ${DBSIZE}
-${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
+# ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/cpu/consolidate ] || find /rootfs/sys/fs/cgroup/cpu/consolidate -type d -delete'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/A'
@@ -35,13 +35,57 @@ ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B
 ${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
+MAXTXR=1800
+CYCLE=60
+
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 200 --tx-rate 0
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 200 --tx-rate 0
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration 200 --tx-rate 0
-sleep 200
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+sleep ${CYCLE}
+
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+sleep ${CYCLE}
 
 # Report
 for m in memory_stats blkio_stats networks cpu_stats sysbench_stats
