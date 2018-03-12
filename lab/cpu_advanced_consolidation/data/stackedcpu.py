@@ -19,7 +19,7 @@ def f():
 		X = np.array(X, dtype='datetime64[ns]')
 		X = 10**-9*np.array(X - X[0], dtype='double')
 		Y = df['percent_usage'][sel]
-		yield X[:180], Y[:180], label
+		yield X, Y, label
 
 plt.figure()
 

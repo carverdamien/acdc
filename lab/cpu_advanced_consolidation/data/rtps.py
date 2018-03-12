@@ -17,5 +17,6 @@ for label in ['mysqla', 'mysqlb', 'mysqlc']:
 	X = np.array(X, dtype='datetime64[ns]')
 	Y = df['rtps'][sel]
 	plt.plot(X,Y,label=label)
+	plt.yscale('log')
 plt.legend()
 plt.savefig(img)
