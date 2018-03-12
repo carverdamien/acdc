@@ -21,7 +21,7 @@ ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchc prepare --dbsize ${DBSIZE}
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
-${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/cpu/consolidate ] || rmdir /rootfs/sys/fs/cgroup/cpu/consolidate'
+${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/cpu/consolidate ] || find /rootfs/sys/fs/cgroup/cpu/consolidate -type d -delete'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/A'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC'
