@@ -27,8 +27,8 @@ ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/A'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C'
-${PRE} exec host bash -c 'echo 100000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_period_us'
-${PRE} exec host bash -c 'echo 100000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_quota_us'
+${PRE} exec host bash -c 'echo 1000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_period_us'
+${PRE} exec host bash -c 'echo 1000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_quota_us'
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/A/cpu.shares'
 ${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/cpu.shares'
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B/cpu.shares'
@@ -38,9 +38,9 @@ ${PRE} down
 # Run
 ${RUN} create
 ${RUN} up -d
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 200 --tx-rate 600
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 200 --tx-rate 600
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration 200 --tx-rate 600
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration 200 --tx-rate 0
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration 200 --tx-rate 0
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration 200 --tx-rate 0
 sleep 200
 
 # Report

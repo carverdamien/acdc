@@ -11,7 +11,7 @@ img = sys.argv[1]
 df = pd.read_csv('sysbench_stats.csv')
 
 plt.figure()
-for label in ['mysqla', 'mysqlb']:
+for label in ['mysqla', 'mysqlb', 'mysqlc']:
 	sel = df['hostname'] == label
 	X = df['time'][sel]
 	X = np.array(X, dtype='datetime64[ns]')
