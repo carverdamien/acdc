@@ -8,8 +8,8 @@ source kernel
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
 
-RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
-PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
+RUN="docker-compose --project-directory $PWD -f compose/restricted.yml -T"
+PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml -T"
 
 # Prepare
 ${RUN} down
