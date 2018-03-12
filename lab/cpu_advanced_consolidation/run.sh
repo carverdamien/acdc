@@ -31,7 +31,7 @@ ${PRE} exec host bash -c 'echo 100000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cp
 ${PRE} exec host bash -c 'echo 100000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_quota_us'
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/A/cpu.shares'
 ${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/cpu.shares'
-${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/Bcpu.shares'
+${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B/cpu.shares'
 ${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
