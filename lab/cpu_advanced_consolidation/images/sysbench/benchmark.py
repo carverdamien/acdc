@@ -98,6 +98,7 @@ def influxformat(measurement, fields, tags={}):
     yield point
 
 def main():
+    main_parser.add_argument('--wait', dest="wait", type=int, nargs='?', default=-1)
     prepare_parser = main_subparsers.add_parser('prepare')
     prepare_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
     prepare_parser.set_defaults(func=prepare)
@@ -109,7 +110,6 @@ def main():
     run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
     run_parser.add_argument('--tx-rate', dest="txrate", type=int, nargs='?', default=0)
     run_parser.add_argument('--max-requests', dest="maxrequests", type=int, nargs='?', default=0)
-    run_parser.add_argument('--wait', dest="wait", type=int, nargs='?', default=-1)
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 
