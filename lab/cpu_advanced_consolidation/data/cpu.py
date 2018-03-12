@@ -10,8 +10,10 @@ img = sys.argv[1]
 
 df = pd.read_csv('cpu_stats.csv')
 
+labels = ['mysqla', 'mysqlb', 'mysqlc']
+
 plt.figure()
-for label in ['sysbencha', 'sysbenchb', 'sysbenchc']:
+for label in labels:
 	sel = df['com.docker.compose.service'] == label
 	X = df['time'][sel]
 	X = np.array(X, dtype='datetime64[ns]')

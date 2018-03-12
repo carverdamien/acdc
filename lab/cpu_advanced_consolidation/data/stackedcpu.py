@@ -10,7 +10,7 @@ img = sys.argv[1]
 
 df = pd.read_csv('cpu_stats.csv')
 
-labels = ['sysbencha', 'sysbenchb', 'sysbenchc']
+labels = ['mysqla', 'mysqlb', 'mysqlc']
 
 def f():
 	for label in labels:
