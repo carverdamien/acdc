@@ -42,49 +42,49 @@ CYCLE=60
 ${RUN} create
 ${RUN} up -d
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
 sleep ${CYCLE}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 100))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 100))
+${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
+${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
 sleep ${CYCLE}
 
 # Report
