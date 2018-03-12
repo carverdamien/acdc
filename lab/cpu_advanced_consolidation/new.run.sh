@@ -45,11 +45,11 @@ ${RUN} up -d
 GO() {
 	TXRATE=$((MAXTXR * X / 10))
 	NREQ=$((TXRATE * CYCLE))
-	${RUN} exec -T ${SYSBENCH} run --dbsize ${DBSIZE} --tx-rate ${TXRATE} --max-requests ${NREQ}	
+	${RUN} exec -T ${SYSBENCH} run --dbsize ${DBSIZE} --tx-rate ${TXRATE} --max-requests ${NREQ} --wait=0
 }
-A() { SYSBENCH=sysbencha for X in 1 1 2 4 8 4 2 1 1; do GO; done; }
-B() { SYSBENCH=sysbenchb for X in 2 4 8 4 2 1 1 1 1; do GO; done; }
-C() { SYSBENCH=sysbenchc for X in 1 1 1 1 2 4 8 4 2; do GO; done; }
+A() { SYSBENCH=sysbencha; for X in 1 1 2 4 8 4 2 1 1; do GO; done; }
+B() { SYSBENCH=sysbenchb; for X in 2 4 8 4 2 1 1 1 1; do GO; done; }
+C() { SYSBENCH=sysbenchc; for X in 1 1 1 1 2 4 8 4 2; do GO; done; }
 
 A&
 B&

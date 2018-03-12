@@ -109,12 +109,16 @@ def main():
     run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
     run_parser.add_argument('--tx-rate', dest="txrate", type=int, nargs='?', default=0)
     run_parser.add_argument('--max-requests', dest="maxrequests", type=int, nargs='?', default=0)
+    run_parser.add_argument('--wait', dest="wait", type=int, nargs='?', default=-1)
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 
     args = main_parser.parse_args()
     
-    wait_for_server_to_start()
+    if args.wait > 0:
+        time.sleep(args.wait)
+    elif args.wait < 0:
+        wait_for_server_to_start()
     args.func(args)
 
 main()
