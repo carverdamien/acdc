@@ -48,7 +48,7 @@ SCHED() {
 	shift
 	NREQ=0
 	TXRATE=$((MAXTXR * X / 10))
-	NREQ=$((TXRATE * CYCLE))
+	NREQ=$((TXRATE * CYCLE + NREQ))
 	CMD="--tx-rate ${TXRATE} --max-requests ${NREQ}"
 	RATE=""
 	TIME=""
