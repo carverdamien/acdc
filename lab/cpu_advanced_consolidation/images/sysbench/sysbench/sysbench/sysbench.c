@@ -64,8 +64,6 @@
 # include <limits.h>
 #endif
 
-#include <fcntl.h>
-
 #include "sysbench.h"
 #include "sb_options.h"
 #include "scripting/sb_script.h"
@@ -183,13 +181,6 @@ static pthread_cond_t     event_queue_cv;
 static event_queue_elem_t queue_array[MAX_QUEUE_LEN];
 
 static int queue_is_full;
-
-#define SLEEP 0
-#define RUN 1
-#define QUIT 2
-pthread_mutex_t activity_lock = PTHREAD_MUTEX_INITIALIZER;
-int activity_value = RUN;
-pthread_cond_t activity_cond = PTHREAD_COND_INITIALIZER;
 
 static void print_header(void);
 static void print_help(void);
@@ -494,7 +485,6 @@ static void *worker_thread(void *arg)
   unsigned long long  queue_start_time = 0;
   sb_list_item_t     *pos;
   event_queue_elem_t *event;
-  int breakloop = 0;
 
   ctxt = (sb_thread_ctxt_t *)arg;
   test = ctxt->test;
@@ -572,17 +562,8 @@ static void *worker_thread(void *arg)
       log_text(LOG_INFO, "Time limit exceeded, exiting...");
       break;
     }
-    else
-    {
-      pthread_mutex_lock(&activity_lock);
-      while (activity_value == SLEEP)
-        pthread_cond_wait(&activity_cond, &activity_lock);
-      if (activity_value == QUIT)
-        breakloop = 1;
-      pthread_mutex_unlock(&activity_lock);
-    }
 
-  } while ((request.type != SB_REQ_TYPE_NULL) && (!sb_globals.error) && !breakloop);
+  } while ((request.type != SB_REQ_TYPE_NULL) && (!sb_globals.error) );
 
   if (test->ops.thread_done != NULL)
     test->ops.thread_done(thread_id);
@@ -794,7 +775,6 @@ static int run_test(sb_test_t *test)
   int          checkpoints_thread_created = 0;
   int          eventgen_thread_created    = 0;
   unsigned int barrier_threads;
-  int breakloop = 0;
 
   /* initialize test */
   if (test->ops.init != NULL && test->ops.init() != 0)
@@ -932,46 +912,6 @@ static int run_test(sb_test_t *test)
 #endif
 
   log_text(LOG_NOTICE, "Threads started!\n");
-
-  if (sb_globals.max_time == 0)
-  {
-    int fd = 0;
-    //int flags = fcntl(fd, F_GETFL, 0);
-    //fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-    do {
-      char c;
-      int ret;
-      ret = read(fd, &c, sizeof(c));
-      if (ret == -1)
-        sleep(1);
-      else
-        switch(c) {
-        case 'q':
-          //printf("Quitting\n");
-          pthread_mutex_lock(&activity_lock);
-          activity_value = QUIT;
-          pthread_cond_broadcast(&activity_cond);
-          pthread_mutex_unlock(&activity_lock);
-          breakloop = 1;
-          break;
-        case 'r':
-          //printf("Resuming\n");
-          pthread_mutex_lock(&activity_lock);
-          activity_value = RUN;
-          pthread_cond_broadcast(&activity_cond);
-          pthread_mutex_unlock(&activity_lock);
-          break;
-        case 'p':
-          //printf("Pausing\n");
-          pthread_mutex_lock(&activity_lock);
-          activity_value = SLEEP;
-          pthread_mutex_unlock(&activity_lock);
-          break;
-        default:
-          break;
-        }
-    } while(!breakloop);
-  }
 
   for(i = 0; i < sb_globals.num_threads; i++)
   {
