@@ -46,8 +46,9 @@ ${RUN} up -d
 SCHED() {
 	X=$1
 	shift
+	NREQ=0
 	TXRATE=$((MAXTXR * X / 10))
-	NREQ=$((TXRATE * CYCLE))
+	NREQ=$((TXRATE * CYCLE + NREQ))
 	CMD="--tx-rate ${TXRATE} --max-requests ${NREQ}"
 	RATE=""
 	TIME=""
@@ -57,7 +58,7 @@ SCHED() {
 		X=$1
 		shift
 		TXRATE=$((MAXTXR * X / 10))
-		NREQ=$((TXRATE * CYCLE))
+		NREQ=$((TXRATE * CYCLE + NREQ))
 		RATE="--scheduled-tx-rate=${TXRATE}"
 		TIME="--scheduled-max-time=0"
 		REQT="--scheduled-max-requests=${NREQ}"
@@ -65,7 +66,7 @@ SCHED() {
 	for X in $@
 	do
 		TXRATE=$((MAXTXR * X / 10))
-		NREQ=$((TXRATE * CYCLE))
+		NREQ=$((TXRATE * CYCLE + NREQ))
 		RATE="${RATE},${TXRATE}"
 		TIME="${TIME},0"
 		REQT="${REQT},${NREQ}"

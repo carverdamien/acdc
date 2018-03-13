@@ -74,9 +74,9 @@ def run(args):
                             '--max-time=%d' % args.duration,
                             '--num-threads=%d' % 8,
                             '--oltp-read-only=on',
-                            '--scheduled-tx-rate=%s' % args.scheduled_tx_rate,
-                            '--scheduled-max-time=%s' % args.scheduled_max_time,
-                            '--scheduled-max-requests=%s' % args.scheduled_max_requests,
+                            '--scheduled-tx-rate %s' % args.scheduled_tx_rate,
+                            '--scheduled-max-time %s' % args.scheduled_max_time,
+                            '--scheduled-max-requests %s' % args.scheduled_max_requests,
                             'run']
     p = subprocess.Popen(call, stdout=subprocess.PIPE)
     for line in p.stdout:
