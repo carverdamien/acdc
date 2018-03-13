@@ -137,9 +137,9 @@ sb_arg_t general_args[] =
    "representing the amount of time in seconds elapsed from start of test "
    "when report checkpoint(s) must be performed. Report checkpoints are off by "
    "default.", SB_ARG_TYPE_LIST, ""},
-  {"scheduled-tx-rate", SB_ARG_TYPE_LIST, ""},
-  {"scheduled-max-requests", SB_ARG_TYPE_LIST, ""},
-  {"scheduled-max-time", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-tx-rate", "", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-max-requests", "", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-max-time", "", SB_ARG_TYPE_LIST, ""},
   {"test", "test to run", SB_ARG_TYPE_STRING, NULL},
   {"debug", "print more debugging info", SB_ARG_TYPE_FLAG, "off"},
   {"validate", "perform validation checks where possible", SB_ARG_TYPE_FLAG, "off"},
