@@ -1157,6 +1157,7 @@ static int init(void)
           sizeof(unsigned int), checkpoint_cmp);
   }
 
+  sb_globals.current_schedule = 0;
   sb_globals.n_schedules = 0;
   some_list = sb_get_value_list("scheduled-tx-rate");
   SB_LIST_FOR_EACH(pos_val, some_list)
