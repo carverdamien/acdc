@@ -35,9 +35,8 @@ ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
-MAXTXR=1800 #
-MAXTXR=1000
-CYCLE=60
+MAXTXR=800 # If too high, queues will fill to quickly
+CYCLE=30 # If too long, queues will overflow
 
 # Run
 ${RUN} create
