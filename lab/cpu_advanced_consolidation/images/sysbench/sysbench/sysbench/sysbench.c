@@ -1232,6 +1232,26 @@ static int init(void)
     log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-max-requests");
       return 1;
   }
+  log_text(LOG_NOTICE, "Schedules\n");
+  for(n_schedules=0; n_schedules < sb_globals.n_schedules; n_schedules++) {
+	  log_text(LOG_NOTICE, "%ld %ld %ld\n",
+		   sb_globals.scheduled_tx_rate[n_schedules],
+		   sb_globals.scheduled_max_time[n_schedules],
+		   sb_globals.scheduled_max_requests[n_schedules]);
+	  if(n_schedules > 1) {
+		  // TODO: check first parameter (not in scheduled[])
+		  if(sb_globals.scheduled_max_requests[n_schedules-1] && 
+		     sb_globals.scheduled_max_requests[n_schedules] <= sb_globals.scheduled_max_requests[n_schedules-1]) {
+			  log_text(LOG_FATAL, "sb_globals.scheduled_max_requests[n_schedules] <= sb_globals.scheduled_max_requests[n_schedules-1]");
+			  return 1;
+		  }
+		  if(sb_globals.scheduled_max_time[n_schedules-1] &&
+		     sb_globals.scheduled_max_time[n_schedules] <= sb_globals.scheduled_max_time[n_schedules-1]) {
+			  log_text(LOG_FATAL, "sb_globals.scheduled_max_time[n_schedules] <= sb_globals.scheduled_max_time[n_schedules-1]");
+			  return 1;
+		  }
+	  }
+  }
   return 0;
 }
 
