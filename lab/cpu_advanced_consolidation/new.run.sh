@@ -70,7 +70,7 @@ SCHED() {
 		TIME="${TIME},0"
 		REQT="${REQT},${NREQ}"
 	done
-	CMD="${CMD} ${RATE} ${TIME} ${REQT}"
+	echo "${CMD} ${RATE} ${TIME} ${REQT}"
 }
 
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 1 1 2 4 8 4 2 1 1);}
