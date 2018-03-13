@@ -32,21 +32,21 @@ services:
     volumes:
       - data-mysqla:/var/lib/mysql
     cgroup_parent: 'consolidate/A'
-    cpuset: 2,3,6,7
+    cpuset: 2,6
   mysqlb:
     build: images/mysql
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
     cgroup_parent: 'consolidate/BC/B'
-    cpuset: 2,3,6,7
+    cpuset: 2,6
   mysqlc:
     build: images/mysql
     hostname: mysqlc
     volumes:
       - data-mysqlc:/var/lib/mysql
     cgroup_parent: 'consolidate/BC/C'
-    cpuset: 2,3,6,7
+    cpuset: 2,6
   influxdb:
     image: influxdb:latest
   collector:
