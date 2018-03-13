@@ -55,6 +55,7 @@
 
 /* Maximum number of elements in --report-checkpoints list */
 #define MAX_CHECKPOINTS 256
+#define MAX_SCHEDULES 256
 
 /* random() is not thread-safe on most platforms, use lrand48() if available */
 #ifdef HAVE_LRAND48
@@ -214,6 +215,12 @@ typedef struct
   unsigned int    tx_rate;      /* target transaction rate */
   unsigned int    max_requests; /* maximum number of requests */
   unsigned int    max_time;     /* total execution time limit */
+  unsigned int    current_schedule;
+  unsigned int    n_schedules;
+  unsigned int    scheduled_tx_rate[MAX_SCHEDULES];
+  unsigned int    scheduled_max_requests[MAX_SCHEDULES];
+  unsigned int    scheduled_max_time[MAX_SCHEDULES];
+
   unsigned char   debug;        /* debug flag */
   int             force_shutdown; /* whether we must force test shutdown */
   unsigned int    timeout;      /* forced shutdown timeout */

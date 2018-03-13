@@ -137,6 +137,9 @@ sb_arg_t general_args[] =
    "representing the amount of time in seconds elapsed from start of test "
    "when report checkpoint(s) must be performed. Report checkpoints are off by "
    "default.", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-tx-rate", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-max-requests", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-max-time", SB_ARG_TYPE_LIST, ""},
   {"test", "test to run", SB_ARG_TYPE_STRING, NULL},
   {"debug", "print more debugging info", SB_ARG_TYPE_FLAG, "off"},
   {"validate", "perform validation checks where possible", SB_ARG_TYPE_FLAG, "off"},
@@ -1009,9 +1012,11 @@ static int init(void)
   char     *s;
   char     *tmp;
   sb_list_t         *checkpoints_list;
+  sb_list_t         *some_list;
   sb_list_item_t    *pos_val;
   value_t           *val;
   long              res;
+  unsigned int    n_schedules;
 
   sb_globals.num_threads = sb_get_value_int("num-threads");
   if (sb_globals.num_threads == 0)
@@ -1152,6 +1157,80 @@ static int init(void)
           sizeof(unsigned int), checkpoint_cmp);
   }
 
+  sb_globals.n_schedules = 0;
+  some_list = sb_get_value_list("scheduled-tx-rate");
+  SB_LIST_FOR_EACH(pos_val, some_list)
+  {
+    char *endptr;
+
+    val = SB_LIST_ENTRY(pos_val, value_t, listitem);
+    res = strtol(val->data, &endptr, 10);
+    if (*endptr != '\0' || res < 0 || res > UINT_MAX)
+    {
+      log_text(LOG_FATAL, "Invalid value for --scheduled-tx-rate: '%s'",
+               val->data);
+      return 1;
+    }
+    if (++sb_globals.n_schedules > MAX_SCHEDULES)
+    {
+      log_text(LOG_FATAL, "Too many in --scheduled-tx-rate "
+               "(up to %d can be defined)", MAX_SCHEDULES);
+      return 1;
+    }
+    sb_globals.scheduled_tx_rate[sb_globals.n_schedules-1] = (unsigned int) res;
+  }
+  n_schedules = 0;
+  some_list = sb_get_value_list("scheduled-max-time");
+  SB_LIST_FOR_EACH(pos_val, some_list)
+  {
+    char *endptr;
+
+    val = SB_LIST_ENTRY(pos_val, value_t, listitem);
+    res = strtol(val->data, &endptr, 10);
+    if (*endptr != '\0' || res < 0 || res > UINT_MAX)
+    {
+      log_text(LOG_FATAL, "Invalid value for --scheduled-max-time: '%s'",
+               val->data);
+      return 1;
+    }
+    if (++n_schedules > MAX_SCHEDULES)
+    {
+      log_text(LOG_FATAL, "Too many in --scheduled-max-time "
+               "(up to %d can be defined)", MAX_SCHEDULES);
+      return 1;
+    }
+    sb_globals.scheduled_max_time[n_schedules-1] = (unsigned int) res;
+  }
+  if (n_schedules != sb_globals.n_schedules) {
+    log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-max-time");
+      return 1;
+  }
+  n_schedules = 0;
+  some_list = sb_get_value_list("scheduled-max-requests");
+  SB_LIST_FOR_EACH(pos_val, some_list)
+  {
+    char *endptr;
+
+    val = SB_LIST_ENTRY(pos_val, value_t, listitem);
+    res = strtol(val->data, &endptr, 10);
+    if (*endptr != '\0' || res < 0 || res > UINT_MAX)
+    {
+      log_text(LOG_FATAL, "Invalid value for --scheduled-max-requests: '%s'",
+               val->data);
+      return 1;
+    }
+    if (++n_schedules > MAX_SCHEDULES)
+    {
+      log_text(LOG_FATAL, "Too many in --scheduled-max-requests "
+               "(up to %d can be defined)", MAX_SCHEDULES);
+      return 1;
+    }
+    sb_globals.scheduled_max_requests[n_schedules-1] = (unsigned int) res;
+  }
+  if (n_schedules != sb_globals.n_schedules) {
+    log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-max-requests");
+      return 1;
+  }
   return 0;
 }
 
