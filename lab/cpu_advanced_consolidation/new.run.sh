@@ -43,14 +43,39 @@ CYCLE=60
 ${RUN} create
 ${RUN} up -d
 
-GO() {
+SCHED() {
+	X=$1
+	shift
 	TXRATE=$((MAXTXR * X / 10))
 	NREQ=$((TXRATE * CYCLE))
-	${RUN} exec -T ${SYSBENCH} python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${TXRATE} --max-requests ${NREQ}
+	CMD="--tx-rate ${TXRATE} --max-requests ${NREQ}"
+	RATE=""
+	TIME=""
+	REQT=""
+	if [ -n "$1" ]
+	then
+		X=$1
+		shift
+		TXRATE=$((MAXTXR * X / 10))
+		NREQ=$((TXRATE * CYCLE))
+		RATE="--scheduled-tx-rate=${TXRATE}"
+		TIME="--scheduled-max-time=0"
+		REQT="--scheduled-max-requests=${NREQ}"
+	fi
+	for X in $@
+	do
+		TXRATE=$((MAXTXR * X / 10))
+		NREQ=$((TXRATE * CYCLE))
+		RATE="${RATE},${TXRATE}"
+		TIME="${TIME},0"
+		REQT="${REQT},${NREQ}"
+	done
+	CMD="${CMD} ${RATE} ${TIME} ${REQT}"
 }
-A() { SYSBENCH=sysbencha; for X in 1 1 2 4 8 4 2 1 1; do GO; done; }
-B() { SYSBENCH=sysbenchb; for X in 2 4 8 4 2 1 1 1 1; do GO; done; }
-C() { SYSBENCH=sysbenchc; for X in 1 1 1 1 2 4 8 4 2; do GO; done; }
+
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 1 1 2 4 8 4 2 1 1);}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 2 4 8 4 2 1 1 1 1);}
+C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 1 1 1 1 2 4 8 4 2);}
 
 A&
 B&

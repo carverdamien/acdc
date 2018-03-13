@@ -74,6 +74,9 @@ def run(args):
                             '--max-time=%d' % args.duration,
                             '--num-threads=%d' % 8,
                             '--oltp-read-only=on',
+                            '--scheduled-tx-rate=%s' % args.scheduled_tx_rate,
+                            '--scheduled-max-time=%s' % args.scheduled_max_time,
+                            '--scheduled-max-requests=%s' % args.scheduled_max_requests,
                             'run']
     p = subprocess.Popen(call, stdout=subprocess.PIPE)
     for line in p.stdout:
@@ -110,6 +113,9 @@ def main():
     run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
     run_parser.add_argument('--tx-rate', dest="txrate", type=int, nargs='?', default=0)
     run_parser.add_argument('--max-requests', dest="maxrequests", type=int, nargs='?', default=0)
+    run_parser.add_argument('--scheduled-tx-rate', dest="scheduled_tx_rate=", type=str, nargs=1, default='')
+    run_parser.add_argument('--scheduled-max-time', dest="scheduled_max_time=", type=str, nargs=1, default='')
+    run_parser.add_argument('--scheduled-max-requests', dest="scheduled_max_requests=", type=str, nargs=1, default='')
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 
