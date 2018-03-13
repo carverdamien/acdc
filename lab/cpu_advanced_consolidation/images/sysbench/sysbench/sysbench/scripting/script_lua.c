@@ -254,6 +254,10 @@ sb_request_t sb_lua_get_request(int thread_id)
       sb_globals.tx_rate = sb_globals.scheduled_tx_rate[sb_globals.current_schedule];
       sb_globals.max_requests = sb_globals.scheduled_max_requests[sb_globals.current_schedule];
       sb_globals.max_time = sb_globals.scheduled_max_time[sb_globals.current_schedule];
+      log_text(LOG_NOTICE, "new schedule: %ld %ld %ld\n",
+	       sb_globals.tx_rate,
+	       sb_globals.max_time,
+	       sb_globals.max_requests);
       sb_globals.current_schedule++;
     }
     nevents++;
