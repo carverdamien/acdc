@@ -35,8 +35,8 @@ ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
-MAXTXR=900
-CYCLE=30
+MAXTXR=870
+CYCLE=10
 
 # Run
 ${RUN} create
