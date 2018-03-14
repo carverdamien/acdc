@@ -137,9 +137,9 @@ sb_arg_t general_args[] =
    "representing the amount of time in seconds elapsed from start of test "
    "when report checkpoint(s) must be performed. Report checkpoints are off by "
    "default.", SB_ARG_TYPE_LIST, ""},
-  {"scheduled-tx-rate", "", SB_ARG_TYPE_LIST, ""},
-  {"scheduled-max-requests", "", SB_ARG_TYPE_LIST, ""},
-  {"scheduled-max-time", "", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-rate", "", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-requests", "", SB_ARG_TYPE_LIST, ""},
+  {"scheduled-time", "", SB_ARG_TYPE_LIST, ""},
   {"test", "test to run", SB_ARG_TYPE_STRING, NULL},
   {"debug", "print more debugging info", SB_ARG_TYPE_FLAG, "off"},
   {"validate", "perform validation checks where possible", SB_ARG_TYPE_FLAG, "off"},
@@ -576,6 +576,8 @@ static void *worker_thread(void *arg)
 
 static void *eventgen_thread_proc(void *arg)
 {
+  unsigned long long total;
+  unsigned int tx_rate, requests, time;
   unsigned long long pause_ns;
   unsigned long long next_ns;
   unsigned long long curr_ns;
@@ -586,6 +588,9 @@ static void *eventgen_thread_proc(void *arg)
 
   SB_LIST_INIT(&event_queue);
   i = 0;
+  tx_rate = sb_globals.tx_rate;
+  requests = 0;
+  time = 0;
 
   log_text(LOG_DEBUG, "Event generating thread started");
 
@@ -596,16 +601,51 @@ static void *eventgen_thread_proc(void *arg)
   curr_ns = sb_timer_value(&sb_globals.exec_timer);
   /* emulate exponential distribution with Lambda = tx_rate */
   intr_ns = (long) (log(1 - (double) sb_rnd() / (double) SB_MAX_RND) /
-                    (-(double) sb_globals.tx_rate)*1000000);
+                    (-(double)tx_rate)*1000000);
   next_ns = curr_ns + intr_ns*1000;
 
-  for (;;)
+  for (total=0;;total++)
   {
+	  /* Schedule mode */
+	  if (sb_globals.n_schedules > 0) {
+		  /* Test if should move to next schedule */
+		  if (sb_globals.current_schedule + 1 < sb_globals.n_schedules) {	  
+			  /* Request mode */
+			  if (sb_globals.max_requests > 0) {
+				  if (total > requests) {
+					  sb_globals.current_schedule++;
+					  log_text(LOG_NOTICE, "done schedule: %d %d %d", tx_rate, requests, time);
+				  }
+			  } else {
+				  /* Time mode */
+				  if (sb_globals.max_time > 0) {
+					  if(sb_timer_value(&sb_globals.exec_timer) > time + 1) {
+						  sb_globals.current_schedule++;
+						  log_text(LOG_NOTICE, "done schedule: %d %d %d", tx_rate, requests, time);
+					  }
+				  } else {
+					  log_text(LOG_FATAL, "max-time and max-requests were not defined");
+					  return NULL;
+				  }
+			  }
+		  }
+
+		  tx_rate = sb_globals.scheduled_rate[sb_globals.current_schedule];
+		  requests = sb_globals.scheduled_requests[sb_globals.current_schedule];
+		  time = sb_globals.scheduled_time[sb_globals.current_schedule];
+		  
+		  if (tx_rate <= 0)
+		  {
+			  log_text(LOG_FATAL, "tx_rate <= 0");
+			  return NULL;
+		  }
+	  }
+
     curr_ns = sb_timer_value(&sb_globals.exec_timer);
 
     /* emulate exponential distribution with Lambda = tx_rate */
     intr_ns = (long) (log(1 - (double)sb_rnd() / (double)SB_MAX_RND) /
-                      (-(double)sb_globals.tx_rate)*1000000);
+                      (-(double)tx_rate)*1000000);
 
     next_ns = next_ns + intr_ns*1000;
     if (next_ns > curr_ns)
@@ -1159,7 +1199,7 @@ static int init(void)
 
   sb_globals.current_schedule = 0;
   sb_globals.n_schedules = 0;
-  some_list = sb_get_value_list("scheduled-tx-rate");
+  some_list = sb_get_value_list("scheduled-rate");
   SB_LIST_FOR_EACH(pos_val, some_list)
   {
     char *endptr;
@@ -1168,20 +1208,20 @@ static int init(void)
     res = strtol(val->data, &endptr, 10);
     if (*endptr != '\0' || res < 0 || res > UINT_MAX)
     {
-      log_text(LOG_FATAL, "Invalid value for --scheduled-tx-rate: '%s'",
+      log_text(LOG_FATAL, "Invalid value for --scheduled-rate: '%s'",
                val->data);
       return 1;
     }
     if (++sb_globals.n_schedules > MAX_SCHEDULES)
     {
-      log_text(LOG_FATAL, "Too many in --scheduled-tx-rate "
+      log_text(LOG_FATAL, "Too many in --scheduled-rate "
                "(up to %d can be defined)", MAX_SCHEDULES);
       return 1;
     }
-    sb_globals.scheduled_tx_rate[sb_globals.n_schedules-1] = (unsigned int) res;
+    sb_globals.scheduled_rate[sb_globals.n_schedules-1] = (unsigned int) res;
   }
   n_schedules = 0;
-  some_list = sb_get_value_list("scheduled-max-time");
+  some_list = sb_get_value_list("scheduled-time");
   SB_LIST_FOR_EACH(pos_val, some_list)
   {
     char *endptr;
@@ -1190,24 +1230,24 @@ static int init(void)
     res = strtol(val->data, &endptr, 10);
     if (*endptr != '\0' || res < 0 || res > UINT_MAX)
     {
-      log_text(LOG_FATAL, "Invalid value for --scheduled-max-time: '%s'",
+      log_text(LOG_FATAL, "Invalid value for --scheduled-time: '%s'",
                val->data);
       return 1;
     }
     if (++n_schedules > MAX_SCHEDULES)
     {
-      log_text(LOG_FATAL, "Too many in --scheduled-max-time "
+      log_text(LOG_FATAL, "Too many in --scheduled-time "
                "(up to %d can be defined)", MAX_SCHEDULES);
       return 1;
     }
-    sb_globals.scheduled_max_time[n_schedules-1] = (unsigned int) res;
+    sb_globals.scheduled_time[n_schedules-1] = (unsigned int) res;
   }
   if (n_schedules != sb_globals.n_schedules) {
-    log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-max-time");
+    log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-time");
       return 1;
   }
   n_schedules = 0;
-  some_list = sb_get_value_list("scheduled-max-requests");
+  some_list = sb_get_value_list("scheduled-requests");
   SB_LIST_FOR_EACH(pos_val, some_list)
   {
     char *endptr;
@@ -1216,38 +1256,55 @@ static int init(void)
     res = strtol(val->data, &endptr, 10);
     if (*endptr != '\0' || res < 0 || res > UINT_MAX)
     {
-      log_text(LOG_FATAL, "Invalid value for --scheduled-max-requests: '%s'",
+      log_text(LOG_FATAL, "Invalid value for --scheduled-requests: '%s'",
                val->data);
       return 1;
     }
     if (++n_schedules > MAX_SCHEDULES)
     {
-      log_text(LOG_FATAL, "Too many in --scheduled-max-requests "
+      log_text(LOG_FATAL, "Too many in --scheduled-requests "
                "(up to %d can be defined)", MAX_SCHEDULES);
       return 1;
     }
-    sb_globals.scheduled_max_requests[n_schedules-1] = (unsigned int) res;
+    sb_globals.scheduled_requests[n_schedules-1] = (unsigned int) res;
   }
   if (n_schedules != sb_globals.n_schedules) {
-    log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-max-requests");
+    log_text(LOG_FATAL, "n_schedules != sb_globals.n_schedules in --scheduled-requests");
       return 1;
+  }
+  if (sb_globals.n_schedules > 1) {
+	  if (sb_globals.scheduled_rate[0] != sb_globals.tx_rate) {
+		  log_text(LOG_FATAL, "sb_globals.scheduled_rate[0] != sb_globals.tx_rate: %d != %d",
+			   sb_globals.scheduled_rate[0], sb_globals.tx_rate);
+		  return 1;
+	  }
+	  if (sb_globals.scheduled_time[sb_globals.n_schedules-1] != sb_globals.max_time) {
+		  log_text(LOG_FATAL, "sb_globals.scheduled_time[sb_globals.n_schedules-1] != sb_globals.max_time: %d != %d",
+			   sb_globals.scheduled_time[sb_globals.n_schedules-1], sb_globals.max_time);
+		  return 1;
+	  }
+	  if (sb_globals.scheduled_requests[sb_globals.n_schedules-1] != sb_globals.max_requests) {
+		  log_text(LOG_FATAL, "sb_globals.scheduled_requests[sb_globals.n_schedules-1] != sb_globals.max_requests: %d != %d",
+			   sb_globals.scheduled_requests[sb_globals.n_schedules-1], sb_globals.max_requests);
+		  return 1;
+	  }
   }
   log_text(LOG_NOTICE, "Schedules\n");
   for(n_schedules=0; n_schedules < sb_globals.n_schedules; n_schedules++) {
 	  log_text(LOG_NOTICE, "%ld %ld %ld\n",
-		   sb_globals.scheduled_tx_rate[n_schedules],
-		   sb_globals.scheduled_max_time[n_schedules],
-		   sb_globals.scheduled_max_requests[n_schedules]);
-	  if(n_schedules > 1) {
-		  // TODO: check first parameter (not in scheduled[])
-		  if(sb_globals.scheduled_max_requests[n_schedules-1] && 
-		     sb_globals.scheduled_max_requests[n_schedules] <= sb_globals.scheduled_max_requests[n_schedules-1]) {
-			  log_text(LOG_FATAL, "sb_globals.scheduled_max_requests[n_schedules] <= sb_globals.scheduled_max_requests[n_schedules-1]");
+		   sb_globals.scheduled_rate[n_schedules],
+		   sb_globals.scheduled_time[n_schedules],
+		   sb_globals.scheduled_requests[n_schedules]);
+	  if (n_schedules > 1) {
+		  /* Time and Requests must be cummualtive */
+		  if(sb_globals.scheduled_requests[n_schedules-1] && 
+		     sb_globals.scheduled_requests[n_schedules] <= sb_globals.scheduled_requests[n_schedules-1]) {
+			  log_text(LOG_FATAL, "sb_globals.scheduled_requests[n_schedules] <= sb_globals.scheduled_requests[n_schedules-1]");
 			  return 1;
 		  }
-		  if(sb_globals.scheduled_max_time[n_schedules-1] &&
-		     sb_globals.scheduled_max_time[n_schedules] <= sb_globals.scheduled_max_time[n_schedules-1]) {
-			  log_text(LOG_FATAL, "sb_globals.scheduled_max_time[n_schedules] <= sb_globals.scheduled_max_time[n_schedules-1]");
+		  if(sb_globals.scheduled_time[n_schedules-1] &&
+		     sb_globals.scheduled_time[n_schedules] <= sb_globals.scheduled_time[n_schedules-1]) {
+			  log_text(LOG_FATAL, "sb_globals.scheduled_time[n_schedules] <= sb_globals.scheduled_time[n_schedules-1]");
 			  return 1;
 		  }
 	  }

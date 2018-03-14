@@ -74,9 +74,9 @@ def run(args):
                             '--max-time=%d' % args.duration,
                             '--num-threads=%d' % 8,
                             '--oltp-read-only=on',
-                            '--scheduled-tx-rate=%s' % ','.join(args.scheduled_tx_rate),
-                            '--scheduled-max-time=%s' % ','.join(args.scheduled_max_time),
-                            '--scheduled-max-requests=%s' % ','.join(args.scheduled_max_requests),
+                            '--scheduled-rate=%s' % ','.join(args.scheduled_rate),
+                            '--scheduled-time=%s' % ','.join(args.scheduled_time),
+                            '--scheduled-requests=%s' % ','.join(args.scheduled_requests),
                             'run']
     p = subprocess.Popen(call, stdout=subprocess.PIPE)
     for line in p.stdout:
@@ -110,12 +110,12 @@ def main():
     run_parser.add_argument("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='influxdb')
     run_parser.add_argument("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
     run_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
-    run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=60)
+    run_parser.add_argument('--duration', dest="duration", type=int, nargs='?', default=0)
     run_parser.add_argument('--tx-rate', dest="txrate", type=int, nargs='?', default=0)
     run_parser.add_argument('--max-requests', dest="maxrequests", type=int, nargs='?', default=0)
-    run_parser.add_argument('--scheduled-tx-rate', dest="scheduled_tx_rate", type=str, nargs=1, default='')
-    run_parser.add_argument('--scheduled-max-time', dest="scheduled_max_time", type=str, nargs=1, default='')
-    run_parser.add_argument('--scheduled-max-requests', dest="scheduled_max_requests", type=str, nargs=1, default='')
+    run_parser.add_argument('--scheduled-rate', dest="scheduled_rate", type=str, nargs=1, default='')
+    run_parser.add_argument('--scheduled-time', dest="scheduled_time", type=str, nargs=1, default='')
+    run_parser.add_argument('--scheduled-requests', dest="scheduled_requests", type=str, nargs=1, default='')
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 

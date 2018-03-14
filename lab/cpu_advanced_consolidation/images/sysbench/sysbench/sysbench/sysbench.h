@@ -217,9 +217,9 @@ typedef struct
   unsigned int    max_time;     /* total execution time limit */
   unsigned int    current_schedule;
   unsigned int    n_schedules;
-  unsigned int    scheduled_tx_rate[MAX_SCHEDULES];
-  unsigned int    scheduled_max_requests[MAX_SCHEDULES];
-  unsigned int    scheduled_max_time[MAX_SCHEDULES];
+  unsigned int    scheduled_rate[MAX_SCHEDULES];
+  unsigned int    scheduled_requests[MAX_SCHEDULES];
+  unsigned int    scheduled_time[MAX_SCHEDULES];
 
   unsigned char   debug;        /* debug flag */
   int             force_shutdown; /* whether we must force test shutdown */
