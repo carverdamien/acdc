@@ -35,26 +35,42 @@ ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
-MAXTXR=1800 #
-MAXTXR=1000
-CYCLE=60
+MAXTXR=870
+CYCLE=10
 
 # Run
 ${RUN} create
 ${RUN} up -d
 
-GO() {
+SCHED() {
+	X=$1
+	shift
+	NREQ=0	
 	TXRATE=$((MAXTXR * X / 10))
-	NREQ=$((TXRATE * CYCLE))
-	${RUN} exec -T ${SYSBENCH} python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${TXRATE} --max-requests ${NREQ}
-}
-A() { SYSBENCH=sysbencha; for X in 1 1 2 4 8 4 2 1 1; do GO; done; }
-B() { SYSBENCH=sysbenchb; for X in 2 4 8 4 2 1 1 1 1; do GO; done; }
-C() { SYSBENCH=sysbenchc; for X in 1 1 1 1 2 4 8 4 2; do GO; done; }
+	NREQ=$((TXRATE * CYCLE + NREQ))
+	CMD="--tx-rate ${TXRATE}"
+	RATE="--scheduled-rate=${TXRATE}"
+	TIME="--scheduled-time=0"
+	REQT="--scheduled-requests=${NREQ}"
 
-A&
-B&
-C&
+	for X in $@
+	do
+		TXRATE=$((MAXTXR * X / 10))
+		NREQ=$((TXRATE * CYCLE + NREQ))
+		RATE="${RATE},${TXRATE}"
+		TIME="${TIME},0"
+		REQT="${REQT},${NREQ}"
+	done
+	echo "${CMD} ${RATE} ${TIME} ${REQT} --max-requests ${NREQ}"
+}
+
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 1 1 2 4 8 4 2 1 1);}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 2 4 8 4 2 1 1 1 1);}
+C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 1 1 1 1 2 4 8 4 2);}
+
+A | tee A.out &
+B | tee B.out &
+C | tee C.out &
 
 wait
 wait
