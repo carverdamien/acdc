@@ -28,64 +28,54 @@ ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C'
 ${PRE} exec host bash -c 'echo 1000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_period_us'
-${PRE} exec host bash -c 'echo 4000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_quota_us'
+${PRE} exec host bash -c 'echo 2000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_quota_us'
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/A/cpu.shares'
 ${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/cpu.shares'
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B/cpu.shares'
-${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
+${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
-MAXTXR=1800
-CYCLE=60
+MAXTXR=870
+MAXTXR=$((MAXTXR/2))
+CYCLE=10
 
 # Run
 ${RUN} create
 ${RUN} up -d
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-sleep ${CYCLE}
+SCHED() {
+	X=$1
+	shift
+	NREQ=0	
+	TXRATE=$((MAXTXR * X / 100))
+	NREQ=$((TXRATE * CYCLE + NREQ))
+	CMD="--tx-rate ${TXRATE}"
+	RATE="--scheduled-rate=${TXRATE}"
+	TIME="--scheduled-time=0"
+	REQT="--scheduled-requests=${NREQ}"
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-sleep ${CYCLE}
+	for X in $@
+	do
+		TXRATE=$((MAXTXR * X / 100))
+		NREQ=$((TXRATE * CYCLE + NREQ))
+		RATE="${RATE},${TXRATE}"
+		TIME="${TIME},0"
+		REQT="${REQT},${NREQ}"
+	done
+	echo "${CMD} ${RATE} ${TIME} ${REQT} --max-requests ${NREQ}"
+}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-sleep ${CYCLE}
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 25 50 25 25 100 25 25 25 25 25 50 25 25 25 50 25 50 25 25 25);}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 25 25 50 25 25 25 100 25 25 25 50 25 50 25 25 25 50 25 25 25);}
+C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 25 25 25 50 25 25 25 25 100 25 25 25 50 25 50 25 50 25 25 25);}
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-sleep ${CYCLE}
+A | tee A.out &
+B | tee B.out &
+C | tee C.out &
 
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
-sleep ${CYCLE}
-
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
-sleep ${CYCLE}
-
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 8 / 10))
-sleep ${CYCLE}
-
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 4 / 10))
-sleep ${CYCLE}
-
-${RUN} exec sysbencha job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchb job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 1 / 10))
-${RUN} exec sysbenchc job run --dbsize ${DBSIZE} --duration ${CYCLE} --tx-rate $((MAXTXR * 2 / 10))
-sleep ${CYCLE}
+wait
+wait
+wait
 
 # Report
 for m in memory_stats blkio_stats networks cpu_stats sysbench_stats
