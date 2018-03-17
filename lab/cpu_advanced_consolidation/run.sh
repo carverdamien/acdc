@@ -36,7 +36,9 @@ ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C
 ${PRE} down
 
 MAXTXR=870
-MAXTXR=$((MAXTXR/2))
+MAXTXR=770
+MAXTXR=780
+MAXTXR=781
 CYCLE=10
 
 # Run
