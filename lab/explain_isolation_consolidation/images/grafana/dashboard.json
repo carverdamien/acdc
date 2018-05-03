@@ -597,6 +597,134 @@
       "showTitle": false,
       "title": "Dashboard Row",
       "titleSize": "h6"
+    },
+    {
+      "collapse": false,
+      "height": 250,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "${DS_ACDC}",
+          "fill": 1,
+          "id": 8,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 12,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "mysqla",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "cpu_stats",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "percent_usage"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "mysqla"
+                }
+              ]
+            },
+            {
+              "alias": "mysqlb",
+              "dsType": "influxdb",
+              "groupBy": [],
+              "measurement": "cpu_stats",
+              "policy": "default",
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "percent_usage"
+                    ],
+                    "type": "field"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "com.docker.compose.service",
+                  "operator": "=",
+                  "value": "mysqlb"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "CPU",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Dashboard Row",
+      "titleSize": "h6"
     }
   ],
   "schemaVersion": 14,
@@ -606,8 +734,8 @@
     "list": []
   },
   "time": {
-    "from": "2018-05-03T08:48:52.990Z",
-    "to": "2018-05-03T08:54:27.230Z"
+    "from": "2018-05-03T09:21:56.557Z",
+    "to": "2018-05-03T09:23:04.362Z"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -636,5 +764,5 @@
   },
   "timezone": "browser",
   "title": "mysql",
-  "version": 0
+  "version": 1
 }
