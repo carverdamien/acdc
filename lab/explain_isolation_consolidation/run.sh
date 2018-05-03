@@ -48,8 +48,8 @@ esac
 }
 
 # Prepare
-${RUN} down
-${PRE} down
+${RUN} down --remove-orphans
+${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
