@@ -73,6 +73,10 @@ A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZ
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
 C() { :;}
 
+# Simple Test
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --max-requests $((MEDTXR*50));}
+B() { sleep 20; ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate 0 --max-requests $((MEDTXR*50/2));}
+
 A | tee A.out &
 B | tee B.out &
 C | tee C.out &
