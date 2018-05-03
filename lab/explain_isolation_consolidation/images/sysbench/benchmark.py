@@ -44,7 +44,7 @@ def wait_for_server_to_start(args):
             break
         except Exception as e:
             print(e)
-        print('Waiting for %s to start' % (arg.mysql_hostname))
+        print('Waiting for %s to start' % (args.mysql_hostname))
         time.sleep(1)
         
 def prepare(args):
