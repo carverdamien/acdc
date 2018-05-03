@@ -10,14 +10,12 @@ services:
       - /:/rootfs
   sysbencha:
     build: images/sysbench
-    command: [ '--mysql-hostname=mysqla', 'mysql-dbname=dbname' ]
     links:
-      - mysqla:mysqla
+      - mysqla:mysql
       - influxdb
     cpuset: 0,4,1,5
   sysbenchb:
     build: images/sysbench
-    command: [ '--mysql-hostname=mysqlb', 'mysql-dbname=dbnameb' ]
     links:
       - mysqla:mysqlb
       - influxdb
