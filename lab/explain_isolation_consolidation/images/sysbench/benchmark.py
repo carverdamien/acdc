@@ -38,6 +38,9 @@ sysbench_expected_v05_intermediate_output = """[{}] timestamp: {timestamp}, thre
 sysbenchoutput_parser = parse.compile(sysbench_expected_v05_intermediate_output)
 
 def wait_for_server_to_start(args):
+    if args.wait > 0:
+        time.sleep(args.wait)
+        return
     while True:
         try:
             subprocess.check_call(mysql_call(args) + ['-e', 'show status'])
@@ -131,11 +134,7 @@ def main():
     run_parser.set_defaults(callback=dummy)
 
     args = main_parser.parse_args()
-
-    if args.wait > 0:
-        time.sleep(args.wait)
-    elif args.wait < 0:
-        wait_for_server_to_start(args)
+    wait_for_server_to_start(args)
     args.func(args)
 
 main()
