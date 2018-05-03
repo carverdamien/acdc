@@ -22,6 +22,11 @@ MYSQLB_HOST="mysqlb"
 MYSQLB_PORT="3306"
 MYSQLB_DBNM="dbname"
 ;;
+	noshares)
+MYSQLB_HOST="mysqlb"
+MYSQLB_PORT="3306"
+MYSQLB_DBNM="dbname"
+;;
 	process)
 MYSQLB_HOST="mysqlb"
 MYSQLB_PORT="3307"
