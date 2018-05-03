@@ -10,9 +10,9 @@ main_parser = argparse.ArgumentParser()
 user = 'root'
 password = ''
 def set_defaults(args):
-    if 'mysql_hostname' not in args || args.mysql_hostname == None:
+    if 'mysql_hostname' not in args or args.mysql_hostname == None:
         args['mysql_hostname'] = 'mysql'
-    if 'mysql_dbname' not in args || args.mysql_dbname == None:
+    if 'mysql_dbname' not in args or args.mysql_dbname == None:
         args['mysql_dbname'] = 'dbname'
     return args
 main_subparsers = main_parser.add_subparsers()
