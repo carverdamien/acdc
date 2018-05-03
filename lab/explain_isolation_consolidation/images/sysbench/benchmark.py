@@ -52,6 +52,7 @@ def wait_for_server_to_start(args):
         
 def prepare(args):
     args = set_defaults(args)
+    wait_for_server_to_start(args)
     try:
         subprocess.check_call(mysql_call(args) + ['-e', 'CREATE DATABASE %s' % dbname])
         subprocess.check_call(sysbench_call(args) + ['prepare'])
@@ -79,7 +80,7 @@ def run(args):
     def callback(fields):
         client.write_points([p for p in influxformat(measurement, fields, tags=tags)])
     args.callback = callback
-
+    wait_for_server_to_start(args)
     call = sysbench_call(args) + ['--report-interval=1',
                             '--tx-rate=%d' % args.txrate,
                             '--max-requests=%d' % args.maxrequests,
@@ -134,7 +135,6 @@ def main():
     run_parser.set_defaults(callback=dummy)
 
     args = main_parser.parse_args()
-    wait_for_server_to_start(args)
     args.func(args)
 
 main()
