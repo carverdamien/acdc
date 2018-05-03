@@ -8,13 +8,33 @@ source kernel
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
 
-RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
-PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
+PRE="docker-compose --project-directory $PWD -f compose/$MODE/unrestricted.yml"
+RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
 
-MYSQLB_HOST="mysql"
-MYSQLB_DBNM="dbname2"
+case $MODE in
+	standalone)
+MYSQLB_HOST="mysqlb"
+MYSQLB_DBNM="dbname"
+;;
+	isolated)
+MYSQLB_HOST="mysqlb"
+MYSQLB_DBNM="dbname"
+;;
+	process)
+echo TODO
+# gosu mysql mysqld --initialize-insecure --datadir=/var/lib/mysql/3307.data
+# gosu mysql mysqld --datadir=/var/lib/mysql/3307.data --socket=/var/run/mysqld/3307.sock --port=3307
+exit 1
+;;
+	not_isolated)
 MYSQLB_HOST="mysqlb"
 MYSQLB_DBNM="dbname2"
+;;
+	*)
+echo "unknown MODE: ${MODE}"
+	exit 1
+		;;
+esac
 
 # Prepare
 ${RUN} down
@@ -26,18 +46,6 @@ ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchb python benchmark.py --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchc prepare --dbsize ${DBSIZE}
 # ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
-${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/cpu/consolidate ] || find /rootfs/sys/fs/cgroup/cpu/consolidate -type d -delete'
-${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate'
-${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/A'
-${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC'
-${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B'
-${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C'
-${PRE} exec host bash -c 'echo 1000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_period_us'
-${PRE} exec host bash -c 'echo 2000000 > /rootfs/sys/fs/cgroup/cpu/consolidate/cpu.cfs_quota_us'
-${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/A/cpu.shares'
-${PRE} exec host bash -c 'echo 2 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/cpu.shares'
-${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B/cpu.shares'
-${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
 # Run
@@ -73,10 +81,6 @@ A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZ
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
 C() { :;}
 
-# Simple Test
-# A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --max-requests $((MEDTXR*50)) --num-threads=1;}
-# B() { sleep 20; ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate 0 --max-requests $((MEDTXR*50/2));}
-
 A | tee A.out &
 B | tee B.out &
 C | tee C.out &
@@ -86,7 +90,8 @@ wait
 wait
 
 # Report
+mkdir -p data/$MODE
 for m in memory_stats blkio_stats networks cpu_stats sysbench_stats
 do
-	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$m.csv
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$MODE/$m.csv
 done

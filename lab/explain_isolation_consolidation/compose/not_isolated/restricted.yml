@@ -13,31 +13,27 @@ services:
     links:
       - mysqla:mysql
       - influxdb
+    cpuset: 0,4,1,5
   sysbenchb:
     build: images/sysbench
     links:
       - mysqla:mysqlb
       - influxdb
-  sysbenchc:
-    build: images/sysbench
-    links:
-      - mysqlc:mysql
-      - influxdb
+    cpuset: 0,4,1,5
   mysqla:
     build: images/mysql
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
+    cpuset: '2'
+    cpus: 1
   mysqlb:
     build: images/mysql
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-  mysqlc:
-    build: images/mysql
-    hostname: mysqlc
-    volumes:
-      - data-mysqlc:/var/lib/mysql
+    cpuset: '2'
+    cpus: 1
   influxdb:
     image: influxdb:latest
   collector:
@@ -61,8 +57,6 @@ volumes:
   data-mysqla:
     external: true
   data-mysqlb:
-    external: true
-  data-mysqlc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
