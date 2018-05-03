@@ -100,7 +100,7 @@ NB5=$((TIMEB5 * MEDTXR + NB44))
 
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                         --scheduled-time=0,0,0         --scheduled-requests=${NA1},${NA2},${NA3}                               --max-requests ${NA3};}
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},1,${MEDTXR},${BRTTXR},1,${MEDTXR} --scheduled-time=0,0,0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB22},${NB3},${NB4},${NB44},${NB5} --max-requests ${NB5};}
-C() {;}
+C() { :;}
 
 A | tee A.out &
 B | tee B.out &
