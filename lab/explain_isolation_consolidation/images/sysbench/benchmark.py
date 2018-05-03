@@ -9,51 +9,57 @@ main_parser = argparse.ArgumentParser()
 # TODO
 user = 'root'
 password = ''
-host = 'mysql'
-dbname = 'dbname'
+def set_defaults(args):
+    if 'mysql_hostname' not in args:
+        args['mysql_hostname'] = 'mysql'
+    if 'mysql_dbname' not in args:
+        args['mysql_dbname'] = 'dbname'
+    return args
 main_subparsers = main_parser.add_subparsers()
 
 sysbench_bin_path = './sysbench/sysbench'
 sysbench_lua_path = './sysbench/tests/db/oltp.lua'
 
-mysql_call = ['mysql',
-              '--host', host,
-              '-u', user]
+def mysql_call(args):
+    return ['mysql',
+            '--host', args.mysql_hostname,
+            '-u', user]
 
-def sysbench_call(dbsize):
+def sysbench_call(args):
     return [sysbench_bin_path,
             '--test=%s' % sysbench_lua_path,
-            '--oltp-table-size=%d' % dbsize,
-            '--mysql-db=%s' % dbname,
-            '--mysql-host=%s' % host,
+            '--oltp-table-size=%d' % args.dbsize,
+            '--mysql-db=%s' % args.mysql_dbname,
+            '--mysql-host=%s' % args.mysql_hostname,
             '--mysql-user=%s' % user,
             '--mysql-password=%s' % password]
 
 sysbench_expected_v05_intermediate_output = """[{}] timestamp: {timestamp}, threads: {threads}, tps: {trps}, reads: {rdps}, writes: {wrps}, response time: {rtps}ms ({}%), errors: {errps}, reconnects:  {recops}"""
 sysbenchoutput_parser = parse.compile(sysbench_expected_v05_intermediate_output)
 
-def wait_for_server_to_start():
+def wait_for_server_to_start(args):
     while True:
         try:
-            subprocess.check_call(mysql_call + ['-e', 'show status'])
+            subprocess.check_call(mysql_call(args) + ['-e', 'show status'])
             break
         except Exception as e:
             print(e)
-        print('Waiting for %s to start' % (host))
+        print('Waiting for %s to start' % (arg.mysql_hostname))
         time.sleep(1)
         
 def prepare(args):
+    args = set_defaults(args)
     try:
-        subprocess.check_call(mysql_call + ['-e', 'CREATE DATABASE %s' % dbname])
-        subprocess.check_call(sysbench_call(args.dbsize) + ['prepare'])
+        subprocess.check_call(mysql_call(args) + ['-e', 'CREATE DATABASE %s' % dbname])
+        subprocess.check_call(sysbench_call(args) + ['prepare'])
     except Exception as e:
         print(e)
     finally:
-        out = subprocess.check_output(mysql_call + ['-D', dbname, '-e', 'select count(*) from sbtest1'])
+        out = subprocess.check_output(mysql_call(args) + ['-D', dbname, '-e', 'select count(*) from sbtest1'])
         count = int(out.split('\n')[1])
         if count != args.dbsize:
             raise Exception('count != dbsize')
-        #subprocess.check_call(mysql_call + ['-e', 'shutdown'])
+        #subprocess.check_call(mysql_call(args) + ['-e', 'shutdown'])
 
 def run(args):
     client = influxdb.InfluxDBClient(host=args.influxdbhost,
@@ -61,14 +67,17 @@ def run(args):
                                     database=args.influxdbname)
     client.create_database(args.influxdbname)
     measurement = 'sysbench_stats'
-    tags = {
-        'hostname' : subprocess.check_output(mysql_call + ['-BNe', 'select @@hostname;'])[:-1]
-    }
+    if 'mysql_hostname' not in args:
+        args = set_defaults(args)
+        hostname = subprocess.check_output(mysql_call(args) + ['-BNe', 'select @@hostname;'])[:-1]
+    else:
+        hostname = args.mysql_hostname
+    tags = { 'hostname' : hostname }
     def callback(fields):
         client.write_points([p for p in influxformat(measurement, fields, tags=tags)])
     args.callback = callback
 
-    call = sysbench_call(args.dbsize) + ['--report-interval=1',
+    call = sysbench_call(args) + ['--report-interval=1',
                             '--tx-rate=%d' % args.txrate,
                             '--max-requests=%d' % args.maxrequests,
                             '--max-time=%d' % args.duration,
@@ -101,6 +110,8 @@ def influxformat(measurement, fields, tags={}):
     yield point
 
 def main():
+    main_parser.add_argument('--mysql-hostname', dest='mysql_hostname', nargs='?', default=None)
+    main_parser.add_argument('--mysql-dbname', dest='mysql_dbname', nargs='?', default=None)
     main_parser.add_argument('--wait', dest="wait", type=int, nargs='?', default=-1)
     prepare_parser = main_subparsers.add_parser('prepare')
     prepare_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
@@ -120,11 +131,11 @@ def main():
     run_parser.set_defaults(callback=dummy)
 
     args = main_parser.parse_args()
-    
+
     if args.wait > 0:
         time.sleep(args.wait)
     elif args.wait < 0:
-        wait_for_server_to_start()
+        wait_for_server_to_start(args)
     args.func(args)
 
 main()
