@@ -31,7 +31,7 @@ services:
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
-    cgroup_parent: 'consolidate/A'
+    cgroup_parent: 'consolidate'
     cpuset: 2,6
     cpus: 1
     mem_limit: '320MB'
@@ -40,7 +40,7 @@ services:
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    cgroup_parent: 'consolidate/BC/B'
+    cgroup_parent: 'consolidate/B'
     cpuset: 2,6
     cpus: 1
     mem_limit: '320MB'
@@ -49,7 +49,7 @@ services:
     hostname: mysqlc
     volumes:
       - data-mysqlc:/var/lib/mysql
-    cgroup_parent: 'consolidate/BC/C'
+    cgroup_parent: 'consolidate/C'
     cpuset: 2,6
     cpus: 1
     mem_limit: '320MB'
