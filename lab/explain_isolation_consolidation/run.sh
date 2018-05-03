@@ -51,9 +51,9 @@ MEDTXR=$((MAXTXR*45/100)) # Medium is 45%
 LOWTXR=$((MAXTXR*10/100)) # Low is 10%
 BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
 
-TIMEA1=30 # Time A is medium
+TIMEA1=25 # Time A is medium
 TIMEA2=10 # Time A is low
-TIMEA3=10 # Time A is medium
+TIMEA3=15 # Time A is medium
 
 TIMEB1=10 # Time B is medium
 TIMEB2=20 # Time B is medium
@@ -69,13 +69,13 @@ NB3=$(( (TIMEB2-1) * MEDTXR + NB2))
 NB4=$((1 * BRTTXR + NB3))
 NB5=$(( (TIMEB3-1) * MEDTXR + NB4))
 
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                     --scheduled-time=0,0,0     --scheduled-requests=${NA1},${NA2},${NA3}               --max-requests ${NA3};}
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                     --scheduled-time=0,0,0     --scheduled-requests=${NA1},${NA2},${NA3}               --max-requests ${NA3} --num-threads=2;}
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
 C() { :;}
 
 # Simple Test
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --max-requests $((MEDTXR*50));}
-B() { sleep 20; ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate 0 --max-requests $((MEDTXR*50/2));}
+# A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --max-requests $((MEDTXR*50)) --num-threads=1;}
+# B() { sleep 20; ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate 0 --max-requests $((MEDTXR*50/2));}
 
 A | tee A.out &
 B | tee B.out &
