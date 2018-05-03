@@ -40,9 +40,11 @@ ${RUN} create
 ${RUN} up -d
 
 MAXTXR=390                # Max on one core
-MEDTXR=$((MAXTXR*40/100)) # Medium is 40%
+MAXTXR=520
+MAXTXR=585
+MEDTXR=$((MAXTXR*45/100)) # Medium is 45%
 LOWTXR=$((MAXTXR*10/100)) # Low is 10%
-BRTTXR=$((MAXTXR))        # Extra requests on a second (burst)
+BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
 
 TIMEA1=30 # Time A is medium
 TIMEA2=10 # Time A is low
