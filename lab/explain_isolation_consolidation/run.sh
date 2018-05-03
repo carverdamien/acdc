@@ -41,8 +41,8 @@ esac
 start_mysqlb() {
 case ${MODE} in
 	process)
-${PRE} exec mysqlb gosu mysql mysqld --initialize-insecure --datadir=/var/lib/3307.data
-${PRE} exec mysqlb gosu mysql mysqld --datadir=/var/lib/3307.data --socket=/var/run/mysqld/3307.sock --port=3307
+${PRE} exec mysqla gosu mysql mysqld --initialize-insecure --datadir=/var/lib/3307.data
+${PRE} exec mysqla gosu mysql mysqld --datadir=/var/lib/3307.data --socket=/var/run/mysqld/3307.sock --port=3307
 ;;
 esac
 }
