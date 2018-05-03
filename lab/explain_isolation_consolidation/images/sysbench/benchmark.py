@@ -23,7 +23,7 @@ sysbench_lua_path = './sysbench/tests/db/oltp.lua'
 def mysql_call(args):
     return ['mysql',
             '--host', args.mysql_hostname,
-            '--port', args.mysql_port,
+            '--port', str(args.mysql_port),
             '-u', user]
 
 def sysbench_call(args):
