@@ -44,7 +44,6 @@ ${PRE} create
 ${PRE} up -d
 ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 ${PRE} exec sysbenchb python benchmark.py --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} prepare --dbsize ${DBSIZE}
-${PRE} exec sysbenchc prepare --dbsize ${DBSIZE}
 # ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} down
 
@@ -79,13 +78,10 @@ NB5=$(( (TIMEB3-1) * MEDTXR + NB4))
 
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                     --scheduled-time=0,0,0     --scheduled-requests=${NA1},${NA2},${NA3}               --max-requests ${NA3} --num-threads=2;}
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
-C() { :;}
 
 A | tee A.out &
 B | tee B.out &
-C | tee C.out &
 
-wait
 wait
 wait
 
