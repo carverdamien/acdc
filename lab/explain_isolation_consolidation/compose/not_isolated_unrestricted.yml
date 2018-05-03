@@ -1,0 +1,71 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  sysbencha:
+    build: images/sysbench
+    command: [ '--mysql-hostname=mysqla', 'mysql-dbname=dbname' ]
+    links:
+      - mysqla:mysqla
+      - influxdb
+  sysbenchb:
+    build: images/sysbench
+    command: [ '--mysql-hostname=mysqlb', 'mysql-dbname=dbnameb' ]
+    links:
+      - mysqla:mysqlb
+      - influxdb
+  sysbenchc:
+    build: images/sysbench
+    links:
+      - mysqlc:mysql
+      - influxdb
+  mysqla:
+    build: images/mysql
+    hostname: mysqla
+    volumes:
+      - data-mysqla:/var/lib/mysql
+  mysqlb:
+    build: images/mysql
+    hostname: mysqlb
+    volumes:
+      - data-mysqlb:/var/lib/mysql
+  mysqlc:
+    build: images/mysql
+    hostname: mysqlc
+    volumes:
+      - data-mysqlc:/var/lib/mysql
+  influxdb:
+    image: influxdb:latest
+  collector:
+    build: images/collector
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-mysqla:
+    external: true
+  data-mysqlb:
+    external: true
+  data-mysqlc:
+    external: true
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
