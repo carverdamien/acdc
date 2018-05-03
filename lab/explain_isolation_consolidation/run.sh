@@ -77,13 +77,13 @@ MEDTXR=$((MAXTXR*45/100)) # Medium is 45%
 LOWTXR=$((MAXTXR*10/100)) # Low is 10%
 BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
 
-TIMEA1=25 * SCALE # Time A is medium
-TIMEA2=10 * SCALE # Time A is low
-TIMEA3=15 * SCALE # Time A is medium
+TIMEA1=$((25 * SCALE)) # Time A is medium
+TIMEA2=$((10 * SCALE)) # Time A is low
+TIMEA3=$((15 * SCALE)) # Time A is medium
 
-TIMEB1=10 * SCALE # Time B is medium
-TIMEB2=20 * SCALE # Time B is medium
-TIMEB3=20 * SCALE # Time B is medium
+TIMEB1=$((10 * SCALE)) # Time B is medium
+TIMEB2=$((20 * SCALE)) # Time B is medium
+TIMEB3=$((20 * SCALE)) # Time B is medium
 
 NA1=$((TIMEA1 * MEDTXR))
 NA2=$((TIMEA2 * LOWTXR + NA1))
