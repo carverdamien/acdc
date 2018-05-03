@@ -87,7 +87,7 @@ def run(args):
                             '--tx-rate=%d' % args.txrate,
                             '--max-requests=%d' % args.maxrequests,
                             '--max-time=%d' % args.duration,
-                            '--num-threads=%d' % 8,
+                            '--num-threads=%d' % args.num_threads,
                             '--oltp-read-only=on',
                             '--scheduled-rate=%s' % ','.join(args.scheduled_rate),
                             '--scheduled-time=%s' % ','.join(args.scheduled_time),
@@ -134,6 +134,7 @@ def main():
     run_parser.add_argument('--scheduled-rate', dest="scheduled_rate", type=str, nargs=1, default='')
     run_parser.add_argument('--scheduled-time', dest="scheduled_time", type=str, nargs=1, default='')
     run_parser.add_argument('--scheduled-requests', dest="scheduled_requests", type=str, nargs=1, default='')
+    run_parser.add_argument('--num-threads', dest='num_threads', type=int, nargs=1, default=8)
     run_parser.set_defaults(func=run)
     run_parser.set_defaults(callback=dummy)
 
