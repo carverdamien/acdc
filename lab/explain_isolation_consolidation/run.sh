@@ -74,17 +74,15 @@ C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZ
 MAXTXR=390                # Max on one core
 MEDTXR=$((MAXTXR*40/100)) # Medium is 40%
 LOWTXR=$((MAXTXR*10/100)) # Low is 10%
-BRTTXR=$((MAXTXR*2))      # Burst
+BRTTXR=$((MAXTXR))        # Extra requests on a second (burst)
 
 TIMEA1=30 # Time A is medium
 TIMEA2=10 # Time A is low
-TIMEA3=20 # Time A is medium
+TIMEA3=10 # Time A is medium
 
 TIMEB1=10 # Time B is medium
-TIMEB2=10 # Time B in BurstMode
+TIMEB2=20 # Time B is medium
 TIMEB3=20 # Time B is medium
-TIMEB4=10 # Time B in BurstMode
-TIMEB5=10 # Time B is medium
 
 NA1=$((TIMEA1 * MEDTXR))
 NA2=$((TIMEA2 * LOWTXR + NA1))
@@ -92,14 +90,12 @@ NA3=$((TIMEA3 * MEDTXR + NA2))
 
 NB1=$((TIMEB1 * MEDTXR))
 NB2=$((1 * BRTTXR + NB1))
-NB22=$((TIMEB2 * 1 + NB2))
-NB3=$((TIMEB3 * MEDTXR + NB22))
+NB3=$(( (TIMEB3-1) * MEDTXR + NB2))
 NB4=$((1 * BRTTXR + NB3))
-NB44=$((TIMEB4 * 1 + NB4))
-NB5=$((TIMEB5 * MEDTXR + NB44))
+NB5=$(( (TIMEB5-1) * MEDTXR + NB4))
 
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                         --scheduled-time=0,0,0         --scheduled-requests=${NA1},${NA2},${NA3}                               --max-requests ${NA3};}
-B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},1,${MEDTXR},${BRTTXR},1,${MEDTXR} --scheduled-time=0,0,0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB22},${NB3},${NB4},${NB44},${NB5} --max-requests ${NB5};}
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                     --scheduled-time=0,0,0     --scheduled-requests=${NA1},${NA2},${NA3}               --max-requests ${NA3};}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
 C() { :;}
 
 A | tee A.out &
