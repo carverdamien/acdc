@@ -10,9 +10,9 @@ main_parser = argparse.ArgumentParser()
 user = 'root'
 password = ''
 def set_defaults(args):
-    if 'mysql_hostname' not in args:
+    if 'mysql_hostname' not in args || args.mysql_hostname == None:
         args['mysql_hostname'] = 'mysql'
-    if 'mysql_dbname' not in args:
+    if 'mysql_dbname' not in args || args.mysql_dbname == None:
         args['mysql_dbname'] = 'dbname'
     return args
 main_subparsers = main_parser.add_subparsers()
@@ -114,8 +114,8 @@ def influxformat(measurement, fields, tags={}):
     yield point
 
 def main():
-    main_parser.add_argument('--mysql-hostname', dest='mysql_hostname', nargs='?', default=None)
-    main_parser.add_argument('--mysql-dbname', dest='mysql_dbname', nargs='?', default=None)
+    main_parser.add_argument('--mysql-hostname', dest='mysql_hostname', type=str, nargs='?', default=None)
+    main_parser.add_argument('--mysql-dbname', dest='mysql_dbname', type=str, nargs='?', default=None)
     main_parser.add_argument('--wait', dest="wait", type=int, nargs='?', default=-1)
     prepare_parser = main_subparsers.add_parser('prepare')
     prepare_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
