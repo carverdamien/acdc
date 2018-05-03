@@ -10,9 +10,9 @@ main_parser = argparse.ArgumentParser()
 user = 'root'
 password = ''
 def set_defaults(args):
-    if 'mysql_hostname' not in args or args.mysql_hostname == None:
+    if args.mysql_hostname == None:
         args.__dict__['mysql_hostname'] = 'mysql'
-    if 'mysql_dbname' not in args or args.mysql_dbname == None:
+    if args.mysql_dbname == None:
         args.__dict__['mysql_dbname'] = 'dbname'
     return args
 main_subparsers = main_parser.add_subparsers()
@@ -72,7 +72,7 @@ def run(args):
                                     database=args.influxdbname)
     client.create_database(args.influxdbname)
     measurement = 'sysbench_stats'
-    if 'mysql_hostname' not in args or args.mysql_hostname == None:
+    if args.mysql_hostname == None:
         args = set_defaults(args)
         wait_for_server_to_start(args)
         hostname = subprocess.check_output(mysql_call(args) + ['-BNe', 'select @@hostname;'])[:-1]
