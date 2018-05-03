@@ -11,9 +11,9 @@ user = 'root'
 password = ''
 def set_defaults(args):
     if 'mysql_hostname' not in args or args.mysql_hostname == None:
-        args['mysql_hostname'] = 'mysql'
+        args.__dict__['mysql_hostname'] = 'mysql'
     if 'mysql_dbname' not in args or args.mysql_dbname == None:
-        args['mysql_dbname'] = 'dbname'
+        args.__dict__['mysql_dbname'] = 'dbname'
     return args
 main_subparsers = main_parser.add_subparsers()
 
@@ -54,12 +54,12 @@ def prepare(args):
     args = set_defaults(args)
     wait_for_server_to_start(args)
     try:
-        subprocess.check_call(mysql_call(args) + ['-e', 'CREATE DATABASE %s' % dbname])
+        subprocess.check_call(mysql_call(args) + ['-e', 'CREATE DATABASE %s' % args.mysql_dbname])
         subprocess.check_call(sysbench_call(args) + ['prepare'])
     except Exception as e:
         print(e)
     finally:
-        out = subprocess.check_output(mysql_call(args) + ['-D', dbname, '-e', 'select count(*) from sbtest1'])
+        out = subprocess.check_output(mysql_call(args) + ['-D', args.mysql_dbname, '-e', 'select count(*) from sbtest1'])
         count = int(out.split('\n')[1])
         if count != args.dbsize:
             raise Exception('count != dbsize')
@@ -71,16 +71,17 @@ def run(args):
                                     database=args.influxdbname)
     client.create_database(args.influxdbname)
     measurement = 'sysbench_stats'
-    if 'mysql_hostname' not in args:
+    if 'mysql_hostname' not in args or args.mysql_hostname == None:
         args = set_defaults(args)
+        wait_for_server_to_start(args)
         hostname = subprocess.check_output(mysql_call(args) + ['-BNe', 'select @@hostname;'])[:-1]
     else:
+        wait_for_server_to_start(args)
         hostname = args.mysql_hostname
     tags = { 'hostname' : hostname }
     def callback(fields):
         client.write_points([p for p in influxformat(measurement, fields, tags=tags)])
     args.callback = callback
-    wait_for_server_to_start(args)
     call = sysbench_call(args) + ['--report-interval=1',
                             '--tx-rate=%d' % args.txrate,
                             '--max-requests=%d' % args.maxrequests,
