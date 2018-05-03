@@ -31,6 +31,7 @@ def sysbench_call(args):
             '--oltp-table-size=%d' % args.dbsize,
             '--mysql-db=%s' % args.mysql_dbname,
             '--mysql-host=%s' % args.mysql_hostname,
+            '--mysql-port=%d' % args.mysql_port,
             '--mysql-user=%s' % user,
             '--mysql-password=%s' % password]
 
@@ -117,6 +118,7 @@ def influxformat(measurement, fields, tags={}):
 def main():
     main_parser.add_argument('--mysql-hostname', dest='mysql_hostname', type=str, nargs='?', default=None)
     main_parser.add_argument('--mysql-dbname', dest='mysql_dbname', type=str, nargs='?', default=None)
+    main_parser.add_argument('--mysql-port', dest='mysql_port', type=int, nargs='?', default=3306)
     main_parser.add_argument('--wait', dest="wait", type=int, nargs='?', default=-1)
     prepare_parser = main_subparsers.add_parser('prepare')
     prepare_parser.add_argument('--dbsize',   dest="dbsize", type=int, nargs='?', default=10000)
