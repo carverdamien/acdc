@@ -25,6 +25,7 @@ services:
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
+      - data-mysqlb:/var/lib/3307.data
     cpuset: '2'
     cpus: 1
   influxdb:
@@ -48,6 +49,8 @@ services:
       - influxdb
 volumes:
   data-mysqla:
+    external: true
+  data-mysqlb:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
