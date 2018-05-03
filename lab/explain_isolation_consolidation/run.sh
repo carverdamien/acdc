@@ -35,41 +35,9 @@ ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/B
 ${PRE} exec host bash -c 'echo 1024 > /rootfs/sys/fs/cgroup/cpu/consolidate/BC/C/cpu.shares'
 ${PRE} down
 
-MAXTXR=870
-MAXTXR=770
-MAXTXR=780
-MAXTXR=781
-CYCLE=10
-
 # Run
 ${RUN} create
 ${RUN} up -d
-
-SCHED() {
-	X=$1
-	shift
-	NREQ=0	
-	TXRATE=$((MAXTXR * X / 100))
-	NREQ=$((TXRATE * CYCLE + NREQ))
-	CMD="--tx-rate ${TXRATE}"
-	RATE="--scheduled-rate=${TXRATE}"
-	TIME="--scheduled-time=0"
-	REQT="--scheduled-requests=${NREQ}"
-
-	for X in $@
-	do
-		TXRATE=$((MAXTXR * X / 100))
-		NREQ=$((TXRATE * CYCLE + NREQ))
-		RATE="${RATE},${TXRATE}"
-		TIME="${TIME},0"
-		REQT="${REQT},${NREQ}"
-	done
-	echo "${CMD} ${RATE} ${TIME} ${REQT} --max-requests ${NREQ}"
-}
-
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 25 50 25 25 100 25 25 25 25 25 50 25 25 25 50 25 50 25 25 25);}
-B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 25 25 50 25 25 25 100 25 25 25 50 25 50 25 25 25 50 25 25 25);}
-C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZE} $(SCHED 25 25 25 50 25 25 25 25 100 25 25 25 50 25 50 25 50 25 25 25);}
 
 MAXTXR=390                # Max on one core
 MEDTXR=$((MAXTXR*40/100)) # Medium is 40%
