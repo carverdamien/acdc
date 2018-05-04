@@ -14,6 +14,9 @@ RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
 
 case $MODE in
 	Aonly)
+MYSQLB_HOST="mysqlb"
+MYSQLB_PORT="3306"
+MYSQLB_DBNM="dbname"
 ;;
 	Bonly)
 MYSQLB_HOST="mysqlb"
