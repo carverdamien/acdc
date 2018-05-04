@@ -13,6 +13,13 @@ PRE="docker-compose --project-directory $PWD -f compose/$MODE/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
 
 case $MODE in
+	Aonly)
+;;
+	Bonly)
+MYSQLB_HOST="mysqlb"
+MYSQLB_PORT="3306"
+MYSQLB_DBNM="dbname"
+;;
 	standalone)
 MYSQLB_HOST="mysqlb"
 MYSQLB_PORT="3306"
@@ -98,8 +105,8 @@ NB5=$(( (TIMEB3-1) * MEDTXR + NB4))
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                     --scheduled-time=0,0,0     --scheduled-requests=${NA1},${NA2},${NA3}               --max-requests ${NA3} --num-threads=2;}
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-port ${MYSQLB_PORT} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
 
-A | tee A.out &
-B | tee B.out &
+[ $MODE == Bonly ] || A | tee A.out &
+[ $MODE == Aonly ] || B | tee B.out &
 
 wait
 wait
