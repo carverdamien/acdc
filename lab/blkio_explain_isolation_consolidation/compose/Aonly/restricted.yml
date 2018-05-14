@@ -27,7 +27,7 @@ services:
       - data-mysqla:/var/lib/mysql
     cpuset: '2'
     cpus: 1
-    memory: '512MB'
+    mem_limit: '512MB'
   mysqlb:
     build: images/mysql
     hostname: mysqlb
@@ -35,7 +35,7 @@ services:
       - data-mysqlb:/var/lib/mysql
     cpuset: '6'
     cpus: 1
-    memory: '512MB'
+    mem_limit: '512MB'
   influxdb:
     image: influxdb:latest
   collector:
