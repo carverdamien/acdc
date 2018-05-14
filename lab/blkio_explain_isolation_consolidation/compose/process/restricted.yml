@@ -26,8 +26,10 @@ services:
     volumes:
       - data-mysqla:/var/lib/mysql
       - data-mysqlb:/var/lib/3307.data
-    cpuset: '2'
-    cpus: 1
+    cpuset: '2,6,3,7'
+    cpus: 4
+    mem_limit: '640MB'
+    cgroup_parent: 'consolidate'
   influxdb:
     image: influxdb:latest
   collector:
