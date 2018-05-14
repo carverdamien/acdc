@@ -25,8 +25,8 @@ services:
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
-    cpuset: '2'
-    cpus: 1
+    cpuset: '2,6'
+    cpus: 2
     mem_limit: '320MB'
     cgroup_parent: 'consolidate'
   mysqlb:
@@ -34,8 +34,8 @@ services:
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    cpuset: '2'
-    cpus: 1
+    cpuset: '3,7'
+    cpus: 2
     mem_limit: '320MB'
     cgroup_parent: 'consolidate'
   influxdb:
