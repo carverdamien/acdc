@@ -27,7 +27,6 @@ services:
       - data-mysqla:/var/lib/mysql
     mem_limit: '512MB'
     memswap_limit: '512MB'
-    cgroup_parent: 'consolidate'
     cpuset: '0,4,1,5'
   mysqlb:
     build: images/mysql
@@ -36,7 +35,6 @@ services:
       - data-mysqlb:/var/lib/mysql
     mem_limit: '512MB'
     memswap_limit: '512MB'
-    cgroup_parent: 'consolidate'
     cpuset: '2,6,3,7'
   influxdb:
     image: influxdb:latest
