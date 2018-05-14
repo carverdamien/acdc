@@ -28,6 +28,7 @@ services:
     cpuset: '2'
     cpus: 1
     mem_limit: '640MB'
+    cgroup_parent: 'consolidate'
   influxdb:
     image: influxdb:latest
   collector:

@@ -28,6 +28,7 @@ services:
     cpuset: '2'
     cpus: 1
     mem_limit: '320MB'
+    cgroup_parent: 'consolidate'
   mysqlb:
     build: images/mysql
     hostname: mysqlb
@@ -36,6 +37,7 @@ services:
     cpuset: '6'
     cpus: 1
     mem_limit: '320MB'
+    cgroup_parent: 'consolidate'
   influxdb:
     image: influxdb:latest
   collector:

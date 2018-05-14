@@ -8,6 +8,7 @@ source kernel
 : ${SCALE:=1}
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
+: ${BLKIO:=$((50*2**20))}
 
 PRE="docker-compose --project-directory $PWD -f compose/$MODE/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
@@ -73,6 +74,10 @@ ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 start_mysqlb
 ${PRE} exec sysbenchb python benchmark.py --mysql-hostname ${MYSQLB_HOST} --mysql-port ${MYSQLB_PORT} --mysql-dbname ${MYSQLB_DBNM} prepare --dbsize ${DBSIZE}
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
+${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
+${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/blkio/consolidate ] || rmdir /rootfs/sys/fs/cgroup/blkio/consolidate'
+${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/blkio/consolidate'
+${PRE} exec host bash -c "echo '$(cat /sys/block/sda/dev) ${BLKIO}' > /rootfs/sys/fs/cgroup/blkio/consolidate/blkio.throttle.read_bps_device"
 ${PRE} down
 
 # Run
