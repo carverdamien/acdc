@@ -27,6 +27,7 @@ services:
       - data-mysqla:/var/lib/mysql
     cpuset: '2'
     cpus: 1
+    mem_limit: '640MB'
   influxdb:
     image: influxdb:latest
   collector:
