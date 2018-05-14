@@ -28,6 +28,7 @@ services:
     cpuset: '2,6'
     cpus: 2
     mem_limit: '320MB'
+    memswap_limit: '320MB'
     cgroup_parent: 'consolidate'
   mysqlb:
     build: images/mysql
@@ -37,6 +38,7 @@ services:
     cpuset: '3,7'
     cpus: 2
     mem_limit: '320MB'
+    memswap_limit: '320MB'
     cgroup_parent: 'consolidate'
   influxdb:
     image: influxdb:latest
