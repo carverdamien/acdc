@@ -24,8 +24,8 @@ services:
     volumes:
       - data-mysqla:/var/lib/mysql
       - data-mysqlb:/var/lib/3307.data
-    mem_limit: '640MB'
-    memswap_limit: '640MB'
+    mem_limit: '1024MB'
+    memswap_limit: '1024MB'
     cgroup_parent: 'consolidate'
   influxdb:
     image: influxdb:latest

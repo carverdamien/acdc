@@ -13,27 +13,31 @@ services:
     links:
       - mysqla:mysql
       - influxdb
+    cpuset: '0,4,1,5'
   sysbenchb:
     build: images/sysbench
     links:
       - mysqlb:mysqlb
       - influxdb
+    cpuset: '2,6,3,7'
   mysqla:
     build: images/mysql
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
-    mem_limit: '320MB'
-    memswap_limit: '320MB'
+    mem_limit: '512MB'
+    memswap_limit: '512MB'
     cgroup_parent: 'consolidate'
+    cpuset: '0,4,1,5'
   mysqlb:
     build: images/mysql
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    mem_limit: '320MB'
-    memswap_limit: '320MB'
+    mem_limit: '512MB'
+    memswap_limit: '512MB'
     cgroup_parent: 'consolidate'
+    cpuset: '2,6,3,7'
   influxdb:
     image: influxdb:latest
   collector:

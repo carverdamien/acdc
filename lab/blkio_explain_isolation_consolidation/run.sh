@@ -90,15 +90,19 @@ MAXTXR=520
 MAXTXR=585
 MAXTXR=600
 MAXTXR=1300
-MEDTXR=$((MAXTXR*40/100)) # Medium is 40%
-LOWTXR=$((MAXTXR*10/100)) # Low is 10%
-BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
+MAXTXR=1400
+MAXTXR=1600
+MEDTXR=$((MAXTXR*40/2/100)) # Medium is 40%
+LOWTXR=$((MAXTXR*10/2/100)) # Low is 10%
+BRTTXR=$((MAXTXR*2*2))      # Extra requests on a second (burst)
 
-TIMEA1=$((25 * SCALE)) # Time A is medium
+INIT=20
+
+TIMEA1=$((INIT + 25 * SCALE)) # Time A is medium
 TIMEA2=$((10 * SCALE)) # Time A is low
 TIMEA3=$((15 * SCALE)) # Time A is medium
 
-TIMEB1=$((10 * SCALE)) # Time B is medium
+TIMEB1=$((INIT + 10 * SCALE)) # Time B is medium
 TIMEB2=$((20 * SCALE)) # Time B is medium
 TIMEB3=$((20 * SCALE)) # Time B is medium
 
@@ -113,7 +117,7 @@ NB4=$((1 * BRTTXR + NB3))
 NB5=$(( (TIMEB3-1) * MEDTXR + NB4))
 
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR}                     --scheduled-time=0,0,0     --scheduled-requests=${NA1},${NA2},${NA3}               --max-requests ${NA3} --num-threads=2;}
-B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-port ${MYSQLB_PORT} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5};}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 --mysql-hostname ${MYSQLB_HOST} --mysql-port ${MYSQLB_PORT} --mysql-dbname ${MYSQLB_DBNM} run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${BRTTXR},${MEDTXR},${BRTTXR},${MEDTXR} --scheduled-time=0,0,0,0,0 --scheduled-requests=${NB1},${NB2},${NB3},${NB4},${NB5} --max-requests ${NB5} --num-threads=16;}
 
 # Test Max Trps
 # A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration 60 --num-threads=8;}
