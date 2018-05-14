@@ -72,7 +72,7 @@ ${PRE} up -d
 ${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
 start_mysqlb
 ${PRE} exec sysbenchb python benchmark.py --mysql-hostname ${MYSQLB_HOST} --mysql-port ${MYSQLB_PORT} --mysql-dbname ${MYSQLB_DBNM} prepare --dbsize ${DBSIZE}
-# ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
+${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} down
 
 # Run
