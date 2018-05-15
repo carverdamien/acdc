@@ -6,5 +6,5 @@ COPY ./*.c ./*.h config* install-sh Makefile* missing aclocal.m4 depcomp parser_
 COPY workloads ./workloads
 RUN ./configure \
 &&  make \
-&&  make install \
+&&  make install
 ENTRYPOINT [ "sleep", "inf" ]
