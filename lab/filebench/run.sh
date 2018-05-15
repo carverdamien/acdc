@@ -23,7 +23,7 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec filebencha echo prepare
+${PRE} exec filebencha filebench -f workloads/A/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} down
@@ -32,7 +32,7 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-A() { ${RUN} exec -T filebencha echo run;}
+A() { ${RUN} exec -T filebencha filebench -f workloads/A/run.f;}
 B() { :;}
 
 [ $MODE == Bonly ] || A | tee A.out &
