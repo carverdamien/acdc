@@ -16,8 +16,6 @@ case $MODE in
 	isolated)
 ;;
 	process)
-	echo todo
-	exit 1
 ;;
 	*)
 echo "unknown MODE: ${MODE}"
@@ -43,6 +41,11 @@ ${RUN} up -d
 
 A() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
 B() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/B/run.f;}
+
+if [ $MODE == process ]
+then
+B() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/B/run.f;}
+fi
 
 [ $MODE == Bonly ] || A | tee A.out &
 [ $MODE == Aonly ] || B | tee B.out &
