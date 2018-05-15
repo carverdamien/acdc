@@ -14,9 +14,27 @@ define process name=filereader,instances=1
   }
 }
 
+eventgen rate = 0
+create files
+create processes
 eventgen rate = 10
-psrun 10 60
+stats clear
+sleep 10
+stats snap
+stats clear
+sleep 10
+stats snap
+stats clear
+sleep 10
+stats snap
 eventgen rate = 20
-psrun 10 60
+stats clear
+sleep 10
+stats snap
+stats clear
+sleep 10
+stats snap
+stats clear
+sleep 10
+stats snap
 shutdown
-quit
