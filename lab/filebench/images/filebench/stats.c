@@ -34,6 +34,7 @@
 #include "flowop.h"
 #include "vars.h"
 #include "stats.h"
+#include "time.h"
 
 /*
  * A set of routines for collecting and dumping various filebench
@@ -614,8 +615,9 @@ stats_snap(void)
 	free(str);
 
 	filebench_log(LOG_INFO,
-	    "IO Summary: %5d ops, %5.3lf ops/s, (%0.0lf/%0.0lf r/w), "
-	    "%5.1lfmb/s, %6.0fus cpu/op, %5.1fms latency",
+	    "IO Summary: {'time':%ld, 'ops':%d, 'ops/s':%lf, 'r':%lf, 'w':%lf, "
+	    "'mb/s':%lf, 'us cpu/op':%f, 'latency ms':%f}",
+	    time(NULL),
 	    iostat->fs_count + aiostat->fs_count,
 	    (iostat->fs_count + aiostat->fs_count) /
 	    ((globalstats->fs_etime - globalstats->fs_stime) / FSECS),

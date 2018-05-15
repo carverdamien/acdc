@@ -11,6 +11,14 @@ RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
 case $MODE in
 	Aonly)
 ;;
+	Bonly)
+;;
+	isolated)
+;;
+	process)
+	echo todo
+	exit 1
+;;
 	*)
 echo "unknown MODE: ${MODE}"
 	exit 1
@@ -24,6 +32,7 @@ ${PRE} build
 ${PRE} create
 ${PRE} up -d
 ${PRE} exec filebencha filebench -f workloads/A/prepare.f
+${PRE} exec filebenchb filebench -f workloads/B/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} down
@@ -33,7 +42,7 @@ ${RUN} create
 ${RUN} up -d
 
 A() { ${RUN} exec -T filebencha filebench -f workloads/A/run.f;}
-B() { :;}
+B() { ${RUN} exec -T filebenchb filebench -f workloads/B/run.f;}
 
 [ $MODE == Bonly ] || A | tee A.out &
 [ $MODE == Aonly ] || B | tee B.out &
