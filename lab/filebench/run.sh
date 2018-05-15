@@ -41,8 +41,8 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-A() { ${RUN} exec -T filebencha filebench -f workloads/A/run.f;}
-B() { ${RUN} exec -T filebenchb filebench -f workloads/B/run.f;}
+A() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
+B() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/B/run.f;}
 
 [ $MODE == Bonly ] || A | tee A.out &
 [ $MODE == Aonly ] || B | tee B.out &

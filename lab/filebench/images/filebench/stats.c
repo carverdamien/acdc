@@ -460,6 +460,11 @@ stats_snap(void)
 	hrtime_t orig_starttime;
 	flowop_t *flowop;
 	char *str;
+	struct timespec timespec;
+	unsigned long time;
+
+	clock_gettime(CLOCK_REALTIME,&timespec);
+	time = (int64_t)(timespec.tv_sec) * (int64_t)1000000000 + (int64_t)(timespec.tv_nsec);
 
 	if (globalstats == NULL) {
 		filebench_log(LOG_ERROR,
@@ -615,9 +620,10 @@ stats_snap(void)
 	free(str);
 
 	filebench_log(LOG_INFO,
-	    "IO Summary: {'time':%ld, 'ops':%d, 'ops/s':%lf, 'r':%lf, 'w':%lf, "
-	    "'mb/s':%lf, 'us cpu/op':%f, 'latency ms':%f}",
-	    time(NULL),
+	    "IO Summary: {\"measurement\":\"filebench_stats\", \"tags\":{\"name\":\"%s\"}, \"time\":%ld, \"fields\":{ \"ops\":%d, \"ops/s\":%lf, \"r\":%lf, \"w\":%lf, "
+	    "\"mb/s\":%lf, \"us cpu/op\":%f, \"latency ms\":%f}}",
+	    filebench_shm->shm_fscriptname,
+	    time,
 	    iostat->fs_count + aiostat->fs_count,
 	    (iostat->fs_count + aiostat->fs_count) /
 	    ((globalstats->fs_etime - globalstats->fs_stime) / FSECS),
