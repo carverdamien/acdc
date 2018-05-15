@@ -1,0 +1,49 @@
+#!/bin/bash
+set -x -e
+
+source kernel
+[ -n "${KERNEL}" ]
+[ "$(uname -sr)" == "Linux ${KERNEL}" ]
+
+PRE="docker-compose --project-directory $PWD -f compose/$MODE/unrestricted.yml"
+RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
+
+case $MODE in
+	Aonly)
+;;
+	*)
+echo "unknown MODE: ${MODE}"
+	exit 1
+		;;
+esac
+
+# Prepare
+${RUN} down --remove-orphans
+${PRE} down --remove-orphans
+${PRE} build
+${PRE} create
+${PRE} up -d
+${PRE} exec filebencha echo prepare
+${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
+${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
+${PRE} down
+
+# Run
+${RUN} create
+${RUN} up -d
+
+A() { ${RUN} exec -T filebencha echo run;}
+B() { :;}
+
+[ $MODE == Bonly ] || A | tee A.out &
+[ $MODE == Aonly ] || B | tee B.out &
+
+wait
+wait
+
+# Report
+mkdir -p data/$MODE
+for m in memory_stats blkio_stats networks cpu_stats filebench_stats
+do
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$MODE/$m.csv
+done
