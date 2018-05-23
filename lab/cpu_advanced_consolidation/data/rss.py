@@ -10,14 +10,13 @@ img = sys.argv[1]
 
 df = pd.read_csv('memory_stats.csv')
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
-for label in ['mysqla', 'mysqlb', 'cassandra']:
+plt.figure()
+for label in ['mysqla', 'mysqlb', 'mysqlc']:
 	sel = df['com.docker.compose.service'] == label
 	X = df['time'][sel]
 	X = np.array(X, dtype='datetime64[ns]')
-	Y = df['stats.recent_ratio_total'][sel]
-	ax.plot(X,Y,label=label)
-ax.legend()
-ax.set_yscale('log')
+	Y = df['stats.rss'][sel]
+	Y /= 2**20
+	plt.plot(X,Y,label=label)
+plt.legend()
 plt.savefig(img)
