@@ -10,14 +10,13 @@ img = sys.argv[1]
 
 df = pd.read_csv('memory_stats.csv')
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
+plt.figure()
 for label in ['mysqla', 'mysqlb', 'cassandra']:
-	sel = df['com.docker.compose.service'] == label
-	X = df['time'][sel]
-	X = np.array(X, dtype='datetime64[ns]')
-	Y = df['stats.recent_ratio_total'][sel]
-	ax.plot(X,Y,label=label)
-ax.legend()
-ax.set_yscale('log')
+	for metric in ['stats.pglost']:
+		sel = df['com.docker.compose.service'] == label
+		X = df['time'][sel]
+		X = np.array(X, dtype='datetime64[ns]')
+		Y = df[metric][sel]
+		plt.plot(X,Y,label=label)
+plt.legend()
 plt.savefig(img)
