@@ -24,6 +24,25 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     links:
       - influxdb
+  idlememstat:
+    build: images/idlememstat
+    privileged: true
+    command: [ "-d", "1", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--cgroup", "/rootfs/sys/fs/cgroup/memory/docker ]
+    environment:
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+    links:
+      - influxdb
   grafana:
     image: grafana/grafana:latest
     ports:
