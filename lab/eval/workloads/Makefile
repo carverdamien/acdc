@@ -2,6 +2,8 @@ SH=$(wildcard *.sh)
 WML=$(SH:%.sh=%.f)
 all:$(WML)
 
+run.f:run.sh prepare.sh
+
 %.f:%.sh
 	bash $< > $@
 

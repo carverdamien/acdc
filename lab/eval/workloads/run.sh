@@ -1,12 +1,13 @@
-LOW=50
-MED=100
+CYCLE=20
+LOW=0
+MED=1024
 source prepare.sh
 echo '
 eventgen rate = 0
 create processes
 '
 echo "eventgen rate = $MED"
-for i in {1..60}
+for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
@@ -15,7 +16,7 @@ stats snap
 EOF
 done
 echo "eventgen rate = $LOW"
-for i in {1..20}
+for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
@@ -24,7 +25,7 @@ stats snap
 EOF
 done
 echo "eventgen rate = $MED"
-for i in {1..30}
+for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear

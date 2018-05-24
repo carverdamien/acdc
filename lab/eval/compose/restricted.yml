@@ -15,7 +15,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
-    mem_limit: 1G
+    mem_limit: 1GB
   influxdb:
     image: influxdb:latest
   collector:
