@@ -1,4 +1,4 @@
-CYCLE=20
+CYCLE=60
 LOW=0
 MED=1024
 source prepare.sh
