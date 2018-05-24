@@ -6,6 +6,15 @@ echo '
 eventgen rate = 0
 create processes
 '
+echo "eventgen rate = $LOW"
+for i in $(seq ${CYCLE})
+do
+cat <<EOF
+stats clear
+sleep 1
+stats snap
+EOF
+done
 echo "eventgen rate = $MED"
 for i in $(seq ${CYCLE})
 do
