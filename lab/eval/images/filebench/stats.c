@@ -620,7 +620,7 @@ stats_snap(void)
 	free(str);
 
 	filebench_log(LOG_INFO,
-	    "IO Summary: {\"measurement\":\"filebench_stats\", \"tags\":{\"filename\":\"%s\"}, \"time\":%ld, \"fields\":{ \"ops\":%d, \"ops/s\":%lf, \"r\":%lf, \"w\":%lf, "
+	    "{\"measurement\":\"filebench_stats\", \"tags\":{\"opname\":\"IO Summary\", \"filename\":\"%s\"}, \"time\":%ld, \"fields\":{ \"ops\":%d, \"ops/s\":%lf, \"r\":%lf, \"w\":%lf, "
 	    "\"mb/s\":%lf, \"us cpu/op\":%f, \"latency ms\":%f}}",
 	    filebench_shm->shm_fscriptname,
 	    time,
