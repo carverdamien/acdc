@@ -722,15 +722,31 @@ static int
 flowoplib_hog(threadflow_t *threadflow, flowop_t *flowop)
 {
 	uint64_t value = avd_get_int(flowop->fo_value);
-	int i;
+	uint64_t wss = avd_get_int(flowop->fo_wss);
+	uint64_t iosize = avd_get_int(flowop->fo_iosize);
+	uint64_t i,j;
+
+	if (!wss)
+		wss = 1;
+	if (wss > avd_get_int(threadflow->tf_memsize)) {
+		filebench_log(LOG_ERROR, "wss > avd_get_int(threadflow->tf_memsize) for thread %s",
+			      flowop->fo_name);
+		return (FILEBENCH_ERROR);
+	}
+	if (!iosize)
+		iosize = 1;
 
 	filebench_log(LOG_DEBUG_IMPL, "hog enter");
 	flowop_beginop(threadflow, flowop);
 	if (threadflow->tf_mem != NULL) {
-		for (i = 0; i < value; i++)
-			*(threadflow->tf_mem) = 1;
+		for (i = j = 0; i < value; i++) {
+			threadflow->tf_mem[j] = 1;
+			j+=iosize;
+			if(j>=wss)
+				j-=wss;
+		}
 	}
-	flowop_endop(threadflow, flowop, 0);
+	flowop_endop(threadflow, flowop, value * iosize);
 	filebench_log(LOG_DEBUG_IMPL, "hog exit");
 	return (FILEBENCH_OK);
 }

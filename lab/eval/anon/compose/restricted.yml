@@ -16,6 +16,7 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     mem_limit: 1GB
+    mem_swappiness: 100
   influxdb:
     image: influxdb:latest
   collector:
