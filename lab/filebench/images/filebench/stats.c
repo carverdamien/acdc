@@ -577,9 +577,11 @@ stats_snap(void)
 			continue;
 		}
 
-		(void) snprintf(line, sizeof (line), "%-20s %dops %8.0lfops/s "
-		    "%5.1lfmb/s %8.1fms/op %8.0fus/op-cpu",
+		(void) snprintf(line, sizeof (line), "{\"measurement\":\"filebench_stats\",\"tags\":{\"opname\":\"%s\",\"filename\":\"%s\"},\"time\":%ld,\"fields\":{\"ops\":%d,\"ops/s\":%lf,"
+		    "\"mb/s\":%lf,\"ms/op\":%f,\"us/op-cpu\":%f",
 		    flowop->fo_name,
+		    filebench_shm->shm_fscriptname,
+		    time,
 		    flowop->fo_stats.fs_count,
 		    flowop->fo_stats.fs_count /
 		    ((globalstats->fs_etime - globalstats->fs_stime) / FSECS),
@@ -593,22 +595,20 @@ stats_snap(void)
 		    (flowop->fo_stats.fs_count * 1000.0) : 0);
 		(void) strcat(str, line);
 
-		(void) snprintf(line, sizeof(line)," [%llums - %llums]",
+		(void) snprintf(line, sizeof(line),",\"ms.min\":%llu,\"ms.max\":%llu",
 			flowop->fo_stats.fs_minlat / 1000000,
 			flowop->fo_stats.fs_maxlat / 1000000);
 		(void) strcat(str, line);
 
 		if (filebench_shm->osprof_enabled) {
-			(void) sprintf(histogram, "\t[ ");
 			for (i = 0; i < OSPROF_BUCKET_NUMBER; i++) {
-				(void) sprintf(hist_reading, "%lu ",
+				(void) sprintf(hist_reading, ",\"ms.hist%d\":%lu",i,
 				flowop->fo_stats.fs_distribution[i]);
 				(void) strcat(histogram, hist_reading);
 			}
-			(void) strcat(histogram, "]\n");
 			(void) strcat(str, histogram);
-		} else
-			(void) strcat(str, "\n");
+		}
+		(void) strcat(str, "}}\n");
 
 		flowop = flowop->fo_next;
 	}
@@ -620,7 +620,7 @@ stats_snap(void)
 	free(str);
 
 	filebench_log(LOG_INFO,
-	    "IO Summary: {\"measurement\":\"filebench_stats\", \"tags\":{\"filename\":\"%s\"}, \"time\":%ld, \"fields\":{ \"ops\":%d, \"ops/s\":%lf, \"r\":%lf, \"w\":%lf, "
+	    "{\"measurement\":\"filebench_stats\", \"tags\":{\"opname\":\"IO Summary\", \"filename\":\"%s\"}, \"time\":%ld, \"fields\":{ \"ops\":%d, \"ops/s\":%lf, \"r\":%lf, \"w\":%lf, "
 	    "\"mb/s\":%lf, \"us cpu/op\":%f, \"latency ms\":%f}}",
 	    filebench_shm->shm_fscriptname,
 	    time,
