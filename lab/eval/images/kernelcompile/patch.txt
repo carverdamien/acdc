@@ -132,7 +132,7 @@ index ad22035..868baa4 100644
  						gfp_t gfp_mask, bool noswap,
  						struct zone *zone,
 diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index fe787f5..b0c6fa2 100644
+index fe787f5..a29cd34 100644
 --- a/mm/memcontrol.c
 +++ b/mm/memcontrol.c
 @@ -85,6 +85,8 @@ static bool cgroup_memory_nosocket;
@@ -144,16 +144,21 @@ index fe787f5..b0c6fa2 100644
  /* Whether the swap controller is active */
  #ifdef CONFIG_MEMCG_SWAP
  int do_swap_account __read_mostly;
-@@ -113,6 +115,8 @@ static const char * const mem_cgroup_events_names[] = {
+@@ -113,6 +115,13 @@ static const char * const mem_cgroup_events_names[] = {
  	"pgpgout",
  	"pgfault",
  	"pgmajfault",
 +	"pglost",
 +	"pgstolen",
++};
++
++static const char * const mem_cgroup_clocks_names[] = {
++	"clckD",
++	"clckA",
  };
  
  static const char * const mem_cgroup_lru_names[] = {
-@@ -1896,7 +1900,7 @@ static void reclaim_high(struct mem_cgroup *memcg,
+@@ -1896,7 +1905,7 @@ static void reclaim_high(struct mem_cgroup *memcg,
  		if (page_counter_read(&memcg->memory) <= memcg->high)
  			continue;
  		mem_cgroup_events(memcg, MEMCG_HIGH, 1);
@@ -162,7 +167,7 @@ index fe787f5..b0c6fa2 100644
  	} while ((memcg = parent_mem_cgroup(memcg)));
  }
  
-@@ -1926,6 +1930,198 @@ void mem_cgroup_handle_over_high(void)
+@@ -1926,6 +1935,198 @@ void mem_cgroup_handle_over_high(void)
  	current->memcg_nr_pages_over_high = 0;
  }
  
@@ -361,7 +366,7 @@ index fe787f5..b0c6fa2 100644
  static int try_charge(struct mem_cgroup *memcg, gfp_t gfp_mask,
  		      unsigned int nr_pages)
  {
-@@ -1937,6 +2133,8 @@ static int try_charge(struct mem_cgroup *memcg, gfp_t gfp_mask,
+@@ -1937,6 +2138,8 @@ static int try_charge(struct mem_cgroup *memcg, gfp_t gfp_mask,
  	bool may_swap = true;
  	bool drained = false;
  
@@ -370,7 +375,7 @@ index fe787f5..b0c6fa2 100644
  	if (mem_cgroup_is_root(memcg))
  		return 0;
  retry:
-@@ -1979,8 +2177,8 @@ retry:
+@@ -1979,8 +2182,8 @@ retry:
  
  	mem_cgroup_events(mem_over_limit, MEMCG_MAX, 1);
  
@@ -381,7 +386,7 @@ index fe787f5..b0c6fa2 100644
  
  	if (mem_cgroup_margin(mem_over_limit) >= nr_pages)
  		goto retry;
-@@ -2478,7 +2676,7 @@ static int mem_cgroup_resize_limit(struct mem_cgroup *memcg,
+@@ -2478,7 +2681,7 @@ static int mem_cgroup_resize_limit(struct mem_cgroup *memcg,
  		if (!ret)
  			break;
  
@@ -390,7 +395,7 @@ index fe787f5..b0c6fa2 100644
  
  		curusage = page_counter_read(&memcg->memory);
  		/* Usage is reduced ? */
-@@ -2529,7 +2727,7 @@ static int mem_cgroup_resize_memsw_limit(struct mem_cgroup *memcg,
+@@ -2529,7 +2732,7 @@ static int mem_cgroup_resize_memsw_limit(struct mem_cgroup *memcg,
  		if (!ret)
  			break;
  
@@ -399,7 +404,7 @@ index fe787f5..b0c6fa2 100644
  
  		curusage = page_counter_read(&memcg->memsw);
  		/* Usage is reduced ? */
-@@ -2654,8 +2852,8 @@ static int mem_cgroup_force_empty(struct mem_cgroup *memcg)
+@@ -2654,8 +2857,8 @@ static int mem_cgroup_force_empty(struct mem_cgroup *memcg)
  		if (signal_pending(current))
  			return -EINTR;
  
@@ -410,7 +415,7 @@ index fe787f5..b0c6fa2 100644
  		if (!progress) {
  			nr_retries--;
  			/* maybe some writeback is necessary */
-@@ -2714,6 +2912,57 @@ static int mem_cgroup_hierarchy_write(struct cgroup_subsys_state *css,
+@@ -2714,6 +2917,57 @@ static int mem_cgroup_hierarchy_write(struct cgroup_subsys_state *css,
  	return retval;
  }
  
@@ -468,7 +473,7 @@ index fe787f5..b0c6fa2 100644
  static void tree_stat(struct mem_cgroup *memcg, unsigned long *stat)
  {
  	struct mem_cgroup *iter;
-@@ -3005,6 +3254,21 @@ static ssize_t mem_cgroup_write(struct kernfs_open_file *of,
+@@ -3005,6 +3259,21 @@ static ssize_t mem_cgroup_write(struct kernfs_open_file *of,
  	return ret ?: nbytes;
  }
  
@@ -490,19 +495,22 @@ index fe787f5..b0c6fa2 100644
  static ssize_t mem_cgroup_reset(struct kernfs_open_file *of, char *buf,
  				size_t nbytes, loff_t off)
  {
-@@ -3216,7 +3480,10 @@ static int memcg_stat_show(struct seq_file *m, void *v)
+@@ -3216,7 +3485,13 @@ static int memcg_stat_show(struct seq_file *m, void *v)
  		seq_printf(m, "recent_scanned_file %lu\n", recent_scanned[1]);
  	}
  #endif
 -
 +	seq_printf(m, "soft_priority %lu\n", mem_cgroup_priority(memcg,value_from_soft_limit));
 +	seq_printf(m, "clck_priority %lu\n", mem_cgroup_priority(memcg,value_from_activity));
-+	/* TODO: print soft excess*/
-+	/* TODO: print clocks */
++	seq_printf(m, "soft_excess %lu\n", soft_limit_excess(memcg));
++	for(i=0; i<MEM_CGROUP_CLOCKS_NR; i++)
++		seq_printf(m, "%s %lu\n",
++			   mem_cgroup_clocks_names[i],
++			   memcg->activity.clock[i]);
  	return 0;
  }
  
-@@ -3943,11 +4210,25 @@ static struct cftype mem_cgroup_legacy_files[] = {
+@@ -3943,11 +4218,25 @@ static struct cftype mem_cgroup_legacy_files[] = {
  		.write = mem_cgroup_force_empty_write,
  	},
  	{
@@ -528,7 +536,7 @@ index fe787f5..b0c6fa2 100644
  		.name = "cgroup.event_control",		/* XXX: for compat */
  		.write = memcg_write_event_control,
  		.flags = CFTYPE_NO_PREFIX | CFTYPE_WORLD_WRITABLE,
-@@ -5003,8 +5284,8 @@ static ssize_t memory_high_write(struct kernfs_open_file *of,
+@@ -5003,8 +5292,8 @@ static ssize_t memory_high_write(struct kernfs_open_file *of,
  
  	nr_pages = page_counter_read(&memcg->memory);
  	if (nr_pages > high)
@@ -539,7 +547,7 @@ index fe787f5..b0c6fa2 100644
  
  	memcg_wb_domain_size_changed(memcg);
  	return nbytes;
-@@ -5057,8 +5338,8 @@ static ssize_t memory_max_write(struct kernfs_open_file *of,
+@@ -5057,8 +5346,8 @@ static ssize_t memory_max_write(struct kernfs_open_file *of,
  		}
  
  		if (nr_reclaims) {
