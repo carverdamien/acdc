@@ -8,15 +8,17 @@ import sys
 
 img = sys.argv[1]
 
-df = pd.read_csv('memory_stats.csv')
+
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-for label in ['filebench']:
-	sel = df['com.docker.compose.service'] == label
+for label in ['y', 'n']:
+        df = pd.read_csv('%s/memory_stats.csv' % label)
+	sel = df['com.docker.compose.service'] == 'filebench'
 	X = df['time'][sel]
 	X = np.array(X, dtype='datetime64[ns]')
 	Y = df['stats.recent_ratio_total'][sel]
+        X = X - X[0]
 	ax.plot(X,Y,label=label)
 ax.legend()
 ax.set_yscale('log')
