@@ -13,12 +13,12 @@ define process name=filereader,instances=1
 {
   thread name=cold,memsize=2m,instances=1
   {
-    flowop read name=seqread,filename=largefile,iosize=$iosize
+    flowop read name=seqread,filename=largefile,iosize=$iosize,random
   }
   thread name=hot,memsize=512m,instances=1
   {
     flowop eventlimit name=limit
-    flowop hog name=hot,value=$MB,workingset=512m,iosize=1
+    flowop hog name=hot,value=131072,workingset=512m,iosize=4k
   }
 }
 
