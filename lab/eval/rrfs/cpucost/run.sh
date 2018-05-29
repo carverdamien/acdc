@@ -25,6 +25,10 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
+# Start ftrace
+${RUN} exec host rm -f /data/${SLEEP}/trace.dat*
+${RUN} exec -T host job trace-cmd record -p function_graph -g scan_mem_cgroup_pages -o /data/${SLEEP}/trace.dat
+
 # Get container id
 filebench=$(${RUN} ps -q filebench)
 
@@ -36,6 +40,10 @@ RUN() { ${RUN} exec -T filebench python benchmark.py -- filebench -f workloads/r
 RUN &
 
 wait
+
+# Stop ftrace
+${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
+until [ -f data/${SLEEP}/trace.dat ]; do echo 'waiting'; sleep 1; done
 
 # Report
 mkdir -p data/$SLEEP
