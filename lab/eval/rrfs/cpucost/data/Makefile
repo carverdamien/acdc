@@ -14,7 +14,7 @@ all: $(PDF) $(PNG) $(DATCSV)
 
 %.csv: %.dat
 	echo 'proc,time,delay,func' > $@
-	trace-cmd report -i $< | sed -n 's/ *\([^ ]*\) *[^ ]* \([^ ]*\): [^ ]*: *. \([^ ]* [^ ]*\) | *\([^ ]*\)();/\1,\2,\3,\4/p' >> $@
+	trace-cmd report -i $< | sed -n 's/ *\([^ ]*\) *[^ ]* \([^ ]*\): [^ ]*: *. \([^ ]* [^ ]*\) | *\([^ ]*\)();/\1,\2,\3,\4/p' | sed 's/ us//g' >> $@
 
 clean:
 	rm -f $(PDF) $(PNG)
