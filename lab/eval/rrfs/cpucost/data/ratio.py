@@ -12,7 +12,7 @@ img = sys.argv[1]
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-for label in ['y', 'n']:
+for label in ['0.001', '0.01', '0.1', '1']:
         df = pd.read_csv('%s/memory_stats.csv' % label)
 	sel = df['com.docker.compose.service'] == 'filebench'
 	X = df['time'][sel]
