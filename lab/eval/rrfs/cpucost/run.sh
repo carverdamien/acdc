@@ -4,12 +4,7 @@ set -x -e
 source kernel
 [ -n "${KERNEL}" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
-
-case $MODE in
-    'y');;
-    'n');;
-    *) exit 1;;
-esac
+[ -n "${SLEEP}" ]
 
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
@@ -30,14 +25,11 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-if [ "${MODE}" == "y" ]
-then
-    # Get container id
-    filebench=$(${RUN} ps -q filebench)
+# Get container id
+filebench=$(${RUN} ps -q filebench)
 
-    # Start scanner
-    ${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/docker/${filebench} $((2**20)) 1
-fi
+# Start scanner
+${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/docker/${filebench} $((2**20)) ${SLEEP}
 
 RUN() { ${RUN} exec -T filebench python benchmark.py -- filebench -f workloads/run.f;}
 
@@ -46,8 +38,8 @@ RUN &
 wait
 
 # Report
-mkdir -p data/$MODE
+mkdir -p data/$SLEEP
 for m in $(${PRE} exec influxdb influx -database acdc -execute 'show measurements' -format=csv |  sed 's/\r//g' | tail -n+2 | cut -d, -f2)
 do
-	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$MODE/$m.csv
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$SLEEP/$m.csv
 done
