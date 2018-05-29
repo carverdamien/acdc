@@ -1,6 +1,6 @@
 CYCLE=60
 LOW=0
-MED=1024
+MED=100
 source prepare.sh
 echo '
 create processes
