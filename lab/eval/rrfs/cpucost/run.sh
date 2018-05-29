@@ -27,7 +27,7 @@ ${RUN} up -d
 
 # Start ftrace
 ${RUN} exec host rm -f /data/${SLEEP}/trace.dat*
-${RUN} exec -T host job trace-cmd record -p function_graph -g scan_mem_cgroup_pages -o /data/${SLEEP}/trace.dat
+${RUN} exec -T host job trace-cmd record -p function_graph -l scan_mem_cgroup_pages -g scan_mem_cgroup_pages -o /data/${SLEEP}/trace.dat
 
 # Get container id
 filebench=$(${RUN} ps -q filebench)
