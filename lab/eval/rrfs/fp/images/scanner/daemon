@@ -1,0 +1,9 @@
+#!/bin/bash
+set -x
+
+inotifywait -m -e close_write . --format %f | while read job
+do
+	tmp=$(mktemp /tmp/job.XXX)
+	mv ${job} ${tmp}
+    (bash ${tmp}; rm -f ${tmp}) &
+done
