@@ -43,7 +43,7 @@ wait
 
 # Stop ftrace
 ${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
-until [ -f data/${SLEEP}/trace.dat ]; do echo 'waiting'; sleep 1; done
+while ${RUN} exec host pgrep trace-cmd; do echo 'waiting'; sleep 1; done
 
 # Report
 mkdir -p data/$SLEEP

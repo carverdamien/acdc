@@ -1,5 +1,5 @@
 export SLEEP
-for SLEEP in 0.001 0.01 0.1 1
+for SLEEP in 1 0.1 0.01 0.001
 do
     bash run.sh
 done
