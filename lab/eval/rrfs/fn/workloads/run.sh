@@ -1,4 +1,5 @@
-CYCLE=60
+SLEEP=5
+CYCLE=12
 LOW=0
 MED=1024
 source prepare.sh
@@ -12,7 +13,7 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep 1
+sleep ${SLEEP}
 stats snap
 EOF
 done
@@ -21,7 +22,7 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep 1
+sleep ${SLEEP}
 stats snap
 EOF
 done
@@ -30,7 +31,7 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep 1
+sleep ${SLEEP}
 stats snap
 EOF
 done
@@ -39,7 +40,7 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep 1
+sleep ${SLEEP}
 stats snap
 EOF
 done
