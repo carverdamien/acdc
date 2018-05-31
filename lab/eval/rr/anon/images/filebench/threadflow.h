@@ -56,6 +56,7 @@ typedef struct threadflow {
 	avd_t		tf_instances;	/* Number of instances for this flow */
 	struct threadflow *tf_next;	/* Next on proc list */
 	struct flowop	*tf_thrd_fops;	/* Flowop list */
+	unsigned int    tf_idx;         /* Current idx in private memory */
 	caddr_t		tf_mem;		/* Private Memory */
 	avd_t		tf_memsize;	/* Private Memory size attribute */
 	fbint_t		tf_constmemsize; /* constant copy of memory size */

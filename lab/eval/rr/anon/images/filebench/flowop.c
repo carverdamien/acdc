@@ -510,6 +510,7 @@ flowop_start(threadflow_t *threadflow)
 		    malloc(memsize);
 	}
 
+	threadflow->tf_idx = 0;
 	(void) memset(threadflow->tf_mem, 0, memsize);
 	filebench_log(LOG_DEBUG_SCRIPT, "Thread allocated %d bytes", memsize);
 
