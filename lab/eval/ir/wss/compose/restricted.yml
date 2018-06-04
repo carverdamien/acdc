@@ -1,13 +1,11 @@
 version: '2.2'
 services:
   host:
-    image: ubuntu
+    build: images/host
     privileged: true
-    entrypoint:
-      - "sleep"
-      - "inf"
     volumes:
       - /:/rootfs
+      - ./data:/data
   filebench:
     build: images/filebench
     links:
@@ -29,7 +27,7 @@ services:
   idlememstat:
     build: images/idlememstat
     privileged: true
-    command: [ "-d", "1", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--cgroup", "/rootfs/sys/fs/cgroup/memory/docker" ]
+    command: [ "-d", "$IDLEMEMSTAT_DELAY", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--cgroup", "/rootfs/sys/fs/cgroup/memory/docker" ]
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
       - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
