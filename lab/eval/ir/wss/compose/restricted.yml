@@ -27,6 +27,7 @@ services:
   idlememstat:
     build: images/idlememstat
     privileged: true
+    cpus: ${IDLEMEMSTAT_CPU_LIMIT}
     command: [ "-d", "$IDLEMEMSTAT_DELAY", "-c", "$IDLEMEMSTAT_SCAN_CHUNK", "--influxdbhost", "influxdb", "--influxdbname=acdc", "--cgroup", "/rootfs/sys/fs/cgroup/memory/docker" ]
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
