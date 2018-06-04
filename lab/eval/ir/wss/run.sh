@@ -5,11 +5,13 @@ source kernel
 [ -n "${KERNEL}" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 [ -n "${IDLEMEMSTAT_DELAY}" ]
+IDLEMEMSTAT_SCAN_CHUNK=$((8*2**30/(4*2**10)))
 
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
 
-echo 'IDLEMEMSTAT_DELAY=${IDLEMEMSTAT_DELAY}' > .env
+echo "IDLEMEMSTAT_DELAY=${IDLEMEMSTAT_DELAY}" > .env
+echo "IDLEMEMSTAT_SCAN_CHUNK=${IDLEMEMSTAT_SCAN_CHUNK}" >> .env
 
 # Prepare
 make -C workloads
