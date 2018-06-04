@@ -6,6 +6,7 @@ import stat
 import sys
 import threading
 import time
+import datetime
 import docker
 import influxdb
 
@@ -106,6 +107,12 @@ class IdleMemTracker:
             self.__scan_done()
             self.__init_scan()
 
+    def get_scan_start(self):
+        return self.__scan_start
+
+    def get_scan_end(self):
+        return self.__scan_start + self.__scan_time
+
     ##
     # Get the current idle memory estimate for the given cgroup ino.
     # Returns (anon_idle_bytes, file_idle_bytes) tuple.
@@ -172,7 +179,10 @@ def tracker_to_influx_points(idlemem_tracker):
                 'idle_file_ratio'  : float(idle[1]) / float(1 + total[1]),
             },
         }
-    read = time.strftime("%Y-%m-%dT%H:%M:%S") # FIX ME: should come from kpageutil.ccp
+    # read = time.strftime("%Y-%m-%dT%H:%M:%S") # FIX ME: should come from kpageutil.ccp
+    # read = idlemem_tracker.get_scan_start()
+    read = idlemem_tracker.get_scan_end()
+    read = datetime.datetime.fromtimestamp(read).strftime("%Y-%m-%dT%H:%M:%S")
     dockerclient = docker.APIClient()
     containers = {c['Id']:c['Labels'] for c in dockerclient.containers()}
     for cgroup, total, idle in idlemem_info(idlemem_tracker):
