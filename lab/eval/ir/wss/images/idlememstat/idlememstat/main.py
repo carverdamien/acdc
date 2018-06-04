@@ -21,7 +21,7 @@ if 'ZONE_INFO_PATH' in os.environ:
     ZONE_INFO_PATH = os.environ['ZONE_INFO_PATH']
 
 DEFAULT_DELAY = 300  # seconds
-
+DEFAULT_SCAN_CHUNK = 32768
 
 def _get_end_pfn():
     end_pfn = 0
@@ -40,8 +40,6 @@ PAGE_SIZE = os.sysconf("SC_PAGE_SIZE")
 
 class IdleMemTracker:
 
-    SCAN_CHUNK = 32768
-
     ##
     # interval: interval between updates, in seconds
     # on_update: callback to run on each update
@@ -49,7 +47,8 @@ class IdleMemTracker:
     # To avoid CPU bursts, the estimator will distribute the scanning in time
     # so that a full scan fits in the given interval.
 
-    def __init__(self, interval, on_update=None):
+    def __init__(self, interval, on_update=None, SCAN_CHUNK=DEFAULT_SCAN_CHUNK):
+        self.__SCAN_CHUNK = SCAN_CHUNK
         self.interval = interval
         self.on_update = on_update
         self.__is_shut_down = threading.Event()
@@ -76,7 +75,7 @@ class IdleMemTracker:
     def __scan_iter(self):
         start_time = self.__time()
         start_pfn = self.__scan_pfn
-        end_pfn = min(self.__scan_pfn + self.SCAN_CHUNK, END_PFN)
+        end_pfn = min(self.__scan_pfn + self.__SCAN_CHUNK, END_PFN)
         # count idle pages
         cur = kpageutil.count_idle_pages_per_cgroup(start_pfn, end_pfn)
         # accumulate the result
@@ -96,7 +95,7 @@ class IdleMemTracker:
         time_required = pages_left * self.__scan_time / self.__scan_pfn
         if time_required > time_left:
             return
-        chunks_left = float(pages_left) / self.SCAN_CHUNK
+        chunks_left = float(pages_left) / self.__SCAN_CHUNK
         self.__sleep((time_left - time_required) / chunks_left
                      if pages_left > 0 else time_left)
 
@@ -209,6 +208,7 @@ def _sighandler(signum, frame):
 def main():
     parser = optparse.OptionParser()
     parser.add_option("-d", dest="delay", default=DEFAULT_DELAY, type=int)
+    parser.add_option("-c", dest="chunk", default=DEFAULT_SCAN_CHUNK, type=int)
     parser.add_option("--influxdbname", dest="influxdbname", type=str, nargs=1, default='idlememstats')
     parser.add_option("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='localhost')
     parser.add_option("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
@@ -231,7 +231,7 @@ def main():
         if options.updateSoftLimit:
             updateSoftLimit(idlemem_tracker, options.cgroup)
 
-    idlemem_tracker = IdleMemTracker(options.delay, on_update)
+    idlemem_tracker = IdleMemTracker(options.delay, on_update, options.chunk)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
     t.start()
 
