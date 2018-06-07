@@ -1,4 +1,4 @@
-SH=$(wildcard *.sh)
+SH=$(shell find . -name '*.sh')
 WML=$(SH:%.sh=%.f)
 all:$(WML)
 
