@@ -1,5 +1,5 @@
 echo '
-set $dir=/data/A/
+set $dir=/data/C/
 set $filesize=2g
 set $iosize=1m
 
