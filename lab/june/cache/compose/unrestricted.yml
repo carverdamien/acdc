@@ -8,7 +8,21 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  filebench:
+  filebencha:
+    build: images/filebench
+    links:
+      - influxdb
+    volumes:
+      - data-filebench:/data
+      - ./workloads:/home/workloads
+  filebenchb:
+    build: images/filebench
+    links:
+      - influxdb
+    volumes:
+      - data-filebench:/data
+      - ./workloads:/home/workloads
+  filebenchc:
     build: images/filebench
     links:
       - influxdb
