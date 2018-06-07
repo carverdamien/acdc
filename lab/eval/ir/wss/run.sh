@@ -10,7 +10,8 @@ IDLEMEMSTAT_SCAN_CHUNK=$((8*2**30/(4*2**10)))
 IDLEMEMSTAT_SCAN_CHUNK=32768
 
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
-RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
+sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml > compose/.restricted.yml
+RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
 
 echo "IDLEMEMSTAT_DELAY=${IDLEMEMSTAT_DELAY}
 IDLEMEMSTAT_SCAN_CHUNK=${IDLEMEMSTAT_SCAN_CHUNK}
