@@ -22,11 +22,11 @@ done
 cycle $LOW
 cycle $LOW
 cycle $LOW
-cycle $LOW
-cycle $MED
-cycle $MED
 cycle $MED
 cycle $LOW
+cycle $LOW
+cycle $LOW
+cycle $LOW
 cycle $MED
-cycle $MED
+cycle $LOW
 cycle $MED
