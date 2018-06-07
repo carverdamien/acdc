@@ -8,7 +8,8 @@ create processes
 eventgen rate = 1
 sleep 1
 '
-echo "eventgen rate = $LOW"
+cycle() {
+echo "eventgen rate = $1"
 for i in $(seq ${CYCLE})
 do
 cat <<EOF
@@ -17,31 +18,15 @@ sleep ${SLEEP}
 stats snap
 EOF
 done
-echo "eventgen rate = $MED"
-for i in $(seq ${CYCLE})
-do
-cat <<EOF
-stats clear
-sleep ${SLEEP}
-stats snap
-EOF
-done
-echo "eventgen rate = $LOW"
-for i in $(seq ${CYCLE})
-do
-cat <<EOF
-stats clear
-sleep ${SLEEP}
-stats snap
-EOF
-done
-echo "eventgen rate = $MED"
-for i in $(seq ${CYCLE})
-do
-cat <<EOF
-stats clear
-sleep ${SLEEP}
-stats snap
-EOF
-done
-echo 'shutdown'
+}
+cycle $LOW
+cycle $LOW
+cycle $MED
+cycle $MED
+cycle $MED
+cycle $LOW
+cycle $LOW
+cycle $MED
+cycle $MED
+cycle $MED
+cycle $MED

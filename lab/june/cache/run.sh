@@ -1,24 +1,26 @@
 #!/bin/bash
 set -x -e
 
-source kernel
-[ -n "${KERNEL}" ]
+[ -n "$KERNEL" ]
+[ -n "$MEMORY" ]
+
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
-MEMORY=$((2**31))
 
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
 
 # Prepare
+DATA_DIR="data/$KERNEL/$MEMORY"
+mkdir -p "$DATA_DIR"
 make -C workloads
 ${RUN} down --remove-orphans
 ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec filebench filebencha -f workloads/a/prepare.f
-${PRE} exec filebench filebenchb -f workloads/b/prepare.f
-${PRE} exec filebench filebenchc -f workloads/c/prepare.f
+${PRE} exec filebencha filebench -f workloads/a/prepare.f
+${PRE} exec filebenchb filebench -f workloads/b/prepare.f
+${PRE} exec filebenchc filebench -f workloads/c/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
@@ -44,8 +46,7 @@ wait
 wait
 
 # Report
-mkdir -p data
-for m in memory_stats blkio_stats networks cpu_stats filebench_stats
+for m in $(${PRE} exec influxdb influx -database acdc -execute 'show measurements' -format=csv |  sed 's/\r//g' | tail -n+2 | cut -d, -f2)
 do
-	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > data/$m.csv
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > "$DATA_DIR/$m.csv"
 done
