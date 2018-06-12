@@ -3,12 +3,16 @@ set -e -x
 
 CGROUP=$1
 SLEEP=$2
+shift 2
+FILTER="$@"
 PAGE_SIZE=$((2**12))
-EPSILON=$((32 * PAGE_SIZE))
+EPSILON=$((2**20))
+
+filterin() { grep $(basename $1) <(echo $FILTER); } 
 
 while sleep ${SLEEP}
 do
-	DIFF=$((2**63))
+	DIFF=$((2**62))
 	find "${CGROUP}" -type d | while read cg
 	do
 		recent_rotated_anon=$(grep recent_rotated_anon $cg/memory.stat | cut -d ' '  -f2)
@@ -19,12 +23,14 @@ do
 		echo "${recent_ratio_total} ${cg}"
 	done | sort -n -r | cut -d ' ' -f2 | while read cg
 	do
+	        filterin $cg || continue
 		USAGE=$(cat ${cg}/memory.usage_in_bytes)
 		if [ $USAGE -lt $DIFF ]
 		then
 				SOFT=0
 		else
-				SOFT=$((USAGE - DIFF + EPSILON))
+				# SOFT=$((USAGE - DIFF + EPSILON)) # Not fast enough
+		                SOFT=$(( (USAGE - DIFF) * 2 ))
 		fi
 		NEW_DIFF=$((USAGE - SOFT)) # DIFF can become negative, it will protect the remaining cg
 		[ $SOFT -lt 0 ] && echo 'ERROR: $SOFT -lt 0'
