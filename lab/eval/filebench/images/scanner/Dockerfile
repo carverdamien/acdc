@@ -6,5 +6,5 @@ WORKDIR scanner
 COPY daemon /usr/bin/daemon
 COPY scan /usr/bin/scan
 COPY job /usr/bin/job
-COPY prioritysetter /usr/bin/prioritysetter
+COPY softlimitsetter /usr/bin/softlimitsetter
 ENTRYPOINT [ "daemon" ]
