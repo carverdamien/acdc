@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e -x
+
+CGROUP=$1
+SLEEP=$2
+PAGE_SIZE=$((2**12))
+EPSILON=$((32 * PAGE_SIZE))
+
+while sleep ${SLEEP}
+do
+	DIFF=$((2**63))
+	find "${CGROUP}" -type d | while read cg
+	do
+		recent_rotated_anon=$(grep recent_rotated_anon $cg/memory.stat | cut -d ' '  -f2)
+		recent_scanned_anon=$(grep recent_scanned_anon $cg/memory.stat | cut -d ' '  -f2)
+		recent_rotated_file=$(grep recent_rotated_file $cg/memory.stat | cut -d ' '  -f2)
+		recent_scanned_file=$(grep recent_scanned_file $cg/memory.stat | cut -d ' '  -f2)
+		recent_ratio_total=$(( (recent_scanned_anon + recent_scanned_file) / (1+recent_rotated_anon+recent_rotated_file) ))
+		echo "${recent_ratio_total} ${cg}"
+	done | sort -n -r | cut -d ' ' -f2 | while read cg
+	do
+		USAGE=$(cat ${cg}/memory.usage_in_bytes)
+		if [ $USAGE -lt $DIFF ]
+		then
+				SOFT=0
+		else
+				SOFT=$((USAGE - DIFF + EPSILON))
+		fi
+		NEW_DIFF=$((USAGE - SOFT)) # DIFF can become negative, it will protect the remaining cg
+		[ $SOFT -lt 0 ] && echo 'ERROR: $SOFT -lt 0'
+		[ $NEW_DIFF -ge $DIFF ] && echo 'ERROR: $NEW_DIFF -ge $DIFF'
+		DIFF=$NEW_DIFF
+		echo $SOFT > ${cg}/memory.soft_limit_in_bytes
+	done
+done

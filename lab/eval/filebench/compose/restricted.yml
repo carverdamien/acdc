@@ -1,0 +1,62 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  filebencha:
+    build: images/filebench
+    links:
+      - influxdb
+    volumes:
+      - data-filebench:/data
+      - ./workloads:/home/workloads
+    mem_limit: 1GB
+    cgroup_parent: parent
+  filebenchb:
+    build: images/filebench
+    links:
+      - influxdb
+    volumes:
+      - data-filebench:/data
+      - ./workloads:/home/workloads
+    mem_limit: 1GB
+    cgroup_parent: parent
+  filebenchc:
+    build: images/filebench
+    links:
+      - influxdb
+    volumes:
+      - data-filebench:/data
+      - ./workloads:/home/workloads
+    mem_limit: 1GB
+    cgroup_parent: parent
+  influxdb:
+    image: influxdb:latest
+  collector:
+    build: images/collector
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-filebench:
+    external: true
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
