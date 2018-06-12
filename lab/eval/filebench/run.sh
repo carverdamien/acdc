@@ -12,21 +12,25 @@ MEMORY=$((2**31)) # 2GB
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
 
+once_prelude() { :; }
 prelude() { :; }
 
 case "$CONFIG" in
     "opt")
 	MEMORY=$((3*2**30)) # 3GB
 	;;
-    "rr-*")
-	SCAN=${CONFIG##rr-}
-	prelude() { ${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/docker/$1 ${SCAN} 1; }
+    "nop")
 	;;
-    "ir-*")
+    rr-*)
+	SCAN=${CONFIG##rr-}
+	prelude() { ${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/parent/$1 ${SCAN} 1; }
+	once_prelude() { ${RUN} exec scanner job softlimitsetter /rootfs/sys/fs/cgroup/memory/parent 1 $@; }
+	;;
+    ir-*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##ir-}
 	RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
 	sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml > compose/.restricted.yml
-	prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/docker --updateSoftLimit; }
+	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/docker --updateSoftLimit; }
 	;;
     "dc")
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }
@@ -67,6 +71,8 @@ for c in filebencha filebenchb filebenchc
 do
     prelude $(${RUN} ps -q $c)
 done
+
+once_prelude $(for c in filebencha filebenchb filebenchc; do ${RUN} ps -q $c; done)
 
 RUN_A() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/a/run.f;}
 RUN_B() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/b/run.f;}
