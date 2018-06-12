@@ -30,3 +30,5 @@ cycle $LOW
 cycle $MED
 cycle $LOW
 cycle $MED
+cycle $LOW
+cycle $LOW

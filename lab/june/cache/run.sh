@@ -33,6 +33,15 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
+if [ "${KERNEL}" == '4.6.0.eval+' ]
+then
+for c in filebencha filebenchb filebenchc
+do
+    cid=$(${RUN} ps -q $c)
+    ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/${cid}/memory.use_clock_demand /rootfs/sys/fs/cgroup/memory/parent/${cid}/memory.use_clock_activate"
+done
+fi
+
 RUN_A() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/a/run.f;}
 RUN_B() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/b/run.f;}
 RUN_C() { ${RUN} exec -T filebenchc python benchmark.py -- filebench -f workloads/c/run.f;}
