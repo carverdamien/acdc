@@ -37,11 +37,35 @@ services:
     cgroup_parent: parent
   influxdb:
     image: influxdb:latest
+  scanner:
+    build: images/scanner
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
   collector:
     build: images/collector
     command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  idlememstat:
+    build: images/idlememstat
+    privileged: true
+    entrypoint: [ "daemon" ]
+    environment:
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
     links:
       - influxdb
   grafana:
