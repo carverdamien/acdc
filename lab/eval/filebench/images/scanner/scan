@@ -5,6 +5,8 @@ CGROUP=$1
 PAGES=$2
 SLEEP=$3
 
+[ $PAGES -eq 0 ] && exit 0
+
 while sleep ${SLEEP}
 do
 	echo ${PAGES} > ${CGROUP}/memory.force_scan
