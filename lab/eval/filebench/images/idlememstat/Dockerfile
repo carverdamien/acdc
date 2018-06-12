@@ -13,9 +13,7 @@ COPY idlememstat idlememstat
 COPY setup.py setup.py
 RUN python setup.py install
 COPY daemon /usr/bin/daemon
-COPY scan /usr/bin/scan
 COPY job /usr/bin/job
-COPY softlimitsetter /usr/bin/softlimitsetter
 ENTRYPOINT [ "idlememstat" ]
 ENV KPAGEFLAGS_PATH=/proc/kpageflags \
     KPAGECGROUP_PATH=/proc/kpagecgroup \
