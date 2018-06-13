@@ -20,6 +20,7 @@ stats snap
 EOF
 done
 }
+cycle $LOW
 cycle $MED
 cycle $MED
 cycle $MED

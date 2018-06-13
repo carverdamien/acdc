@@ -23,6 +23,7 @@ done
 cycle $LOW
 cycle $LOW
 cycle $LOW
+cycle $LOW
 cycle $MED
 cycle $LOW
 cycle $LOW
