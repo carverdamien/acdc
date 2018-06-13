@@ -60,12 +60,14 @@ class IdleMemTracker:
 
     # like sleep, but is interrupted by shutdown
     def __sleep(self, seconds):
+        self.__sleep_time += seconds
         self.__should_shut_down.wait(seconds)
 
     def __init_scan(self):
         self.__nr_idle = {}
         self.__scan_pfn = 0
         self.__scan_time = 0.0
+        self.__sleep_time = 0.0
         self.__scan_start = self.__time()
 
     def __scan_done(self):
@@ -114,6 +116,9 @@ class IdleMemTracker:
 
     def get_scan_time(self):
         return self.__scan_time
+
+    def get_sleep_time(self):
+        return self.__sleep_time
 
     ##
     # Get the current idle memory estimate for the given cgroup ino.
@@ -164,7 +169,7 @@ def idlemem_info(idlemem_tracker):
         yield (cgroup, total, idle)
 
 def tracker_to_influx_points(idlemem_tracker):
-    def to_record(read, tags, total, idle, scan_time):
+    def to_record(read, tags, total, idle, scan_time, sleep_time):
         return {
             "measurement" : 'idlemem_stats',
             "time" : read,
@@ -180,6 +185,7 @@ def tracker_to_influx_points(idlemem_tracker):
                 'idle_anon_ratio'  : float(idle[0]) / float(1 + total[0]),
                 'idle_file_ratio'  : float(idle[1]) / float(1 + total[1]),
                 'scan_time' : scan_time,
+                'sleep_time' : sleep_time,
             },
         }
     # read = time.strftime("%Y-%m-%dT%H:%M:%S") # FIX ME: should come from kpageutil.ccp
@@ -187,13 +193,14 @@ def tracker_to_influx_points(idlemem_tracker):
     read = idlemem_tracker.get_scan_end()
     read = datetime.datetime.fromtimestamp(read).strftime("%Y-%m-%dT%H:%M:%S")
     scan_time = idlemem_tracker.get_scan_time()
+    sleep_time = idlemem_tracker.get_sleep_time()
     dockerclient = docker.APIClient()
     containers = {c['Id']:c['Labels'] for c in dockerclient.containers()}
     for cgroup, total, idle in idlemem_info(idlemem_tracker):
         try:
             cid = cgroup.split('/')[-1]
             if cid not in containers: continue
-            yield to_record(read, containers[cid], total, idle, scan_time)
+            yield to_record(read, containers[cid], total, idle, scan_time, sleep_time)
         except Exception as e:
             print(e)
 
