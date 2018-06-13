@@ -203,8 +203,12 @@ def updateSoftLimit(idlemem_tracker, parent_cgroup):
         idle = idlemem_tracker.get_idle_size(ino)
         total = get_memcg_usage(dir)
         limit = (total[0]+total[1]) - (idle[0]+idle[1])
-        with open('/'.join([dir, 'memory.soft_limit_in_bytes']), 'w') as f:
-            f.write("%d\n" % limit)
+        try:
+            with open('/'.join([dir, 'memory.soft_limit_in_bytes']), 'w') as f:
+                f.write("%d\n" % limit)
+        except Exception as e:
+            print(e)
+            print(limit)
 
 def _sighandler(signum, frame):
     global _shutdown_request
