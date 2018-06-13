@@ -16,7 +16,15 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     mem_limit: 1GB
+    cpuset: '0,4'
     cgroup_parent: parent
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '200mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '200mb'
   filebenchb:
     build: images/filebench
     links:
@@ -25,7 +33,15 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     mem_limit: 1GB
+    cpuset: '1,5'
     cgroup_parent: parent
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '200mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '200mb'
   filebenchc:
     build: images/filebench
     links:
@@ -34,7 +50,15 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     mem_limit: 1GB
+    cpuset: '2,6'
     cgroup_parent: parent
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '200mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '200mb'
   influxdb:
     image: influxdb:latest
   scanner:
