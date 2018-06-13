@@ -2,6 +2,7 @@ SLEEP=5
 CYCLE=12
 LOW=0
 MED=1024
+MED=2048
 source "$(dirname $0)/prepare.sh"
 echo '
 create processes
