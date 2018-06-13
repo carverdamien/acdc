@@ -61,6 +61,7 @@ ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir 
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/parent/memory.use_hierarchy'
 ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/parent/memory.limit_in_bytes"
+${PRE} exec host bash -c "echo 0 > /rootfs/proc/sys/kernel/randomize_va_space"
 ${PRE} down
 
 # Run
