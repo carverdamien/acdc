@@ -76,7 +76,7 @@ eventgen_usage(void)
 static void
 eventgen_thread(void)
 {
-	hrtime_t last;
+	hrtime_t last, now;
 
 	last = gethrtime();
 	filebench_shm->shm_eventgen_enabled = FALSE;
@@ -88,6 +88,7 @@ eventgen_thread(void)
 		int count, rate;
 
 		if (filebench_shm->shm_eventgen_hz == NULL) {
+			last = gethrtime();
 			(void) sleep(1);
 			continue;
 		} else {
@@ -95,6 +96,7 @@ eventgen_thread(void)
 			if (rate > 0) {
 				filebench_shm->shm_eventgen_enabled = TRUE;
 			} else {
+				last = gethrtime();
 				continue;
 			}
 		}
@@ -112,8 +114,9 @@ eventgen_thread(void)
 			sleeptime.tv_nsec -= (sleeptime.tv_sec * FB_SEC2NSEC);
 
 		(void) nanosleep(&sleeptime, NULL);
-		delta = gethrtime() - last;
-		last = gethrtime();
+		now = gethrtime();
+		delta = now - last;
+		last = now;
 		count = (rate * delta) / FB_SEC2NSEC;
 
 		filebench_log(LOG_DEBUG_SCRIPT,
