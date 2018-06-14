@@ -8,27 +8,6 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  filebencha:
-    build: images/filebench
-    links:
-      - influxdb
-    volumes:
-      - data-filebench:/data
-      - ./workloads:/home/workloads
-  filebenchb:
-    build: images/filebench
-    links:
-      - influxdb
-    volumes:
-      - data-filebench:/data
-      - ./workloads:/home/workloads
-  filebenchc:
-    build: images/filebench
-    links:
-      - influxdb
-    volumes:
-      - data-filebench:/data
-      - ./workloads:/home/workloads
   influxdb:
     image: influxdb:latest
   scanner:
@@ -73,8 +52,6 @@ services:
     links:
       - influxdb
 volumes:
-  data-filebench:
-    external: true
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:

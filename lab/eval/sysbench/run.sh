@@ -56,9 +56,9 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec filebencha filebench -f workloads/a/prepare.f
-${PRE} exec filebenchb filebench -f workloads/b/prepare.f
-${PRE} exec filebenchc filebench -f workloads/c/prepare.f
+${PRE} exec sysbencha sysbench -f workloads/a/prepare.f
+${PRE} exec sysbenchb sysbench -f workloads/b/prepare.f
+${PRE} exec sysbenchc sysbench -f workloads/c/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
@@ -72,16 +72,16 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-for c in filebencha filebenchb filebenchc
+for c in sysbencha sysbenchb sysbenchc
 do
     prelude $(${RUN} ps -q $c)
 done
 
-once_prelude $(for c in filebencha filebenchb filebenchc; do ${RUN} ps -q $c; done)
+once_prelude $(for c in sysbencha sysbenchb sysbenchc; do ${RUN} ps -q $c; done)
 
-RUN_A() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/a/run.f;}
-RUN_B() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/b/run.f;}
-RUN_C() { ${RUN} exec -T filebenchc python benchmark.py -- filebench -f workloads/c/run.f;}
+RUN_A() { ${RUN} exec -T sysbencha python benchmark.py -- sysbench -f workloads/a/run.f;}
+RUN_B() { ${RUN} exec -T sysbenchb python benchmark.py -- sysbench -f workloads/b/run.f;}
+RUN_C() { ${RUN} exec -T sysbenchc python benchmark.py -- sysbench -f workloads/c/run.f;}
 
 RUN_A | tee a.out &
 RUN_B | tee b.out &
