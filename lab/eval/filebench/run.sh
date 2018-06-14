@@ -29,7 +29,7 @@ case "$CONFIG" in
     ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##ir-}
 	RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
-	sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml > compose/.restricted.yml
+	sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml > compose/.restricted.yml # FIXME: IDLEMEMSTAT_CPU_LIMIT not present in .yml
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	;;
     ir-*)
