@@ -205,11 +205,41 @@ def tracker_to_influx_points(idlemem_tracker):
             print(e)
 
 def updateSoftLimit(idlemem_tracker, parent_cgroup):
+    cgroups = []
     for dir, subdirs, files in os.walk(parent_cgroup):
+        if dir == parent_cgroup:
+            continue
         ino = os.stat(dir)[stat.ST_INO]
         idle = idlemem_tracker.get_idle_size(ino)
         total = get_memcg_usage(dir)
-        limit = (total[0]+total[1]) - (idle[0]+idle[1])
+        cgroups.append((dir, total, idle))
+    def cmp(a,b):
+        # TODO: make cmp configurable
+        a_dir, a_total, a_idle = a
+        b_dir, b_total, b_idle = b
+        # return (b_idle[0]+b_idle[1]) - (a_idle[0]+a_idle[1])
+        a_idle_total_ratio = float(a_idle[0] + a_idle[1]) / float(1 + a_total[0] + a_total[1])
+        b_idle_total_ratio = float(b_idle[0] + b_idle[1]) / float(1 + b_total[0] + b_total[1])
+        diff = b_idle_total_ratio - a_idle_total_ratio
+        if diff > 0:
+            return 1
+        elif diff < 0:
+            return -1
+        else:
+            return 0
+    diff=2**62
+    for dir, total, idle in sorted(cgroups, cmp=cmp):
+        usage = total[0] + total[1]
+        if usage < diff:
+            limit = 0
+        else:
+            limit = (usage - diff) * 2
+        new_diff=usage - limit
+        if limit < 0:
+            print('limit < 0', limit)
+        if new_diff >= diff:
+            print('new_diff >= diff', new_diff, diff)
+        diff=new_diff
         try:
             with open('/'.join([dir, 'memory.soft_limit_in_bytes']), 'w') as f:
                 f.write("%d\n" % limit)
