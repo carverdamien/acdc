@@ -82,7 +82,7 @@ class IdleMemTracker:
         # count idle pages
         cur = kpageutil.count_idle_pages_per_cgroup(start_pfn, end_pfn)
         # accumulate the result
-        Z = (0, 0)
+        Z = (0, 0, 0, 0)
         tot = self.__nr_idle
         for k in set(cur.keys() + tot.keys()):
             tot[k] = map(sum, zip(tot.get(k, Z), cur.get(k, Z)))
@@ -126,8 +126,8 @@ class IdleMemTracker:
     # Returns (anon_idle_bytes, file_idle_bytes) tuple.
 
     def get_idle_size(self, ino):
-        nr_idle = self.__nr_idle_old.get(ino, (0, 0))
-        return (nr_idle[0] * PAGE_SIZE, nr_idle[1] * PAGE_SIZE)
+        nr_idle = self.__nr_idle_old.get(ino, (0, 0, 0 ,0))
+        return (nr_idle[0] * PAGE_SIZE, nr_idle[1] * PAGE_SIZE, nr_idle[2] * PAGE_SIZE, nr_idle[3] * PAGE_SIZE)
 
     ##
     # Scan memory periodically counting unused pages until shutdown.
@@ -149,23 +149,11 @@ class IdleMemTracker:
         self.__should_shut_down.set()
         self.__is_shut_down.wait()
 
-
-def get_memcg_usage(path):
-    anon_usage, file_usage = 0, 0
-    with open(os.path.join(path, 'memory.stat'), 'r') as f:
-        for l in f.readlines():
-            (k, v) = l.split()
-            if k in ('active_anon', 'inactive_anon'):
-                anon_usage += int(v)
-            elif k in ('active_file', 'inactive_file'):
-                file_usage += int(v)
-    return (anon_usage, file_usage)
-
 def idlemem_info(idlemem_tracker):
     for dir, subdirs, files in os.walk(MEMCG_ROOT_PATH):
         ino = os.stat(dir)[stat.ST_INO]
         idle = idlemem_tracker.get_idle_size(ino)
-        total = get_memcg_usage(dir)
+        total = (idle[0]+idle[2], idle[1]+idle[3])
         cgroup = dir.replace(MEMCG_ROOT_PATH, '', 1) or '/'
         yield (cgroup, total, idle)
 
@@ -182,9 +170,9 @@ def tracker_to_influx_points(idlemem_tracker):
                 'idle_anon'  : idle[0],
                 'idle_file'  : idle[1],
                 'idle_total' : idle[0] + idle[1],
-                'idle_total_ratio' : float(idle[0] + idle[1]) / float(1 + total[0] + total[1]),
-                'idle_anon_ratio'  : float(idle[0]) / float(1 + total[0]),
-                'idle_file_ratio'  : float(idle[1]) / float(1 + total[1]),
+                'idle_total_ratio' : float(1 + idle[0] + idle[1]) / float(1 + total[0] + total[1]),
+                'idle_anon_ratio'  : float(1 + idle[0]) / float(1 + total[0]),
+                'idle_file_ratio'  : float(1 + idle[1]) / float(1 + total[1]),
                 'scan_time' : scan_time,
                 'sleep_time' : sleep_time,
             },
@@ -212,15 +200,15 @@ def updateSoftLimit(idlemem_tracker, parent_cgroup):
             continue
         ino = os.stat(dir)[stat.ST_INO]
         idle = idlemem_tracker.get_idle_size(ino)
-        total = get_memcg_usage(dir)
+        total = (idle[0]+idle[2], idle[1]+idle[3])
         cgroups.append((dir, total, idle))
     def cmp(a,b):
         # TODO: make cmp configurable
         a_dir, a_total, a_idle = a
         b_dir, b_total, b_idle = b
         # return (b_idle[0]+b_idle[1]) - (a_idle[0]+a_idle[1])
-        a_idle_total_ratio = float(a_idle[0] + a_idle[1]) / float(1 + a_total[0] + a_total[1])
-        b_idle_total_ratio = float(b_idle[0] + b_idle[1]) / float(1 + b_total[0] + b_total[1])
+        a_idle_total_ratio = float(1 + a_idle[0] + a_idle[1]) / float(1 + a_total[0] + a_total[1])
+        b_idle_total_ratio = float(1 + b_idle[0] + b_idle[1]) / float(1 + b_total[0] + b_total[1])
         diff = b_idle_total_ratio - a_idle_total_ratio
         if diff > 0:
             return 1

@@ -131,7 +131,7 @@ static void set_idle_pages(long start_pfn, long end_pfn) throw(error)
 
 // Counts idle pages in range [start_pfn, end_pfn).
 // Returns map: cg ino -> (idle anon, idle file).
-static unordered_map<long, pair<long, long>>
+static unordered_map<long, tuple<long, long, long, long>>
 count_idle_pages_per_cgroup(long start_pfn, long end_pfn) throw(error)
 {
 	// kpageidle requires pfn to be aligned by 64
@@ -151,7 +151,7 @@ count_idle_pages_per_cgroup(long start_pfn, long end_pfn) throw(error)
 	long head_cg = 0;
 	int buf_index = KPAGE_BATCH;
 
-	unordered_map<long, pair<long, long>> result;
+	unordered_map<long, tuple<long, long, long, long>> result;
 
 	for (long pfn = start_pfn2; pfn < end_pfn; ++pfn, ++buf_index) {
 		if (buf_index >= KPAGE_BATCH) {
@@ -177,24 +177,33 @@ count_idle_pages_per_cgroup(long start_pfn, long end_pfn) throw(error)
 			head_anon = !!(flags & (1 << KPF_ANON));
 
 			if (!idle)
-				continue;
+				goto account;
 
 			// do not treat mlock'd pages as idle
-			if (flags & (1 << KPF_UNEVICTABLE))
-				continue;
+			if (flags & (1 << KPF_UNEVICTABLE)) {
+				idle = false;
+				goto account;
+			}
 
 			head_idle = true;
 		} else {
 			// compound page tail - count it if the head is idle
 			if (!head_idle)
-				continue;
+				goto account;
 		}
 
+	account:
 		auto &cnt = result[head_cg];
-		if (head_anon)
-			cnt.first++;
+		if (idle || head_idle)
+			if (head_anon)
+				get<0>(cnt)++;
+			else
+				get<1>(cnt)++;
 		else
-			cnt.second++;
+			if (head_anon)
+				get<2>(cnt)++;
+			else
+				get<3>(cnt)++;
 	}
 	return result;
 }
@@ -218,7 +227,7 @@ static PyObject *py_count_idle_pages_per_cgroup(PyObject *self, PyObject *args)
 	if (!PyArg_ParseTuple(args, "ll", &start_pfn, &end_pfn))
 		return NULL;
 
-	unordered_map<long, pair<long, long>> result;
+	unordered_map<long, tuple<long, long, long, long>> result;
 	try {
 		result = count_idle_pages_per_cgroup(start_pfn, end_pfn);
 	} py_catch_error();
@@ -230,13 +239,16 @@ static PyObject *py_count_idle_pages_per_cgroup(PyObject *self, PyObject *args)
 
 	for (auto &kv : result) {
 		py_ref key = PyInt_FromLong(kv.first);
-		py_ref val1 = PyInt_FromLong(kv.second.first);
-		py_ref val2 = PyInt_FromLong(kv.second.second);
-		if (!key || !val1 || !val2)
+		py_ref val1 = PyInt_FromLong(get<0>(kv.second));
+		py_ref val2 = PyInt_FromLong(get<1>(kv.second));
+		py_ref val3 = PyInt_FromLong(get<2>(kv.second));
+		py_ref val4 = PyInt_FromLong(get<3>(kv.second));
+		if (!key || !val1 || !val2 || !val3 || !val4)
 			return PyErr_NoMemory();
 
-		py_ref val = PyTuple_Pack(2,
-				(PyObject *)val1, (PyObject *)val2);
+		py_ref val = PyTuple_Pack(4,
+					  (PyObject *)val1, (PyObject *)val2,
+					  (PyObject *)val3, (PyObject *)val4);
 		if (!val)
 			return PyErr_NoMemory();
 
