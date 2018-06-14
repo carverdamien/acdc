@@ -71,6 +71,7 @@ class IdleMemTracker:
         self.__scan_start = self.__time()
 
     def __scan_done(self):
+        self.__nr_idle_old = self.__nr_idle
         if self.on_update:
             self.on_update(self)
 
@@ -125,7 +126,7 @@ class IdleMemTracker:
     # Returns (anon_idle_bytes, file_idle_bytes) tuple.
 
     def get_idle_size(self, ino):
-        nr_idle = self.__nr_idle.get(ino, (0, 0))
+        nr_idle = self.__nr_idle_old.get(ino, (0, 0))
         return (nr_idle[0] * PAGE_SIZE, nr_idle[1] * PAGE_SIZE)
 
     ##
@@ -274,8 +275,11 @@ def main():
     def on_update(idlemem_tracker):
         points = [p for p in tracker_to_influx_points(idlemem_tracker)]
         client.write_points(points)
-        if options.updateSoftLimit:
-            updateSoftLimit(idlemem_tracker, options.cgroup)
+        if options.updateSoftLimit and options.delay == 0:
+            try:
+                updateSoftLimit(idlemem_tracker, options.cgroup)
+            except Exception as e:
+                print(e)
 
     idlemem_tracker = IdleMemTracker(options.delay, on_update, options.chunk)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
@@ -283,6 +287,11 @@ def main():
 
     while not _shutdown_request and t.isAlive():
         time.sleep(1)
+        if options.updateSoftLimit and options.delay > 0:
+            try:
+                updateSoftLimit(idlemem_tracker, options.cgroup)
+            except Exception as e:
+                print(e)
 
     if not t.isAlive():
         sys.stderr.write("Oops, tracker thread crashed unexpectedly!\n")
