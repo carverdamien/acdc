@@ -83,9 +83,9 @@ RUN_A() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workload
 RUN_B() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/b/run.f;}
 RUN_C() { ${RUN} exec -T filebenchc python benchmark.py -- filebench -f workloads/c/run.f;}
 
-RUN_A &
-RUN_B &
-RUN_C &
+RUN_A | tee a.out &
+RUN_B | tee b.out &
+RUN_C | tee c.out &
 
 wait
 wait
