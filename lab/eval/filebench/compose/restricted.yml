@@ -77,6 +77,7 @@ services:
     build: images/idlememstat
     privileged: true
     entrypoint: [ "daemon" ]
+    cpus: ${IDLEMEMSTAT_CPU_LIMIT}
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
       - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
