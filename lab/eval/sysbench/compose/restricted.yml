@@ -13,7 +13,7 @@ services:
     links:
       - mysqla:mysql
       - influxdb
-    cpuset: 0,4,1,5
+    cpuset: 2,3,6,7
   sysbenchb:
     build: images/sysbench
     links:
@@ -25,28 +25,44 @@ services:
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
-    cpuset: '2'
-    cpus: 1
+    cgroup_parent: parent
+    cpuset: 2,3,6,7
+    mem_limit: 1G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '20mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '20mb'
   mysqlb:
     build: images/mysql
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    cpuset: '2'
-    cpus: 1
+    cgroup_parent: parent
+    cpuset: 0,4,1,5
+    mem_limit: 1G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '20mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '20mb'
   cassandra:
     build: images/cassandra
-    cgroup_parent: consolidate
+    cgroup_parent: parent
     mem_limit: 2516901888
     mem_swappiness: 0
     cpuset: 0,4,1,5
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '27mb'
+          rate: '20mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '27mb'
+          rate: '20mb'
   influxdb:
     image: influxdb:latest
   scanner:
