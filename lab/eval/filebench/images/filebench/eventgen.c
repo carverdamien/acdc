@@ -126,7 +126,7 @@ eventgen_thread(void)
 		/* Send 'count' events */
 		(void) ipc_mutex_lock(&filebench_shm->shm_eventgen_lock);
 		/* Keep the producer with a max of 5 second depth */
-		if (filebench_shm->shm_eventgen_q < (5 * rate))
+		//if (filebench_shm->shm_eventgen_q < (5 * rate))
 			filebench_shm->shm_eventgen_q += count;
 
 		(void) pthread_cond_signal(&filebench_shm->shm_eventgen_cv);
