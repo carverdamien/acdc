@@ -16,7 +16,7 @@ services:
   sysbenchb:
     build: images/sysbench
     links:
-      - mysqlb:mysqlb
+      - mysqlb:mysql
       - influxdb
   mysqla:
     build: images/mysql
