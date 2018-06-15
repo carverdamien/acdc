@@ -8,61 +8,69 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  sysbencha:
-    build: images/sysbench
-    links:
-      - mysqla:mysql
-      - influxdb
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
     cpuset: 2,3,6,7
-  sysbenchb:
-    build: images/sysbench
     links:
-      - mysqlb:mysql
+      - redisa
       - influxdb
-    cpuset: 0,4,1,5
-  mysqla:
-    build: images/mysql
-    hostname: mysqla
+  redisa:
+    image: redis:latest
     volumes:
-      - data-mysqla:/var/lib/mysql
-    cgroup_parent: parent
+      - data-redisa:/data
     cpuset: 2,3,6,7
+    cgroup_parent: parent
     mem_limit: 1G
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
-  mysqlb:
-    build: images/mysql
-    hostname: mysqlb
-    volumes:
-      - data-mysqlb:/var/lib/mysql
-    cgroup_parent: parent
+          rate: '1gb'
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
     cpuset: 0,4,1,5
+    links:
+      - redisa
+      - influxdb
+  redisb:
+    image: redis:latest
+    volumes:
+      - data-redisb:/data
+    cpuset: 0,4,1,5
+    cgroup_parent: parent
     mem_limit: 1G
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
-  cassandra:
-    build: images/cassandra
-    cgroup_parent: parent
-    mem_limit: 2516901888
-    mem_swappiness: 0
+          rate: '1gb'
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
     cpuset: 0,4,1,5
+    links:
+      - redisc
+      - influxdb
+  redisc:
+    image: redis:latest
+    volumes:
+      - data-redisc:/data
+    cpuset: 0,4,1,5
+    cgroup_parent: parent
+    mem_limit: 1G
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
   influxdb:
     image: influxdb:latest
   scanner:
@@ -108,10 +116,9 @@ services:
     links:
       - influxdb
 volumes:
-  data-mysqla:
-    external: true
-  data-mysqlb:
-    external: true
+  data-redisa:
+  data-redisb:
+  data-redisc:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:

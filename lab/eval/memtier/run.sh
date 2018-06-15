@@ -7,9 +7,15 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${SCALE:=1}
-: ${DBSIZE:=10000000} # Use small value for debug
-: ${MEMORY:=3800358912}
+: ${MEMORY:=$((2**31))}
+
+SIZE=$((2**12)) # 512MB max
+REQUESTS=$((2*189841)) #
+REQUESTS=$((REQUESTS/2))
+
+EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
+EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
+EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t 1"
 
 IDLEMEMSTAT_CPU_LIMIT=1
 
@@ -18,7 +24,7 @@ prelude() { :; }
 
 case "$CONFIG" in
     "opt")
-	MEMORY=$((2**31+2516901888))
+	MEMORY=$((3*2**31))
 	;;
     "nop")
 	;;
@@ -62,69 +68,44 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
-${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
-${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
+${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+${PRE} exec redisa redis-cli save
+${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+${PRE} exec redisb redis-cli save
+${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
+${PRE} exec redisc redis-cli save
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/parent/memory.use_hierarchy'
 ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/parent/memory.limit_in_bytes"
-${PRE} exec host bash -c "echo 0 > /rootfs/proc/sys/kernel/randomize_va_space"
 ${PRE} down
 
 # Run
 ${RUN} create
 ${RUN} up -d
 
-for c in mysqla mysqlb cassandra
+for c in redisa redisb redisc
 do
     prelude $(${RUN} ps -q $c)
 done
 
-once_prelude $(for c in mysqla mysqlb cassandra; do ${RUN} ps -q $c; done)
+once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
-MAXTXR=390                # Max on one core
-MAXTXR=520
-MAXTXR=585
-MAXTXR=600
-MAXTXR=2000
-MEDTXR=$((MAXTXR*50/100)) # Medium is 50%
-LOWTXR=$((MAXTXR*10/100)) # Low is 10%
-BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
-
-WARM=60
-
-TIMEA0=$WARM
-TIMEA1=$((100 * SCALE)) # Time A is medium
-TIMEA2=$((100 * SCALE)) # Time A is medium
-TIMEA3=$((100 * SCALE)) # Time A is medium
-
-TIMEB0=$WARM
-TIMEB1=$((060 * SCALE)) # Time B is medium
-TIMEB2=$((180 * SCALE)) # Time B is low
-TIMEB3=$((060 * SCALE)) # Time B is medium
-
-NA0=$((TIMEA0 * LOWTXR))
-NA1=$((TIMEA1 * MEDTXR + NA0))
-NA2=$((TIMEA2 * MEDTXR + NA1))
-NA3=$((TIMEA3 * MEDTXR + NA2))
-
-NB0=$((TIMEB0 * LOWTXR))
-NB1=$((TIMEB1 * MEDTXR + NB0))
-NB2=$((TIMEB2 * LOWTXR + NB1))
-NB3=$((TIMEB3 * MEDTXR + NB2))
-
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${LOWTXR} --scheduled-rate=${LOWTXR},${MEDTXR},${MEDTXR},${MEDTXR} --scheduled-time=0,0,0,0 --scheduled-requests=${NA0},${NA1},${NA2},${NA3} --max-requests ${NA3};}
-B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${LOWTXR} --scheduled-rate=${LOWTXR},${MEDTXR},${LOWTXR},${MEDTXR} --scheduled-time=0,0,0,0 --scheduled-requests=${NB0},${NB1},${NB2},${NB3} --max-requests ${NB3};}
-C() { sleep $WARM; sleep 120; ${RUN} exec -T cassandra job start; sleep 60; ${RUN} exec -T cassandra job stop; }
+A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300; }
+B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60; sleep 180; ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60; }
+C() { sleep 120;
+    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
+    #${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
+    #${PRE} exec redisc redis-cli save
+}
 
 A | tee a.out &
 B | tee b.out &
 C | tee c.out &
 
 wait
-wait
+wait 
 wait
 
 # Report

@@ -8,28 +8,36 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  sysbencha:
-    build: images/sysbench
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
     links:
-      - mysqla:mysql
+      - redisa
       - influxdb
-  sysbenchb:
-    build: images/sysbench
+  redisa:
+    image: redis:latest
+    volumes:
+      - data-redisa:/data
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
     links:
-      - mysqlb:mysql
+      - redisb
       - influxdb
-  mysqla:
-    build: images/mysql
-    hostname: mysqla
+  redisb:
+    image: redis:latest
     volumes:
-      - data-mysqla:/var/lib/mysql
-  mysqlb:
-    build: images/mysql
-    hostname: mysqlb
+      - data-redisb:/data
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
+    links:
+      - redisc
+      - influxdb
+  redisc:
+    image: redis:latest
     volumes:
-      - data-mysqlb:/var/lib/mysql
-  cassandra:
-    build: images/cassandra
+      - data-redisc:/data
   influxdb:
     image: influxdb:latest
   scanner:
@@ -74,10 +82,9 @@ services:
     links:
       - influxdb
 volumes:
-  data-mysqla:
-    external: true
-  data-mysqlb:
-    external: true
+  data-redisa:
+  data-redisb:
+  data-redisc:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
