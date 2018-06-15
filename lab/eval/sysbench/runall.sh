@@ -1,5 +1,5 @@
 export CONFIG
-for CONFIG in ir-2 opt nop rr-0 rr-$((2**20)) dc acdc
+for CONFIG in opt nop rr-0 rr-$((2**20)) dc acdc ir-0.1
 do
     if [ -d data/$CONFIG ]
     then

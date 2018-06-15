@@ -74,40 +74,47 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-for c in sysbencha sysbenchb sysbenchc
+for c in mysqla mysqlb cassandra
 do
     prelude $(${RUN} ps -q $c)
 done
 
-once_prelude $(for c in sysbencha sysbenchb sysbenchc; do ${RUN} ps -q $c; done)
+once_prelude $(for c in mysqla mysqlb cassandra; do ${RUN} ps -q $c; done)
 
 MAXTXR=390                # Max on one core
 MAXTXR=520
 MAXTXR=585
 MAXTXR=600
-MEDTXR=$((MAXTXR*40/100)) # Medium is 40%
+MAXTXR=2000
+MEDTXR=$((MAXTXR*50/100)) # Medium is 50%
 LOWTXR=$((MAXTXR*10/100)) # Low is 10%
 BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
 
+WARM=60
+
+TIMEA0=$WARM
 TIMEA1=$((100 * SCALE)) # Time A is medium
 TIMEA2=$((100 * SCALE)) # Time A is medium
 TIMEA3=$((100 * SCALE)) # Time A is medium
 
+TIMEB0=$WARM
 TIMEB1=$((060 * SCALE)) # Time B is medium
 TIMEB2=$((180 * SCALE)) # Time B is low
 TIMEB3=$((060 * SCALE)) # Time B is medium
 
-NA1=$((TIMEA1 * MEDTXR))
+NA0=$((TIMEA0 * LOWTXR))
+NA1=$((TIMEA1 * MEDTXR + NA0))
 NA2=$((TIMEA2 * MEDTXR + NA1))
 NA3=$((TIMEA3 * MEDTXR + NA2))
 
-NB1=$((TIMEB1 * MEDTXR))
+NB0=$((TIMEB0 * LOWTXR))
+NB1=$((TIMEB1 * MEDTXR + NB0))
 NB2=$((TIMEB2 * LOWTXR + NB1))
 NB3=$((TIMEB3 * MEDTXR + NB2))
 
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${MEDTXR},${MEDTXR} --scheduled-time=0,0,0 --scheduled-requests=${NA1},${NA2},${NA3} --max-requests ${NA3};}
-B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR} --scheduled-time=0,0,0 --scheduled-requests=${NB1},${NB2},${NB3} --max-requests ${NB3};}
-C() { sleep 120; ${RUN} exec -T cassandra job start; sleep 60; ${RUN} exec -T cassandra job stop; }
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${LOWTXR} --scheduled-rate=${LOWTXR},${MEDTXR},${MEDTXR},${MEDTXR} --scheduled-time=0,0,0,0 --scheduled-requests=${NA0},${NA1},${NA2},${NA3} --max-requests ${NA3};}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${LOWTXR} --scheduled-rate=${LOWTXR},${MEDTXR},${LOWTXR},${MEDTXR} --scheduled-time=0,0,0,0 --scheduled-requests=${NB0},${NB1},${NB2},${NB3} --max-requests ${NB3};}
+C() { sleep $WARM; sleep 120; ${RUN} exec -T cassandra job start; sleep 60; ${RUN} exec -T cassandra job stop; }
 
 A | tee a.out &
 B | tee b.out &
