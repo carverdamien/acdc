@@ -53,7 +53,7 @@ sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.y
 # Prepare
 DATA_DIR="data/$CONFIG/"
 mkdir -p "$DATA_DIR"
-make -C workloads
+
 ${RUN} down --remove-orphans
 ${PRE} down --remove-orphans
 ${PRE} build
