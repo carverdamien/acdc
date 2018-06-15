@@ -1,5 +1,6 @@
 SLEEP=5
-CYCLE=12
+SHORT_CYCLE=12
+LONG__CYCLE=48
 LOW=0
 MED=1024
 MED=2048
@@ -10,8 +11,8 @@ eventgen rate = 1
 sleep 1
 '
 cycle() {
-echo "eventgen rate = $1"
-for i in $(seq ${CYCLE})
+echo "eventgen rate = $2"
+for i in $(seq ${1})
 do
 cat <<EOF
 stats clear
@@ -20,16 +21,14 @@ stats snap
 EOF
 done
 }
-cycle $LOW
-cycle $LOW
-cycle $MED
-cycle $LOW
-cycle $LOW
-cycle $LOW
-cycle $MED
-cycle $LOW
-cycle $LOW
-cycle $MED
-cycle $LOW
-cycle $LOW
-
+cycle ${SHORT_CYCLE} $LOW
+cycle ${SHORT_CYCLE} $LOW
+cycle ${SHORT_CYCLE} $MED
+cycle ${LONG__CYCLE} $LOW #
+cycle ${SHORT_CYCLE} $LOW
+cycle ${LONG__CYCLE} $LOW #
+cycle ${SHORT_CYCLE} $MED
+cycle ${LONG__CYCLE} $LOW #
+cycle ${SHORT_CYCLE} $MED
+cycle ${LONG__CYCLE} $LOW #
+cycle ${LONG__CYCLE} $LOW #
