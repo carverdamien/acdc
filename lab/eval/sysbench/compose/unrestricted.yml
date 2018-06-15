@@ -8,6 +8,28 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
+  sysbencha:
+    build: images/sysbench
+    links:
+      - mysqla:mysql
+      - influxdb
+  sysbenchb:
+    build: images/sysbench
+    links:
+      - mysqlb:mysqlb
+      - influxdb
+  mysqla:
+    build: images/mysql
+    hostname: mysqla
+    volumes:
+      - data-mysqla:/var/lib/mysql
+  mysqlb:
+    build: images/mysql
+    hostname: mysqlb
+    volumes:
+      - data-mysqlb:/var/lib/mysql
+  cassandra:
+    build: images/cassandra
   influxdb:
     image: influxdb:latest
   scanner:
@@ -52,6 +74,10 @@ services:
     links:
       - influxdb
 volumes:
+  data-mysqla:
+    external: true
+  data-mysqlb:
+    external: true
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:

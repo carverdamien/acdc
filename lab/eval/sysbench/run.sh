@@ -7,7 +7,10 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-MEMORY=$((2**31)) # 2GB
+: ${SCALE:=1}
+: ${DBSIZE:=10000000} # Use small value for debug
+: ${MEMORY:=3800358912}
+
 IDLEMEMSTAT_CPU_LIMIT=1
 
 once_prelude() { :; }
@@ -56,9 +59,8 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec sysbencha sysbench -f workloads/a/prepare.f
-${PRE} exec sysbenchb sysbench -f workloads/b/prepare.f
-${PRE} exec sysbenchc sysbench -f workloads/c/prepare.f
+${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
+${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
@@ -79,13 +81,37 @@ done
 
 once_prelude $(for c in sysbencha sysbenchb sysbenchc; do ${RUN} ps -q $c; done)
 
-RUN_A() { ${RUN} exec -T sysbencha python benchmark.py -- sysbench -f workloads/a/run.f;}
-RUN_B() { ${RUN} exec -T sysbenchb python benchmark.py -- sysbench -f workloads/b/run.f;}
-RUN_C() { ${RUN} exec -T sysbenchc python benchmark.py -- sysbench -f workloads/c/run.f;}
+MAXTXR=390                # Max on one core
+MAXTXR=520
+MAXTXR=585
+MAXTXR=600
+MEDTXR=$((MAXTXR*40/100)) # Medium is 40%
+LOWTXR=$((MAXTXR*10/100)) # Low is 10%
+BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
 
-RUN_A | tee a.out &
-RUN_B | tee b.out &
-RUN_C | tee c.out &
+TIMEA1=$((100 * SCALE)) # Time A is medium
+TIMEA2=$((100 * SCALE)) # Time A is medium
+TIMEA3=$((100 * SCALE)) # Time A is medium
+
+TIMEB1=$((060 * SCALE)) # Time B is medium
+TIMEB2=$((180 * SCALE)) # Time B is low
+TIMEB3=$((060 * SCALE)) # Time B is medium
+
+NA1=$((TIMEA1 * MEDTXR))
+NA2=$((TIMEA2 * MEDTXR + NA1))
+NA3=$((TIMEA3 * MEDTXR + NA2))
+
+NB1=$((TIMEB1 * MEDTXR))
+NB2=$((TIMEB2 * LOWTXR + NB1))
+NB3=$((TIMEB3 * MEDTXR + NB2))
+
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${MEDTXR},${MEDTXR} --scheduled-time=0,0,0 --scheduled-requests=${NA1},${NA2},${NA3} --max-requests ${NA3};}
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${MEDTXR} --scheduled-rate=${MEDTXR},${LOWTXR},${MEDTXR} --scheduled-time=0,0,0 --scheduled-requests=${NB1},${NB2},${NB3} --max-requests ${NB3};}
+C() { sleep 120; ${RUN} exec -T cassandra job start; sleep 60; ${RUN} exec -T cassandra job stop; }
+
+A | tee a.out &
+B | tee b.out &
+C | tee c.out &
 
 wait
 wait
