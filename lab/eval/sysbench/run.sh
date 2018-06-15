@@ -18,7 +18,7 @@ prelude() { :; }
 
 case "$CONFIG" in
     "opt")
-	MEMORY=$((3*2**30)) # 3GB
+	MEMORY=$((2**31+2516901888))
 	;;
     "nop")
 	;;
