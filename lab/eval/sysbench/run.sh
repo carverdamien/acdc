@@ -25,15 +25,18 @@ case "$CONFIG" in
     rr-*)
 	SCAN=${CONFIG##rr-}
 	prelude() { ${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/parent/$1 ${SCAN} 1; }
-	once_prelude() { ${RUN} exec scanner job softlimitsetter /rootfs/sys/fs/cgroup/memory/parent 1 $@; }
+	# once_prelude() { ${RUN} exec scanner job softlimitsetter /rootfs/sys/fs/cgroup/memory/parent 1 $@; }
+	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent 1; }
 	;;
     ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##ir-}
-	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
+	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
+	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
 	;;
     ir-*)
 	IDLEMEMSTAT_DELAY=${CONFIG##ir-}
-	once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
+	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
+	once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
 	;;
     "dc")
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }

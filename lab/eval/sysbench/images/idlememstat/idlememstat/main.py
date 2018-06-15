@@ -193,6 +193,21 @@ def tracker_to_influx_points(idlemem_tracker):
         except Exception as e:
             print(e)
 
+def cmp(a,b):
+    # TODO: make cmp configurable
+    a_dir, a_total, a_idle = a
+    b_dir, b_total, b_idle = b
+    # return (b_idle[0]+b_idle[1]) - (a_idle[0]+a_idle[1])
+    a_idle_total_ratio = float(1 + a_idle[0] + a_idle[1]) / float(1 + a_total[0] + a_total[1])
+    b_idle_total_ratio = float(1 + b_idle[0] + b_idle[1]) / float(1 + b_total[0] + b_total[1])
+    diff = b_idle_total_ratio - a_idle_total_ratio
+    if diff > 0:
+        return 1
+    elif diff < 0:
+        return -1
+    else:
+        return 0
+
 def updateSoftLimit(idlemem_tracker, parent_cgroup):
     cgroups = []
     for dir, subdirs, files in os.walk(parent_cgroup):
@@ -202,20 +217,6 @@ def updateSoftLimit(idlemem_tracker, parent_cgroup):
         idle = idlemem_tracker.get_idle_size(ino)
         total = (idle[0]+idle[2], idle[1]+idle[3])
         cgroups.append((dir, total, idle))
-    def cmp(a,b):
-        # TODO: make cmp configurable
-        a_dir, a_total, a_idle = a
-        b_dir, b_total, b_idle = b
-        # return (b_idle[0]+b_idle[1]) - (a_idle[0]+a_idle[1])
-        a_idle_total_ratio = float(1 + a_idle[0] + a_idle[1]) / float(1 + a_total[0] + a_total[1])
-        b_idle_total_ratio = float(1 + b_idle[0] + b_idle[1]) / float(1 + b_total[0] + b_total[1])
-        diff = b_idle_total_ratio - a_idle_total_ratio
-        if diff > 0:
-            return 1
-        elif diff < 0:
-            return -1
-        else:
-            return 0
     diff=2**62
     for dir, total, idle in sorted(cgroups, cmp=cmp):
         usage = total[0] + total[1]
@@ -236,6 +237,21 @@ def updateSoftLimit(idlemem_tracker, parent_cgroup):
             print(e)
             print(limit)
 
+def updateReclaimOrder(idlemem_tracker, parent_cgroup):
+    cgroups = []
+    for dir, subdirs, files in os.walk(parent_cgroup):
+        if dir == parent_cgroup:
+            continue
+        ino = os.stat(dir)[stat.ST_INO]
+        idle = idlemem_tracker.get_idle_size(ino)
+        total = (idle[0]+idle[2], idle[1]+idle[3])
+        cgroups.append((dir, total, idle))
+    i = 1
+    for dir, total, idle in sorted(cgroups, cmp=cmp, reverse=True):
+        with open('/'.join([dir, 'memory.reclaim_order']), 'w') as f:
+            f.write("%d\n" % i)
+        i += 1
+
 def _sighandler(signum, frame):
     global _shutdown_request
     _shutdown_request = True
@@ -248,6 +264,7 @@ def main():
     parser.add_option("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='localhost')
     parser.add_option("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
     parser.add_option("--updateSoftLimit", dest="updateSoftLimit", default=False, action="store_true")
+    parser.add_option("--updateReclaimOrder", dest="updateReclaimOrder", default=False, action="store_true")
     parser.add_option("--cgroup", dest="cgroup", type=str, nargs=1)
     (options, args) = parser.parse_args()
 
@@ -263,11 +280,17 @@ def main():
     def on_update(idlemem_tracker):
         points = [p for p in tracker_to_influx_points(idlemem_tracker)]
         client.write_points(points)
-        if options.updateSoftLimit and options.delay == 0:
-            try:
-                updateSoftLimit(idlemem_tracker, options.cgroup)
-            except Exception as e:
-                print(e)
+        if options.delay == 0:
+            if options.updateSoftLimit:
+                try:
+                    updateSoftLimit(idlemem_tracker, options.cgroup)
+                except Exception as e:
+                    print(e)
+            if options.updateReclaimOrder:
+                try:
+                    updateReclaimOrder(idlemem_tracker, options.cgroup)
+                except Exception as e:
+                    print(e)
 
     idlemem_tracker = IdleMemTracker(options.delay, on_update, options.chunk)
     t = threading.Thread(target=idlemem_tracker.serve_forever)
@@ -275,11 +298,17 @@ def main():
 
     while not _shutdown_request and t.isAlive():
         time.sleep(1)
-        if options.updateSoftLimit and options.delay > 0:
-            try:
-                updateSoftLimit(idlemem_tracker, options.cgroup)
-            except Exception as e:
-                print(e)
+        if options.delay > 0:
+            if options.updateSoftLimit:
+                try:
+                    updateSoftLimit(idlemem_tracker, options.cgroup)
+                except Exception as e:
+                    print(e)
+            if options.updateReclaimOrder:
+                try:
+                    updateReclaimOrder(idlemem_tracker, options.cgroup)
+                except Exception as e:
+                    print(e)
 
     if not t.isAlive():
         sys.stderr.write("Oops, tracker thread crashed unexpectedly!\n")
