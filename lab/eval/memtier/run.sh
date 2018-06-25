@@ -68,12 +68,12 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
-${PRE} exec redisa redis-cli save
-${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
-${PRE} exec redisb redis-cli save
-${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
-${PRE} exec redisc redis-cli save
+#${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+#${PRE} exec redisa redis-cli save
+#${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+#${PRE} exec redisb redis-cli save
+#${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
+#${PRE} exec redisc redis-cli save
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/parent'
@@ -93,11 +93,36 @@ done
 once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
 A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300; }
-B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60; sleep 180; ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60; }
+B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 300 &
+    sleep 60;
+    docker update --cpus 0.01 $(${RUN} ps -q redisb);
+    sleep 180;
+    docker update --cpus 1 $(${RUN} ps -q redisb);
+}
 C() { sleep 120;
     ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
     #${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
     #${PRE} exec redisc redis-cli save
+}
+
+${RUN} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
+${RUN} exec redisa redis-cli save
+
+${RUN} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
+${RUN} exec redisb redis-cli save
+
+B() { 
+    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60;
+    sleep 180;
+    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60;
+}
+
+C() {
+sleep 120
+${RUN} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
+${RUN} exec -T redisc redis-cli save
+sleep 60
+${RUN} stop redisc
 }
 
 A | tee a.out &
