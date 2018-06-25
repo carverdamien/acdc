@@ -17,15 +17,13 @@ services:
       - influxdb
   redisa:
     image: redis:latest
-    volumes:
-      - data-redisa:/data
     cpuset: 2,3,6,7
     cgroup_parent: parent
     mem_limit: 1G
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '1gb'
+          rate: '1mb'
       device_write_bps:
         - path: /dev/sda
           rate: '1gb'
@@ -38,8 +36,6 @@ services:
       - influxdb
   redisb:
     image: redis:latest
-    volumes:
-      - data-redisb:/data
     cpuset: 0,4,1,5
     cgroup_parent: parent
     mem_limit: 1G
@@ -59,8 +55,6 @@ services:
       - influxdb
   redisc:
     image: redis:latest
-    volumes:
-      - data-redisc:/data
     cpuset: 0,4,1,5
     cgroup_parent: parent
     mem_limit: 1G
@@ -116,9 +110,6 @@ services:
     links:
       - influxdb
 volumes:
-  data-redisa:
-  data-redisb:
-  data-redisc:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
