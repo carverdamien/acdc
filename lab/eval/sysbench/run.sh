@@ -117,7 +117,7 @@ NB3=$((TIMEB3 * MEDTXR + NB2))
 
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${LOWTXR} --scheduled-rate=${LOWTXR},${MEDTXR},${MEDTXR},${MEDTXR} --scheduled-time=0,0,0,0 --scheduled-requests=${NA0},${NA1},${NA2},${NA3} --max-requests ${NA3};}
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate ${LOWTXR} --scheduled-rate=${LOWTXR},${MEDTXR},${LOWTXR},${MEDTXR} --scheduled-time=0,0,0,0 --scheduled-requests=${NB0},${NB1},${NB2},${NB3} --max-requests ${NB3};}
-C() { sleep $WARM; sleep 120; ${RUN} exec -T cassandra job start; sleep 60; ${RUN} exec -T cassandra job stop; }
+C() { sleep $WARM; sleep $((120 * SCALE)); ${RUN} exec -T cassandra job start; sleep $((60*SCALE)); ${RUN} exec -T cassandra job stop; }
 
 A | tee a.out &
 B | tee b.out &
