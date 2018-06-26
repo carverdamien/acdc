@@ -91,6 +91,7 @@ MAXTXR=600
 MAXTXR=2000
 MEDTXR=$((MAXTXR*50/100)) # Medium is 50%
 LOWTXR=$((MAXTXR*10/100)) # Low is 10%
+LOWTXR=1
 BRTTXR=$((MAXTXR*2))      # Extra requests on a second (burst)
 
 WARM=60
