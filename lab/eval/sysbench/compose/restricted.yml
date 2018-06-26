@@ -31,10 +31,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '15mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '15mb'
   mysqlb:
     build: images/mysql
     hostname: mysqlb
@@ -46,10 +46,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '15mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '15mb'
   cassandra:
     build: images/cassandra
     cgroup_parent: parent
@@ -59,10 +59,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '15mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '15mb'
   influxdb:
     image: influxdb:latest
   scanner:

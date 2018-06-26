@@ -7,7 +7,7 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${SCALE:=1}
+: ${SCALE:=2}
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=3800358912}
 
