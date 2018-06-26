@@ -1,24 +1,52 @@
-#!/bin/bash
-set -e -x
+#!/usr/bin/env python
+import time
+import sys
+import os
 
-CGROUP=$1
-SLEEP=$2
+def main():
+    CGROUP=sys.argv[1]
+    SLEEP=int(sys.argv[2])
+    while True:
+        time.sleep(SLEEP)
+        loop(CGROUP)
 
-while sleep ${SLEEP}
-do
-	i=1
-	find "${CGROUP}" -name 'memory.reclaim_order' | while read cg
-	do
-		cg=$(dirname $cg)
-		recent_rotated_anon=$(grep recent_rotated_anon $cg/memory.stat | cut -d ' '  -f2)
-		recent_scanned_anon=$(grep recent_scanned_anon $cg/memory.stat | cut -d ' '  -f2)
-		recent_rotated_file=$(grep recent_rotated_file $cg/memory.stat | cut -d ' '  -f2)
-		recent_scanned_file=$(grep recent_scanned_file $cg/memory.stat | cut -d ' '  -f2)
-		recent_ratio_total=$(( (recent_scanned_anon + recent_scanned_file) / (1+recent_rotated_anon+recent_rotated_file) ))
-		echo "${recent_ratio_total} ${cg}"
-	done | sort -nr | cut -d ' ' -f2 | while read cg
-	do
-		echo $i > ${cg}/memory.reclaim_order
-		i=$((i+1))
-	done
-done
+def loop(CGROUP):
+    stats = [get_value(cg) for cg in iterate_cgroups(CGROUP)]
+    order = 1
+    for s in sorted(stats, key=lambda x:x[1]):
+        cg, _ = s
+        set_reclaim_order(cg,order)
+        order+=1
+
+def iterate_cgroups(cgroot):
+    for root, dirs, files in os.walk(cgroot):
+        if 'memory.reclaim_order' in files:
+            yield root
+
+def get_value(cg):
+    val = 0
+    keys = ['recent_rotated_anon',
+            'recent_scanned_anon',
+            'recent_rotated_file',
+            'recent_scanned_file']
+    values = {}
+    try:
+        with open('%s/memory.stat' % cg) as f:
+            for line in f:
+                k,v = line.split(' ')
+                if k in keys:
+                    values[k] = float(v)
+        val = (values['recent_scanned_file']+values['recent_scanned_anon'])/(1+values['recent_rotated_file']+values['recent_rotated_anon'])
+    except Exception as e:
+        print(e)
+    return (cg,val)
+
+def set_reclaim_order(cg, order):
+    try:
+        with open('%s/memory.reclaim_order' % (cg),'w') as f:
+            f.write("%d\n" % order)
+    except Exception as e:
+        print(e)
+
+if __name__ == '__main__':
+    main()
