@@ -13,26 +13,26 @@ services:
     links:
       - mysqla:mysql
       - influxdb
-    cpuset: 2,3,6,7
+    cpuset: 0,4,3,7
   sysbenchb:
     build: images/sysbench
     links:
       - mysqlb:mysql
       - influxdb
-    cpuset: 0,4,1,5
+    cpuset: 1,5,3,7
   sysbenchc:
     build: images/sysbench
     links:
       - mysqlc:mysql
       - influxdb
-    cpuset: 0,4,1,5
+    cpuset: 2,6,3,7
   mysqla:
     build: images/mysql
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
     cgroup_parent: parent
-    cpuset: 2,3,6,7
+    cpuset: 0,4
     mem_limit: 1G
     blkio_config:
       device_read_bps:
@@ -47,7 +47,7 @@ services:
     volumes:
       - data-mysqlb:/var/lib/mysql
     cgroup_parent: parent
-    cpuset: 0,4,1,5
+    cpuset: 1,5
     mem_limit: 1G
     blkio_config:
       device_read_bps:
@@ -62,7 +62,7 @@ services:
     volumes:
       - data-mysqlc:/var/lib/mysql
     cgroup_parent: parent
-    cpuset: 0,4,1,5
+    cpuset: 2,6
     mem_limit: 1G
     blkio_config:
       device_read_bps:
