@@ -5,12 +5,18 @@ import os
 
 def main():
     CGROUP=sys.argv[1]
-    SLEEP=int(sys.argv[2])
+    SCAN=int(sys.argv[2])
+    SLEEP=float(sys.argv[3])
     while True:
         time.sleep(SLEEP)
-        loop(CGROUP)
+        force_scans(CGROUP,SCAN)
+        set_reclaim_orders(CGROUP)
 
-def loop(CGROUP):
+def force_scans(CGROUP, SCAN):
+    for cg in iterate_cgroups(CGROUP):
+        force_scan(cg, SCAN)
+
+def set_reclaim_orders(CGROUP):
     stats = [get_value(cg) for cg in iterate_cgroups(CGROUP)]
     order = 1
     for s in sorted(stats, key=lambda x:x[1]):
@@ -45,6 +51,13 @@ def set_reclaim_order(cg, order):
     try:
         with open('%s/memory.reclaim_order' % (cg),'w') as f:
             f.write("%d\n" % order)
+    except Exception as e:
+        print(e)
+
+def force_scan(cg, scan):
+    try:
+        with open('%s/memory.force_scan' % (cg),'w') as f:
+            f.write("%d\n" % scan)
     except Exception as e:
         print(e)
 

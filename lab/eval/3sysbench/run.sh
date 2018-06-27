@@ -11,6 +11,7 @@ source kernel
 : ${DBSIZE:=10000000} # Use small value for debug
 : ${MEMORY:=$((2*2**30))}
 
+SCANNER_CPU_LIMIT=1
 IDLEMEMSTAT_CPU_LIMIT=1
 
 once_prelude() { :; }
@@ -22,11 +23,9 @@ case "$CONFIG" in
 	;;
     "nop")
 	;;
-    rr-*)
-	SCAN=${CONFIG##rr-}
-	prelude() { ${RUN} exec scanner job scan /rootfs/sys/fs/cgroup/memory/parent/$1 ${SCAN} 1; }
-	# once_prelude() { ${RUN} exec scanner job softlimitsetter /rootfs/sys/fs/cgroup/memory/parent 1 $@; }
-	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent 1; }
+    rr-*.*)
+	SCANNER_CPU_LIMIT=${CONFIG##rr-}
+	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
 	;;
     ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##ir-}
@@ -51,7 +50,8 @@ esac
 
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
-sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml > compose/.restricted.yml
+sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml |
+sed "s/\${SCANNER_CPU_LIMIT}/${SCANNER_CPU_LIMIT}/" > compose/.restricted.yml
 
 # Prepare
 DATA_DIR="data/$CONFIG/"

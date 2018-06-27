@@ -76,6 +76,7 @@ services:
   scanner:
     build: images/scanner
     privileged: true
+    cpus: ${SCANNER_CPU_LIMIT}
     volumes:
       - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
   collector:
