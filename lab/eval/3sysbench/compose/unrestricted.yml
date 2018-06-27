@@ -18,6 +18,11 @@ services:
     links:
       - mysqlb:mysql
       - influxdb
+  sysbenchc:
+    build: images/sysbench
+    links:
+      - mysqlc:mysql
+      - influxdb
   mysqla:
     build: images/mysql
     hostname: mysqla
@@ -28,8 +33,11 @@ services:
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-  cassandra:
-    build: images/cassandra
+  mysqlc:
+    build: images/mysql
+    hostname: mysqlc
+    volumes:
+      - data-mysqlc:/var/lib/mysql
   influxdb:
     image: influxdb:latest
   scanner:
@@ -77,6 +85,8 @@ volumes:
   data-mysqla:
     external: true
   data-mysqlb:
+    external: true
+  data-mysqlc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
