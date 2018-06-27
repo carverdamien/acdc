@@ -91,7 +91,7 @@ SWITCH=2
 REQA=$((MAXTXR*TOTSEC))
 REQBC=$((REQA/2/SWITCH))
 
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --max-requests ${REQA}}
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --max-requests ${REQA}; }
 BC() {
 	for switch in $(seq $SWITCH)
 	do
