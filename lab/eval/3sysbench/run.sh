@@ -16,6 +16,8 @@ IDLEMEMSTAT_CPU_LIMIT=1
 
 once_prelude() { :; }
 prelude() { :; }
+activate() { docker update --cpus 8 $1; }
+deactivate() { docker update --cpus 0.01 $1; }
 
 case "$CONFIG" in
     "opt")
@@ -103,8 +105,8 @@ do
     move_tasks "/sys/fs/cgroup/blkio/parent/$($mysql)" "/sys/fs/cgroup/blkio/parent/$(mysqla)"
 done
 
-docker update --cpus 0.01 $(mysqlb)
-docker update --cpus 0.01 $(mysqlc)
+deactivate $(mysqlb)
+deactivate $(mysqlc)
 oldmysql=mysqlc
 
 A | tee a.out &
@@ -112,13 +114,13 @@ B | tee b.out &
 C | tee c.out &
 
 sleep $CYCLE
-docker update --cpus 8 $(mysqlb)
+activate $(mysqlb)
 sleep $CYCLE
 
 for mysql in mysqla mysqlb mysqlc mysqla
 do
-    docker update --cpus 0.01 $($mysql)
-    docker update --cpus   8 $($oldmysql)
+    deactivate $($mysql)
+    activate   $($oldmysql)
     oldmysql=$mysql
     sleep $CYCLE
 done
