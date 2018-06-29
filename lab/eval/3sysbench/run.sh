@@ -25,6 +25,10 @@ case "$CONFIG" in
 	;;
     "nop")
 	;;
+	"orcl")
+	activate()   { docker update --memory-reservation $((8*2**30)) $1; docker update --cpus 8 $1; }
+	deactivate() { docker update --memory-reservation            0 $1; docker update --cpus 0.01 $1; }
+	;;
     rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##rr-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
