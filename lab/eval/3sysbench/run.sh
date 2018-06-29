@@ -84,27 +84,46 @@ done
 
 once_prelude $(for c in mysqla mysqlb mysqlc; do ${RUN} ps -q $c; done)
 
-MAXTXR=1000
-TOTSEC=300
-SWITCH=2
+CYCLE=60
+NCYCLE=6
+TOTSEC=$((NCYCLE * CYCLE))
 
-REQA=$((MAXTXR*TOTSEC))
-REQBC=$((REQA/2/SWITCH))
+A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
+B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
+C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
 
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --max-requests ${REQA}; }
-BC() {
-	for switch in $(seq $SWITCH)
-	do
-		for sysbench in sysbenchb sysbenchc
-		do
-			${RUN} exec -T ${sysbench} python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --max-requests ${REQBC}
-		done
-	done
-}
+mysqla() { ${RUN} ps -q mysqla; }
+mysqlb() { ${RUN} ps -q mysqlb; }
+mysqlc() { ${RUN} ps -q mysqlc; }
 
-A  | tee a.out &
-BC | tee b.out &
+move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
 
+for mysql in mysqlb mysqlc
+do
+    move_tasks "/sys/fs/cgroup/blkio/parent/$($mysql)" "/sys/fs/cgroup/blkio/parent/$(mysqla)"
+done
+
+docker update --cpus 0.01 $(mysqlb)
+docker update --cpus 0.01 $(mysqlc)
+oldmysql=mysqlc
+
+A | tee a.out &
+B | tee b.out &
+C | tee c.out &
+
+sleep $CYCLE
+docker update --cpus 8 $(mysqlb)
+sleep $CYCLE
+
+for mysql in mysqla mysqlb mysqlc mysqla
+do
+    docker update --cpus 0.01 $($mysql)
+    docker update --cpus   8 $($oldmysql)
+    oldmysql=$mysql
+    sleep $CYCLE
+done
+
+wait
 wait
 wait
 
