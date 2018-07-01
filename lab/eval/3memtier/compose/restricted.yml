@@ -8,29 +8,29 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  sysbencha:
-    build: images/sysbench
+  memtiera:
+    build: images/memtier_benchmark
     links:
-      - mysqla:mysql
+      - redisa:redis
       - influxdb
     cpuset: 0,4,3,7
-  sysbenchb:
-    build: images/sysbench
+  memtierb:
+    build: images/memtier_benchmark
     links:
-      - mysqlb:mysql
+      - redisb:redis
       - influxdb
     cpuset: 1,5,3,7
-  sysbenchc:
-    build: images/sysbench
+  memtierc:
+    build: images/memtier_benchmark
     links:
-      - mysqlc:mysql
+      - redisc:redis
       - influxdb
     cpuset: 2,6,3,7
-  mysqla:
-    build: images/mysql
-    hostname: mysqla
+  redisa:
+    build: images/redis
+    hostname: redisa
     volumes:
-      - data-mysqla:/var/lib/mysql
+      - data-redisa:/var/lib/redis
     cgroup_parent: parent
     cpuset: 0,4
     mem_limit: 1G
@@ -41,11 +41,11 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '20mb'
-  mysqlb:
-    build: images/mysql
-    hostname: mysqlb
+  redisb:
+    build: images/redis
+    hostname: redisb
     volumes:
-      - data-mysqlb:/var/lib/mysql
+      - data-redisb:/var/lib/redis
     cgroup_parent: parent
     cpuset: 1,5
     mem_limit: 1G
@@ -56,11 +56,11 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '20mb'
-  mysqlc:
-    build: images/mysql
-    hostname: mysqlc
+  redisc:
+    build: images/redis
+    hostname: redisc
     volumes:
-      - data-mysqlc:/var/lib/mysql
+      - data-redisc:/var/lib/redis
     cgroup_parent: parent
     cpuset: 2,6
     mem_limit: 1G
@@ -117,11 +117,11 @@ services:
     links:
       - influxdb
 volumes:
-  data-mysqla:
+  data-redisa:
     external: true
-  data-mysqlb:
+  data-redisb:
     external: true
-  data-mysqlc:
+  data-redisc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
