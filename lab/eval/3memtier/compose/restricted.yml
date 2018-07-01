@@ -1,0 +1,128 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  memtiera:
+    build: images/memtier_benchmark
+    links:
+      - redisa:redis
+      - influxdb
+    cpuset: 0,4,3,7
+  memtierb:
+    build: images/memtier_benchmark
+    links:
+      - redisb:redis
+      - influxdb
+    cpuset: 1,5,3,7
+  memtierc:
+    build: images/memtier_benchmark
+    links:
+      - redisc:redis
+      - influxdb
+    cpuset: 2,6,3,7
+  redisa:
+    build: images/redis
+    hostname: redisa
+    volumes:
+      - data-redisa:/var/lib/redis
+    cgroup_parent: parent
+    cpuset: 0,4
+    mem_limit: 1G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '20mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '20mb'
+  redisb:
+    build: images/redis
+    hostname: redisb
+    volumes:
+      - data-redisb:/var/lib/redis
+    cgroup_parent: parent
+    cpuset: 1,5
+    mem_limit: 1G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '20mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '20mb'
+  redisc:
+    build: images/redis
+    hostname: redisc
+    volumes:
+      - data-redisc:/var/lib/redis
+    cgroup_parent: parent
+    cpuset: 2,6
+    mem_limit: 1G
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '20mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '20mb'
+  influxdb:
+    image: influxdb:latest
+  scanner:
+    build: images/scanner
+    privileged: true
+    cpus: ${SCANNER_CPU_LIMIT}
+    volumes:
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+  collector:
+    build: images/collector
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  idlememstat:
+    build: images/idlememstat
+    privileged: true
+    entrypoint: [ "daemon" ]
+    cpus: ${IDLEMEMSTAT_CPU_LIMIT}
+    environment:
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-redisa:
+    external: true
+  data-redisb:
+    external: true
+  data-redisc:
+    external: true
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
