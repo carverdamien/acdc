@@ -7,9 +7,14 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${SCALE:=1}
-: ${DBSIZE:=10000000} # Use small value for debug
-: ${MEMORY:=$((2*2**30))}
+: ${MEMORY:=$((2**31))}
+
+SIZE=$((2**12)) # 512MB max
+REQUESTS=$((189841)) 
+
+EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
+EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
+EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t 1"
 
 SCANNER_CPU_LIMIT=1
 IDLEMEMSTAT_CPU_LIMIT=1
@@ -68,9 +73,12 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec sysbencha prepare --dbsize ${DBSIZE}
-${PRE} exec sysbenchb prepare --dbsize ${DBSIZE}
-${PRE} exec sysbenchc prepare --dbsize ${DBSIZE}
+${PRE} exec memtiera run -- memtier_benchmark -s redis ${EXTRA_INIT}
+${PRE} exec redisa redis-cli save
+${PRE} exec memtierb run -- memtier_benchmark -s redis ${EXTRA_INIT}
+${PRE} exec redisb redis-cli save
+${PRE} exec memtierc run -- memtier_benchmark -s redis ${EXTRA_INIT}
+${PRE} exec redisc redis-cli save
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
@@ -83,49 +91,49 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-for c in mysqla mysqlb mysqlc
+for c in redisa redisb redisc
 do
     prelude $(${RUN} ps -q $c)
 done
 
-once_prelude $(for c in mysqla mysqlb mysqlc; do ${RUN} ps -q $c; done)
+once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
 CYCLE=60
 NCYCLE=6
 TOTSEC=$((NCYCLE * CYCLE))
 
-A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
-B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
-C() { ${RUN} exec -T sysbenchc python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
+A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redis ${EXTRA_HIGH} --test-time ${TOTSEC}; }
+B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redis ${EXTRA_HIGH} --test-time ${TOTSEC}; }
+C() { ${RUN} exec -T memtierc run -- memtier_benchmark -s redis ${EXTRA_HIGH} --test-time ${TOTSEC}; }
 
-mysqla() { ${RUN} ps -q mysqla; }
-mysqlb() { ${RUN} ps -q mysqlb; }
-mysqlc() { ${RUN} ps -q mysqlc; }
+redisa() { ${RUN} ps -q redisa; }
+redisb() { ${RUN} ps -q redisb; }
+redisc() { ${RUN} ps -q redisc; }
 
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
 
-for mysql in mysqlb mysqlc
+for redis in redisb redisc
 do
-    move_tasks "/sys/fs/cgroup/blkio/parent/$($mysql)" "/sys/fs/cgroup/blkio/parent/$(mysqla)"
+    move_tasks "/sys/fs/cgroup/blkio/parent/$($redis)" "/sys/fs/cgroup/blkio/parent/$(redisa)"
 done
 
-deactivate $(mysqlb)
-deactivate $(mysqlc)
-oldmysql=mysqlc
+deactivate $(redisb)
+deactivate $(redisc)
+oldredis=redisc
 
 A | tee a.out &
 B | tee b.out &
 C | tee c.out &
 
 sleep $CYCLE
-activate $(mysqlb)
+activate $(redisb)
 sleep $CYCLE
 
-for mysql in mysqla mysqlb mysqlc mysqla
+for redis in redisa redisb redisc redisa
 do
-    deactivate $($mysql)
-    activate   $($oldmysql)
-    oldmysql=$mysql
+    deactivate $($redis)
+    activate   $($oldredis)
+    oldredis=$redis
     sleep $CYCLE
 done
 
