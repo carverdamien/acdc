@@ -20,33 +20,33 @@ activate() { docker update --cpus 8 $1; }
 deactivate() { docker update --cpus 0.01 $1; }
 
 case "$CONFIG" in
-    "opt")
+    *opt)
 	MEMORY=$((3*2**30))
 	;;
-    "nop")
+    *nop)
 	;;
 	"orcl")
 	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; docker update --cpus 8 $1; }
 	deactivate() { echo 0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; docker update --cpus 0.01 $1; }
 	;;
-    rr-*.*)
-	SCANNER_CPU_LIMIT=${CONFIG##rr-}
+    *rr-*.*)
+	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
 	;;
-    ir-*.*)
-	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##ir-}
+    *ir-*.*)
+	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
 	;;
-    ir-*)
-	IDLEMEMSTAT_DELAY=${CONFIG##ir-}
+    *ir-*)
+	IDLEMEMSTAT_DELAY=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
 	;;
-    "dc")
+    *dc)
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }
 	;;
-    "acdc")
+    *acdc)
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_{demand,activate}"; }
 	;;
     *)
