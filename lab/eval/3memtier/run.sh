@@ -30,7 +30,7 @@ case "$CONFIG" in
 	;;
     *nop)
 	;;
-	"orcl")
+	*orcl)
 	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; docker update --cpus 8 $1; }
 	deactivate() { echo 0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; docker update --cpus 0.01 $1; }
 	;;
