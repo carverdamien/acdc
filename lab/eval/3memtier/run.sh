@@ -73,11 +73,11 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec memtiera run -- memtier_benchmark -s redis ${EXTRA_INIT}
+${PRE} exec memtiera run -- memtier_benchmark -s redisa ${EXTRA_INIT}
 ${PRE} exec redisa redis-cli save
-${PRE} exec memtierb run -- memtier_benchmark -s redis ${EXTRA_INIT}
+${PRE} exec memtierb run -- memtier_benchmark -s redisb ${EXTRA_INIT}
 ${PRE} exec redisb redis-cli save
-${PRE} exec memtierc run -- memtier_benchmark -s redis ${EXTRA_INIT}
+${PRE} exec memtierc run -- memtier_benchmark -s redisc ${EXTRA_INIT}
 ${PRE} exec redisc redis-cli save
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
@@ -102,9 +102,9 @@ CYCLE=60
 NCYCLE=6
 TOTSEC=$((NCYCLE * CYCLE))
 
-A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redis ${EXTRA_HIGH} --test-time ${TOTSEC}; }
-B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redis ${EXTRA_HIGH} --test-time ${TOTSEC}; }
-C() { ${RUN} exec -T memtierc run -- memtier_benchmark -s redis ${EXTRA_HIGH} --test-time ${TOTSEC}; }
+A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time ${TOTSEC}; }
+B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time ${TOTSEC}; }
+C() { ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time ${TOTSEC}; }
 
 redisa() { ${RUN} ps -q redisa; }
 redisb() { ${RUN} ps -q redisb; }

@@ -9,19 +9,22 @@ services:
     volumes:
       - /:/rootfs
   memtiera:
+    hostname: memtiera
     build: images/memtier_benchmark
     links:
-      - redisa:redis
+      - redisa
       - influxdb
   memtierb:
+    hostname: memtierb
     build: images/memtier_benchmark
     links:
-      - redisb:redis
+      - redisb
       - influxdb
   memtierc:
+    hostname: memtierc
     build: images/memtier_benchmark
     links:
-      - redisc:redis
+      - redisc
       - influxdb
   redisa:
     image: redis
