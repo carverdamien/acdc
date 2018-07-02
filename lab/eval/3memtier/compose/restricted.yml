@@ -27,7 +27,7 @@ services:
       - influxdb
     cpuset: 2,6,3,7
   redisa:
-    build: images/redis
+    image: redis
     hostname: redisa
     volumes:
       - data-redisa:/var/lib/redis
@@ -42,7 +42,7 @@ services:
         - path: /dev/sda
           rate: '20mb'
   redisb:
-    build: images/redis
+    image: redis
     hostname: redisb
     volumes:
       - data-redisb:/var/lib/redis
@@ -57,7 +57,7 @@ services:
         - path: /dev/sda
           rate: '20mb'
   redisc:
-    build: images/redis
+    image: redis
     hostname: redisc
     volumes:
       - data-redisc:/var/lib/redis

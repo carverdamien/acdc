@@ -24,17 +24,17 @@ services:
       - redisc:redis
       - influxdb
   redisa:
-    build: images/redis
+    image: redis
     hostname: redisa
     volumes:
       - data-redisa:/var/lib/redis
   redisb:
-    build: images/redis
+    image: redis
     hostname: redisb
     volumes:
       - data-redisb:/var/lib/redis
   redisc:
-    build: images/redis
+    image: redis
     hostname: redisc
     volumes:
       - data-redisc:/var/lib/redis
