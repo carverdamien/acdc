@@ -30,17 +30,17 @@ services:
     image: redis
     hostname: redisa
     volumes:
-      - data-redisa:/var/lib/redis
+      - data-redisa:/data
   redisb:
     image: redis
     hostname: redisb
     volumes:
-      - data-redisb:/var/lib/redis
+      - data-redisb:/data
   redisc:
     image: redis
     hostname: redisc
     volumes:
-      - data-redisc:/var/lib/redis
+      - data-redisc:/data
   influxdb:
     image: influxdb:latest
   scanner:

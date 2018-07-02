@@ -33,7 +33,7 @@ services:
     image: redis
     hostname: redisa
     volumes:
-      - data-redisa:/var/lib/redis
+      - data-redisa:/data
     cgroup_parent: parent
     cpuset: 0,4
     mem_limit: 1G
@@ -48,7 +48,7 @@ services:
     image: redis
     hostname: redisb
     volumes:
-      - data-redisb:/var/lib/redis
+      - data-redisb:/data
     cgroup_parent: parent
     cpuset: 1,5
     mem_limit: 1G
@@ -63,7 +63,7 @@ services:
     image: redis
     hostname: redisc
     volumes:
-      - data-redisc:/var/lib/redis
+      - data-redisc:/data
     cgroup_parent: parent
     cpuset: 2,6
     mem_limit: 1G
