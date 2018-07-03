@@ -7,10 +7,12 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${MEMORY:=$((2**31))}
+: ${SCALE:=16}
+: ${MEM:=$((2**30/SCALE))}
+: ${MEMORY:=$((2*MEM+10*2**20))}
 
 SIZE=$((2**12)) # 512MB max
-REQUESTS=$((189841)) 
+REQUESTS=$((189841/SCALE)) 
 
 EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
 EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
@@ -62,6 +64,7 @@ esac
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
 sed "s/\${IDLEMEMSTAT_CPU_LIMIT}/${IDLEMEMSTAT_CPU_LIMIT}/" compose/restricted.yml |
+sed "s/\${MEM}/${MEM}/" |
 sed "s/\${SCANNER_CPU_LIMIT}/${SCANNER_CPU_LIMIT}/" > compose/.restricted.yml
 
 # Prepare

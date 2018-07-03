@@ -36,7 +36,7 @@ services:
       - data-redisa:/data
     cgroup_parent: /parent
     cpuset: 0,4
-    mem_limit: 1G
+    mem_limit: ${MEM}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -51,7 +51,7 @@ services:
       - data-redisb:/data
     cgroup_parent: /parent
     cpuset: 1,5
-    mem_limit: 1G
+    mem_limit: ${MEM}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -66,7 +66,7 @@ services:
       - data-redisc:/data
     cgroup_parent: /parent
     cpuset: 2,6
-    mem_limit: 1G
+    mem_limit: ${MEM}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
