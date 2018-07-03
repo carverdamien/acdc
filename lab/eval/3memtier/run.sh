@@ -12,11 +12,13 @@ source kernel
 : ${MEMORY:=$((2*MEM+10*2**20))}
 
 SIZE=$((2**12)) # 512MB max
-REQUESTS=$((189841/SCALE)) 
+REQUESTS=$((189841/SCALE))
+REQUESTS=$((REQUESTS-1280))
 
-EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t 1"
-EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t 1"
-EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t 1"
+THREADS=2
+EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t ${THREADS}"
+EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t ${THREADS}"
+EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t ${THREADS}"
 
 SCANNER_CPU_LIMIT=1
 IDLEMEMSTAT_CPU_LIMIT=1
