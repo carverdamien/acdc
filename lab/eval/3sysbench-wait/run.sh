@@ -91,8 +91,9 @@ done
 once_prelude $(for c in mysqla mysqlb mysqlc; do ${RUN} ps -q $c; done)
 
 CYCLE=60
+WAIT=5
 NCYCLE=6
-TOTSEC=$((NCYCLE * CYCLE))
+TOTSEC=$(( NCYCLE * (CYCLE + WAIT) ))
 
 A() { ${RUN} exec -T sysbencha python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
 B() { ${RUN} exec -T sysbenchb python benchmark.py --wait=0 run --dbsize ${DBSIZE} --tx-rate 0 --duration ${TOTSEC}; }
@@ -117,13 +118,14 @@ A | tee a.out &
 B | tee b.out &
 C | tee c.out &
 
-sleep $CYCLE
+sleep $((CYCLE + WAIT))
 activate $(mysqlb)
-sleep $CYCLE
+sleep $((CYCLE + WAIT))
 
 for mysql in mysqla mysqlb mysqlc mysqla
 do
     deactivate $($mysql)
+    sleep $WAIT
     activate   $($oldmysql)
     oldmysql=$mysql
     sleep $CYCLE
