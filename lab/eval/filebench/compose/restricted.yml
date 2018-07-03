@@ -17,7 +17,7 @@ services:
       - ./workloads:/home/workloads
     mem_limit: 1GB
     cpuset: '0,4'
-    cgroup_parent: parent
+    cgroup_parent: /parent
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -34,7 +34,7 @@ services:
       - ./workloads:/home/workloads
     mem_limit: 1GB
     cpuset: '1,5'
-    cgroup_parent: parent
+    cgroup_parent: /parent
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -51,7 +51,7 @@ services:
       - ./workloads:/home/workloads
     mem_limit: 1GB
     cpuset: '2,6'
-    cgroup_parent: parent
+    cgroup_parent: /parent
     blkio_config:
       device_read_bps:
         - path: /dev/sda

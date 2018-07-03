@@ -31,7 +31,7 @@ services:
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
-    cgroup_parent: parent
+    cgroup_parent: /parent
     cpuset: 0,4
     mem_limit: 1G
     blkio_config:
@@ -46,7 +46,7 @@ services:
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    cgroup_parent: parent
+    cgroup_parent: /parent
     cpuset: 1,5
     mem_limit: 1G
     blkio_config:
@@ -61,7 +61,7 @@ services:
     hostname: mysqlc
     volumes:
       - data-mysqlc:/var/lib/mysql
-    cgroup_parent: parent
+    cgroup_parent: /parent
     cpuset: 2,6
     mem_limit: 1G
     blkio_config:

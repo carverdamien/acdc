@@ -25,7 +25,7 @@ services:
     hostname: mysqla
     volumes:
       - data-mysqla:/var/lib/mysql
-    cgroup_parent: parent
+    cgroup_parent: /parent
     cpuset: 2,3,6,7
     mem_limit: 1G
     blkio_config:
@@ -40,7 +40,7 @@ services:
     hostname: mysqlb
     volumes:
       - data-mysqlb:/var/lib/mysql
-    cgroup_parent: parent
+    cgroup_parent: /parent
     cpuset: 0,4,1,5
     mem_limit: 1G
     blkio_config:
@@ -52,7 +52,7 @@ services:
           rate: '15mb'
   cassandra:
     build: images/cassandra
-    cgroup_parent: parent
+    cgroup_parent: /parent
     mem_limit: 2516901888
     mem_swappiness: 0
     cpuset: 0,4,1,5
