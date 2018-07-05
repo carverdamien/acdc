@@ -98,7 +98,7 @@ ABG() { X filebencha; }
 BBG() { X filebenchb; }
 CBG() { X filebenchc; }
 
-Y() { activated $($1); ${RUN} exec -T $1 python benchmark.py -- filebench -f workloads/$1/reuse.f; deactivated $($1) }
+Y() { activated $($1); ${RUN} exec -T $1 python benchmark.py -- filebench -f workloads/$1/reuse.f; deactivated $($1); }
 A() { Y filebencha; }
 B() { Y filebenchb; }
 C() { Y filebenchc; }
