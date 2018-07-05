@@ -14,8 +14,9 @@ source kernel
 SIZE=$((2**12)) # 512MB max
 REQUESTS=$((189841/SCALE))
 REQUESTS=$((REQUESTS-1280))
+REQUESTS=$((REQUESTS-256-128))
 
-THREADS=2
+THREADS=1
 EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t ${THREADS}"
 EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t ${THREADS}"
 EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t ${THREADS}"
@@ -25,8 +26,16 @@ IDLEMEMSTAT_CPU_LIMIT=1
 
 once_prelude() { :; }
 prelude() { :; }
-activate() { docker update --cpus 8 $1; }
-deactivate() { docker update --cpus 0.01 $1; }
+
+slow_cpu() { docker update --cpus 0.01 $1; }
+slow_cpu() { echo 1000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_quota_us"; echo 1000000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_period_us"; }
+
+fast_cpu() { docker update --cpus 8 $1; }
+fast_cpu() { echo 8000000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_quota_us"; echo 1000000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_period_us"; }
+
+activate()   { fast_cpu $1; }
+deactivate() { slow_cpu $1; }
+
 
 case "$CONFIG" in
     *opt)
@@ -35,8 +44,8 @@ case "$CONFIG" in
     *nop)
 	;;
 	*orcl)
-	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; docker update --cpus 8 $1; }
-	deactivate() { echo 0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; docker update --cpus 0.01 $1; }
+	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; fast_cpu $1; }
+	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; slow_cpu $1; }
 	;;
     *rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
@@ -116,6 +125,7 @@ redisb() { ${RUN} ps -q redisb; }
 redisc() { ${RUN} ps -q redisc; }
 
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
+# move_tasks() { :; }
 
 for redis in redisb redisc
 do
