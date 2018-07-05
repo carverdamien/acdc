@@ -7,7 +7,7 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${CYCLE:=6}
+: ${NCYCLE:=6}
 : ${CYCLE:=60}
 : ${MEM:=$((2**30))}
 : ${MEMORY:=$((2*MEM))}
