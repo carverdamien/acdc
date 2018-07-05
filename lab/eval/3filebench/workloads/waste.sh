@@ -1,6 +1,6 @@
 echo "
 set \$dir=/data/
-set \$smallfilesize=${MEM}
+set \$smallfilesize=$((MEM/2))
 set \$largefilesize=$((2*MEM))
 set \$iosize=1m
 
