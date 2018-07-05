@@ -8,32 +8,13 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  memtiera:
-    hostname: memtiera
-    build: images/memtier_benchmark
+  filebencha:
+    build: images/filebench
     links:
-      - redisa
       - influxdb
-    cpuset: 0,4,3,7
-  memtierb:
-    hostname: memtierb
-    build: images/memtier_benchmark
-    links:
-      - redisb
-      - influxdb
-    cpuset: 1,5,3,7
-  memtierc:
-    hostname: memtierc
-    build: images/memtier_benchmark
-    links:
-      - redisc
-      - influxdb
-    cpuset: 2,6,3,7
-  redisa:
-    image: redis
-    hostname: redisa
     volumes:
-      - data-redisa:/data
+      - data-filebencha:/data
+      - ./workloads:/home/workloads
     cgroup_parent: /parent
     cpuset: 0,4
     mem_limit: ${MEM}
@@ -44,11 +25,13 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '20mb'
-  redisb:
-    image: redis
-    hostname: redisb
+  filebenchb:
+    build: images/filebench
+    links:
+      - influxdb
     volumes:
-      - data-redisb:/data
+      - data-filebenchb:/data
+      - ./workloads:/home/workloads
     cgroup_parent: /parent
     cpuset: 1,5
     mem_limit: ${MEM}
@@ -59,11 +42,13 @@ services:
       device_write_bps:
         - path: /dev/sda
           rate: '20mb'
-  redisc:
-    image: redis
-    hostname: redisc
+  filebenchc:
+    build: images/filebench
+    links:
+      - influxdb
     volumes:
-      - data-redisc:/data
+      - data-filebenchc:/data
+      - ./workloads:/home/workloads
     cgroup_parent: /parent
     cpuset: 2,6
     mem_limit: ${MEM}
@@ -120,11 +105,11 @@ services:
     links:
       - influxdb
 volumes:
-  data-redisa:
+  data-filebencha:
     external: true
-  data-redisb:
+  data-filebenchb:
     external: true
-  data-redisc:
+  data-filebenchc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
