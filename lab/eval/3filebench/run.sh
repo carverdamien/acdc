@@ -93,12 +93,12 @@ done
 
 once_prelude $(for c in filebencha filebenchb filebenchc; do ${RUN} ps -q $c; done)
 
-X() { ${RUN} exec -T $1 python benchmark.py -- filebench -f workloads/$1/waste.f; }
+X() { ${RUN} exec -T $1 job python benchmark.py -- filebench -f workloads/$1/waste.f; }
 ABG() { X filebencha; }
 BBG() { X filebenchb; }
 CBG() { X filebenchc; }
 
-Y() { activated $($1); ${RUN} exec -T $1 python benchmark.py -- filebench -f workloads/$1/reuse.f; deactivated $($1); }
+Y() { activated $($1); ${RUN} exec -T $1 job python benchmark.py -- filebench -f workloads/$1/reuse.f; deactivated $($1); }
 A() { Y filebencha; }
 B() { Y filebenchb; }
 C() { Y filebenchc; }
@@ -108,7 +108,7 @@ filebenchb() { ${RUN} ps -q filebenchb; }
 filebenchc() { ${RUN} ps -q filebenchc; }
 
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
-move_tasks() { :; }
+# move_tasks() { :; }
 
 for filebench in filebenchb filebenchc
 do
@@ -129,10 +129,6 @@ sched2() { sleep $CYCLE; B; A; C; }
 sched1 | tee sched1.out &
 sched2 | tee sched2.out &
 
-wait
-wait
-wait
-wait
 wait
 
 # Report

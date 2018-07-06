@@ -1,7 +1,7 @@
 echo "
 set \$dir=/data/
-set \$smallfilesize=$((MEM/2))
-set \$largefilesize=$((2*MEM))
+set \$smallfilesize=$(( 90*MEM/100 )) 
+set \$largefilesize=$(( 8*2**20 ))
 set \$iosize=1m
 
 define file name=largefile,path=\$dir,size=\$largefilesize,prealloc,reuse
@@ -18,11 +18,9 @@ define process name=filereader,instances=1
     flowop read name=randread,filename=smallfile,iosize=\$iosize,random
   }
 }
-
-create files
-create processes
-
 "
+echo create files
+echo create processes
 for i in $(seq $((2*CYCLE/5)))
 do
 cat <<EOF
