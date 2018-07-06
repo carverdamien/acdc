@@ -171,6 +171,7 @@ flowop_beginop(threadflow_t *threadflow, flowop_t *flowop)
 	FILE *filep;
 	int ret;
 	
+	if (0) {
 	tid = gettid();
 	filebench_log(LOG_DEBUG_SCRIPT, "proc/pid/stat called ==> tid = %d", tid);
 	sprintf(fname,"/proc/%d/stat", tid);
@@ -186,6 +187,7 @@ flowop_beginop(threadflow_t *threadflow, flowop_t *flowop)
 	
 	} else {
 		filebench_log(LOG_ERROR, "Unable to open proc/<pid>/stat file for given thread (errno=%d)", errno);
+	}
 	}
 #endif
 
@@ -269,7 +271,8 @@ flowop_endop(threadflow_t *threadflow, flowop_t *flowop, int64_t bytes)
 	unsigned long utime, stime;
 	FILE *filep;
 	int ret;
-
+	
+	if(0) {
 	if ((filebench_shm->shm_mmode & FILEBENCH_MODE_NOUSAGE) == 0) {
 		tid = gettid();
 		filebench_log(LOG_DEBUG_SCRIPT, "proc/pid/stat called ==> tid = %d", tid);
@@ -289,6 +292,7 @@ flowop_endop(threadflow_t *threadflow, flowop_t *flowop, int64_t bytes)
 			filebench_log(LOG_ERROR, "Unable to open proc/<pid>/stat file for given thread (errno=%d)", errno);
 		}
 
+	}
 	}
 #endif
 	flowop->fo_stats.fs_count++;

@@ -172,6 +172,7 @@ kstats_read_cpu(void)
 	hrtime_t user, nice, system;
 	char cpu[128]; /* placeholder to read "cpu" */
 
+	if(0) {
 	statfd = fopen("/proc/stat", "r");
 	if (!statfd) {
 		filebench_log(LOG_ERROR, "Cannot open /proc/stat");
@@ -188,6 +189,7 @@ kstats_read_cpu(void)
 	
 
 	fclose(statfd);
+	}
 	
 	/* convert jiffies to nanosecs */
 	return ((user+nice+system)*10000000);
