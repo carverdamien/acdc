@@ -7,9 +7,10 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${NCYCLE:=6}
-: ${CYCLE:=60}
+: ${NCYCLE:=12}
+: ${CYCLE:=30}
 : ${MEM:=$((2**30))}
+MEM=$((60*2**20))
 : ${MEMORY:=$((2*MEM))}
 
 SCANNER_CPU_LIMIT=1
@@ -123,8 +124,8 @@ ABG | tee a.out &
 BBG | tee b.out &
 CBG | tee c.out &
 
-sched1() { A; C; B; }
-sched2() { sleep $CYCLE; B; A; C; }
+sched1() { A; C; B; A; C; B; A; C; B; A; C; B; }
+sched2() { sleep $CYCLE; B; A; C; B; A; C; B; A; C; B; A; C; }
 
 sched1 | tee sched1.out &
 sched2 | tee sched2.out &
