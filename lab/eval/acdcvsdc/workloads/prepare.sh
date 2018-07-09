@@ -1,7 +1,7 @@
 echo "
 set \$dir=/data/
 set \$smallfilesize=$(( 90*MEM/100 ))
-set \$largefilesize=$(( 8*2**20 ))
+set \$largefilesize=$(( 4*MEM ))
 set \$iosize=1m
 
 define file name=largefile,path=\$dir,size=\$largefilesize,prealloc,reuse

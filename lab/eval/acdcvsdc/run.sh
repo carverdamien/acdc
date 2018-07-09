@@ -7,11 +7,9 @@ source kernel
 [ -n "$KERNEL" ]
 [ "$(uname -sr)" == "Linux ${KERNEL}" ]
 
-: ${NCYCLE:=12}
-: ${CYCLE:=30}
+: ${TOTSEC:=300}
 : ${MEM:=$((2**30))}
-MEM=$((60*2**20))
-: ${MEMORY:=$((2*MEM))}
+: ${MEMORY:=$((MEM + 512*2**20))}
 
 SCANNER_CPU_LIMIT=1
 IDLEMEMSTAT_CPU_LIMIT=1
@@ -31,20 +29,24 @@ case "$CONFIG" in
 	*orcl)
 	activated()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	deactivated() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
+	exit 1
 	;;
     *rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
+	exit 1
 	;;
     *ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
+	exit 1
 	;;
     *ir-*)
 	IDLEMEMSTAT_DELAY=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
+	exit 1
 	;;
     *dc)
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }
@@ -66,7 +68,7 @@ sed "s/\${SCANNER_CPU_LIMIT}/${SCANNER_CPU_LIMIT}/" > compose/.restricted.yml
 # Prepare
 DATA_DIR="data/$CONFIG/"
 mkdir -p "$DATA_DIR"
-make -B -C workloads CYCLE=${CYCLE} MEM=${MEM} NCYCLE=${NCYCLE}
+make -B -C workloads MEM=${MEM} TOTSEC=${TOTSEC}
 ${RUN} down --remove-orphans
 ${PRE} down --remove-orphans
 ${PRE} build
@@ -77,6 +79,7 @@ ${PRE} exec filebenchb filebench -f workloads/filebenchb/prepare.f
 ${PRE} exec filebenchc filebench -f workloads/filebenchc/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
+${PRE} exec host bash -c 'echo cfq > /sys/block/sdb/queue/scheduler'
 ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/parent/memory.use_hierarchy'
@@ -94,41 +97,32 @@ done
 
 once_prelude $(for c in filebencha filebenchb filebenchc; do ${RUN} ps -q $c; done)
 
-X() { ${RUN} exec -T $1 job python benchmark.py -- filebench -f workloads/$1/waste.f; }
-ABG() { X filebencha; }
-BBG() { X filebenchb; }
-CBG() { X filebenchc; }
+WARM_A () {
+    ${RUN} exec -T filebencha job tar czf - /data/smallfile > /dev/null;
+    ${RUN} exec -T filebencha job tar czf - /data/smallfile > /dev/null;
+}
 
-Y() { activated $($1); ${RUN} exec -T $1 job python benchmark.py -- filebench -f workloads/$1/reuse.f; deactivated $($1); }
-A() { Y filebencha; }
-B() { Y filebenchb; }
-C() { Y filebenchc; }
+A() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/filebencha/reuse.f; }
+B() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/filebenchb/waste.f; }
+C() { ${RUN} exec -T filebenchc job python benchmark.py -- filebench -f workloads/filebenchc/waste.f; }
 
 filebencha() { ${RUN} ps -q filebencha; }
 filebenchb() { ${RUN} ps -q filebenchb; }
 filebenchc() { ${RUN} ps -q filebenchc; }
 
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
-# move_tasks() { :; }
+move_tasks() { :; }
 
 for filebench in filebenchb filebenchc
 do
     move_tasks "/sys/fs/cgroup/blkio/parent/$($filebench)" "/sys/fs/cgroup/blkio/parent/$(filebencha)"
 done
 
-deactivated $(filebencha)
-deactivated $(filebenchb)
-deactivated $(filebenchc)
-
-ABG | tee a.out &
-BBG | tee b.out &
-CBG | tee c.out &
-
-sched1() { A; C; B; A; C; B; A; C; B; A; C; B; }
-sched2() { sleep $CYCLE; B; A; C; B; A; C; B; A; C; B; A; C; }
-
-sched1 | tee sched1.out &
-sched2 | tee sched2.out &
+# WARM_A
+A | tee a.out &
+sleep 10
+B | tee b.out &
+C | tee c.out &
 
 wait
 

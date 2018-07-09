@@ -21,10 +21,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
   filebenchb:
     build: images/filebench
     links:
@@ -38,10 +38,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
   filebenchc:
     build: images/filebench
     links:
@@ -55,10 +55,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '1gb'
   influxdb:
     image: influxdb:latest
   scanner:

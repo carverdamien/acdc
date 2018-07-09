@@ -1,11 +1,11 @@
 echo "
 set \$dir=/data/
-set \$smallfilesize=$(( 90*MEM/100 ))
-set \$largefilesize=$(( 8*2**20 ))
+# set \$smallfilesize=$(( 90*MEM/100 ))
+set \$largefilesize=$(( 4*MEM ))
 set \$iosize=1m
 
 define file name=largefile,path=\$dir,size=\$largefilesize,prealloc,reuse
-define file name=smallfile,path=\$dir,size=\$smallfilesize,prealloc,reuse
+# define file name=smallfile,path=\$dir,size=\$smallfilesize,prealloc,reuse
 
 define process name=filereader,instances=1
 {
@@ -20,9 +20,8 @@ define process name=filereader,instances=1
 }
 "
 echo create files
-exit 0
 echo create processes
-for i in $(seq $((NCYCLE*CYCLE/5)))
+for i in $( seq $((TOTSEC/5)) )
 do
 cat <<EOF
 stats clear
