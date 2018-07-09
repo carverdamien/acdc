@@ -19,7 +19,7 @@ REQUESTS=$((REQUESTS-256-128))
 THREADS=1
 EXTRA_INIT="-d ${SIZE} --key-pattern=S:S --key-maximum=${REQUESTS} --ratio=1:0 --requests=${REQUESTS} -c 1 -t ${THREADS}"
 EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -c 1 -t ${THREADS}"
-EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 40 / 100)) --ratio=0:1 -c 1 -t ${THREADS}"
+EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 1 / 100)) --ratio=0:1 -c 1 -t ${THREADS}"
 
 SCANNER_CPU_LIMIT=1
 IDLEMEMSTAT_CPU_LIMIT=1
@@ -40,26 +40,31 @@ deactivate() { slow_cpu $1; }
 case "$CONFIG" in
     *opt)
 	MEMORY=$((3*2**30))
+	exit 1
 	;;
     *nop)
 	;;
 	*orcl)
 	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; fast_cpu $1; }
 	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; slow_cpu $1; }
+	exit 1
 	;;
     *rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
+	exit 1
 	;;
     *ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
+	exit 1
 	;;
     *ir-*)
 	IDLEMEMSTAT_DELAY=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
+	exit 1
 	;;
     *dc)
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }
@@ -112,13 +117,17 @@ done
 
 once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
-CYCLE=60
-NCYCLE=6
-TOTSEC=$((NCYCLE * CYCLE))
-
-A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time ${TOTSEC}; }
-B() { ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time ${TOTSEC}; }
-C() { ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time ${TOTSEC}; }
+A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300; }
+B() {
+    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
+    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 180
+    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
+}
+C() {
+    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 90
+    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
+    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 90
+}
 
 redisa() { ${RUN} ps -q redisa; }
 redisb() { ${RUN} ps -q redisb; }
@@ -132,28 +141,10 @@ do
     move_tasks "/sys/fs/cgroup/blkio/parent/$($redis)" "/sys/fs/cgroup/blkio/parent/$(redisa)"
 done
 
-deactivate $(redisb)
-deactivate $(redisc)
-oldredis=redisc
-
 A | tee a.out &
 B | tee b.out &
 C | tee c.out &
 
-sleep $CYCLE
-activate $(redisb)
-sleep $CYCLE
-
-for redis in redisa redisb redisc redisa
-do
-    deactivate $($redis)
-    activate   $($oldredis)
-    oldredis=$redis
-    sleep $CYCLE
-done
-
-wait
-wait
 wait
 
 # Report

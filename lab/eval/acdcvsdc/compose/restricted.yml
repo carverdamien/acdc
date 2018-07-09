@@ -40,10 +40,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '2mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '2mb'
   redisb:
     image: redis
     hostname: redisb
@@ -55,10 +55,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '2mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '2mb'
   redisc:
     image: redis
     hostname: redisc
@@ -70,10 +70,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '2mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '2mb'
   influxdb:
     image: influxdb:latest
   scanner:
