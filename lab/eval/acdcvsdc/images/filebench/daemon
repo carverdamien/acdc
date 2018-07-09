@@ -1,9 +1,0 @@
-#!/bin/bash
-set -x
-
-inotifywait -m -e moved_to . --format %f | while read job
-do
-	tmp=$(mktemp /tmp/job.XXX)
-	mv ${job} ${tmp}
-    (bash ${tmp}; rm -f ${tmp}) &
-done

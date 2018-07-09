@@ -8,27 +8,39 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  filebencha:
-    build: images/filebench
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
     links:
+      - redisa
       - influxdb
-    volumes:
-      - data-filebencha:/data
-      - ./workloads:/home/workloads
-  filebenchb:
-    build: images/filebench
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
     links:
+      - redisb
       - influxdb
-    volumes:
-      - data-filebenchb:/data
-      - ./workloads:/home/workloads
-  filebenchc:
-    build: images/filebench
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
     links:
+      - redisc
       - influxdb
+  redisa:
+    image: redis
+    hostname: redisa
     volumes:
-      - data-filebenchc:/data
-      - ./workloads:/home/workloads
+      - data-redisa:/data
+  redisb:
+    image: redis
+    hostname: redisb
+    volumes:
+      - data-redisb:/data
+  redisc:
+    image: redis
+    hostname: redisc
+    volumes:
+      - data-redisc:/data
   influxdb:
     image: influxdb:latest
   scanner:
@@ -73,11 +85,11 @@ services:
     links:
       - influxdb
 volumes:
-  data-filebencha:
+  data-redisa:
     external: true
-  data-filebenchb:
+  data-redisb:
     external: true
-  data-filebenchc:
+  data-redisc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:

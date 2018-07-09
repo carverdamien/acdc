@@ -8,57 +8,72 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  filebencha:
-    build: images/filebench
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
     links:
+      - redisa
       - influxdb
+    cpuset: 0,4,3,7
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
+    links:
+      - redisb
+      - influxdb
+    cpuset: 1,5,3,7
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
+    links:
+      - redisc
+      - influxdb
+    cpuset: 2,6,3,7
+  redisa:
+    image: redis
+    hostname: redisa
     volumes:
-      - data-filebencha:/data
-      - ./workloads:/home/workloads
+      - data-redisa:/data
     cgroup_parent: /parent
     cpuset: 0,4
     mem_limit: ${MEM}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '1gb'
+          rate: '20mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '1gb'
-  filebenchb:
-    build: images/filebench
-    links:
-      - influxdb
+          rate: '20mb'
+  redisb:
+    image: redis
+    hostname: redisb
     volumes:
-      - data-filebenchb:/data
-      - ./workloads:/home/workloads
+      - data-redisb:/data
     cgroup_parent: /parent
     cpuset: 1,5
     mem_limit: ${MEM}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '1gb'
+          rate: '20mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '1gb'
-  filebenchc:
-    build: images/filebench
-    links:
-      - influxdb
+          rate: '20mb'
+  redisc:
+    image: redis
+    hostname: redisc
     volumes:
-      - data-filebenchc:/data
-      - ./workloads:/home/workloads
+      - data-redisc:/data
     cgroup_parent: /parent
     cpuset: 2,6
     mem_limit: ${MEM}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '1gb'
+          rate: '20mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '1gb'
+          rate: '20mb'
   influxdb:
     image: influxdb:latest
   scanner:
@@ -105,11 +120,11 @@ services:
     links:
       - influxdb
 volumes:
-  data-filebencha:
+  data-redisa:
     external: true
-  data-filebenchb:
+  data-redisb:
     external: true
-  data-filebenchc:
+  data-redisc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
