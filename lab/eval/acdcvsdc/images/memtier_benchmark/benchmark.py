@@ -16,7 +16,7 @@ def run(args):
     client.create_database(args.influxdbname)
     measurement = 'memtier_stats'
     tags = {
-        'hostname' : os.environ['HOSTNAME'],
+        'hostname' : args.hostname[0],
     }
     def callback(fields):
         client.write_points([p for p in influxformat(measurement, fields, tags=tags)])
@@ -55,6 +55,7 @@ def main():
     run_parser.add_argument("--influxdbname", dest="influxdbname", type=str, nargs=1, default='acdc')
     run_parser.add_argument("--influxdbhost", dest="influxdbhost", type=str, nargs=1, default='influxdb')
     run_parser.add_argument("--influxdbport", dest="influxdbport", type=str, nargs=1, default='8086')
+    run_parser.add_argument("--hostname", dest="hostname", type=str, nargs=1, default=os.environ['HOSTNAME'])
     run_parser.add_argument('call', metavar='N', type=str, nargs='+')
 
     args = main_parser.parse_args()

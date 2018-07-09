@@ -27,15 +27,8 @@ IDLEMEMSTAT_CPU_LIMIT=1
 once_prelude() { :; }
 prelude() { :; }
 
-slow_cpu() { docker update --cpus 0.01 $1; }
-slow_cpu() { echo 1000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_quota_us"; echo 1000000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_period_us"; }
-
-fast_cpu() { docker update --cpus 8 $1; }
-fast_cpu() { echo 8000000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_quota_us"; echo 1000000 | sudo tee "/sys/fs/cgroup/cpu/parent/$1/cpu.cfs_period_us"; }
-
-activate()   { fast_cpu $1; }
-deactivate() { slow_cpu $1; }
-
+activate()   { :; }
+deactivate() { :; }
 
 case "$CONFIG" in
     *opt)
@@ -45,9 +38,8 @@ case "$CONFIG" in
     *nop)
 	;;
 	*orcl)
-	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; fast_cpu $1; }
-	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; slow_cpu $1; }
-	exit 1
+	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
+	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	;;
     *rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
@@ -117,17 +109,14 @@ done
 
 once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
-A() { ${RUN} exec -T memtiera run -- memtier_benchmark -s redisa ${EXTRA_HIGH} --test-time 300; }
-B() {
-    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
-    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_LOW} --test-time 180
-    ${RUN} exec -T memtierb run -- memtier_benchmark -s redisb ${EXTRA_HIGH} --test-time 60
-}
-C() {
-    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 90
-    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_HIGH} --test-time 60
-    ${RUN} exec -T memtierc run -- memtier_benchmark -s redisc ${EXTRA_LOW} --test-time 90
-}
+CYCLE=60
+
+X() { activate $(redis$1); ${RUN} exec -T memtier$1 python benchmark.py run --hostname highredis$1 -- memtier_benchmark -s redis$1 ${EXTRA_HIGH} --test-time ${CYCLE}; deactivate $(redis$1); }
+_() {                      ${RUN} exec -T memtier$1 python benchmark.py run --hostname lowredis$1  -- memtier_benchmark -s redis$1 ${EXTRA_LOW}  --test-time ${CYCLE}; }
+
+A() { X a; X a; _ a; X a; X a; _ a; }
+B() { _ b; X b; X b; _ b; X b; X b; }
+C() { X c; _ c; X c; X c; _ c; X c; }
 
 redisa() { ${RUN} ps -q redisa; }
 redisb() { ${RUN} ps -q redisb; }
@@ -140,6 +129,10 @@ for redis in redisb redisc
 do
     move_tasks "/sys/fs/cgroup/blkio/parent/$($redis)" "/sys/fs/cgroup/blkio/parent/$(redisa)"
 done
+
+deactivate $(redisa)
+deactivate $(redisb)
+deactivate $(redisc)
 
 A | tee a.out &
 B | tee b.out &
