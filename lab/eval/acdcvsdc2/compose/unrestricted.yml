@@ -32,15 +32,15 @@ services:
   mysqla:
     build: images/mysql
     volumes:
-      - data-mysqla:/data
+      - data-mysqla:/var/lib/mysql
   mysqlb:
     build: images/mysql
     volumes:
-      - data-mysqlb:/data
+      - data-mysqlb:/var/lib/mysql
   mysqlc:
     build: images/mysql
     volumes:
-      - data-mysqlc:/data
+      - data-mysqlc:/var/lib/mysql
   influxdb:
     image: influxdb:latest
   scanner:
