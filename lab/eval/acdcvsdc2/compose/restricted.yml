@@ -16,7 +16,7 @@ services:
       - mysqla:lowmysqla
       - influxdb
     cpuset: 0,4,3,7
- sysbenchb:
+  sysbenchb:
     build: images/sysbench
     links:
       - mysqlb:mysql
