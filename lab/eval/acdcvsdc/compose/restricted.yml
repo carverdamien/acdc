@@ -34,7 +34,7 @@ services:
     hostname: redisa
     volumes:
       - data-redisa:/data
-    cgroup_parent: /parent
+    cgroup_parent: parent
     cpuset: 0,4
     mem_limit: ${MEM}
     blkio_config:
@@ -49,7 +49,7 @@ services:
     hostname: redisb
     volumes:
       - data-redisb:/data
-    cgroup_parent: /parent
+    cgroup_parent: parent
     cpuset: 1,5
     mem_limit: ${MEM}
     blkio_config:
@@ -64,7 +64,7 @@ services:
     hostname: redisc
     volumes:
       - data-redisc:/data
-    cgroup_parent: /parent
+    cgroup_parent: parent
     cpuset: 2,6
     mem_limit: ${MEM}
     blkio_config:
