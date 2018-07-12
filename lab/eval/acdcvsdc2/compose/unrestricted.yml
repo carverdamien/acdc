@@ -8,39 +8,40 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  memtiera:
-    hostname: memtiera
-    build: images/memtier_benchmark
+  sysbencha:
+    build: images/sysbench
     links:
-      - redisa
+      - mysqla:mysql
+      - mysqla:highmysqla
+      - mysqla:lowmysqla
       - influxdb
-  memtierb:
-    hostname: memtierb
-    build: images/memtier_benchmark
+  sysbenchb:
+    build: images/sysbench
     links:
-      - redisb
+      - mysqlb:mysql
+      - mysqlb:highmysqlb
+      - mysqlb:lowmysqlb
       - influxdb
-  memtierc:
-    hostname: memtierc
-    build: images/memtier_benchmark
+  sysbenchc:
+    build: images/sysbench
     links:
-      - redisc
+      - mysqlc:mysql
+      - mysqlc:highmysqlc
+      - mysqlc:lowmysqlc
       - influxdb
-  redisa:
-    image: redis
+  mysqla:
+    build: images/mysql
     hostname: redisa
     volumes:
-      - data-redisa:/data
-  redisb:
-    image: redis
-    hostname: redisb
+      - data-mysqla:/data
+  mysqlb:
+    build: images/mysql
     volumes:
-      - data-redisb:/data
-  redisc:
-    image: redis
-    hostname: redisc
+      - data-mysqlb:/data
+  mysqlc:
+    build: images/mysql
     volumes:
-      - data-redisc:/data
+      - data-mysqlc:/data
   influxdb:
     image: influxdb:latest
   scanner:
@@ -85,11 +86,11 @@ services:
     links:
       - influxdb
 volumes:
-  data-redisa:
+  data-mysqla:
     external: true
-  data-redisb:
+  data-mysqlb:
     external: true
-  data-redisc:
+  data-mysqlc:
     external: true
   data-grafana-var-lib:
   data-grafana-var-log:
