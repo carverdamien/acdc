@@ -31,7 +31,6 @@ services:
       - influxdb
   mysqla:
     build: images/mysql
-    hostname: redisa
     volumes:
       - data-mysqla:/data
   mysqlb:
