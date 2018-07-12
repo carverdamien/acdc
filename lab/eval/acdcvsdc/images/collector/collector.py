@@ -6,6 +6,7 @@ import sys
 import influxdb
 import datetime
 import time
+import math
 
 def fields(myk, myv):
     if type(myv) == dict:
@@ -18,6 +19,14 @@ def fields(myk, myv):
                 yield k, v
     else:
         yield (myk, myv)
+
+def isvalid(v):
+    if type(v) == float:
+        return not math.isnan(v)
+    if type(v) == int:
+        return v < 2**63
+    # TODO: other types
+    return True
 
 def influx_format(stat, tags={}):
     # TODO: cpu usage %, pg{in,out}/s, blkio byte/s
@@ -32,7 +41,7 @@ def influx_format(stat, tags={}):
             "time": time,
             "fields": {
                 '.'.join([str(e) for e in k]) : v
-                for k,v in fields([], stat[measurement])
+                for k,v in fields([], stat[measurement]) if isvalid(v)
             },
         }
         yield point
