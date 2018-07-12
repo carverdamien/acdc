@@ -42,10 +42,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '40mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '40mb'
   mysqlb:
     build: images/mysql
     volumes:
@@ -56,10 +56,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '40mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '40mb'
   mysqlc:
     build: images/mysql
     volumes:
@@ -70,10 +70,10 @@ services:
     blkio_config:
       device_read_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '40mb'
       device_write_bps:
         - path: /dev/sda
-          rate: '20mb'
+          rate: '40mb'
   influxdb:
     image: influxdb:latest
   scanner:
