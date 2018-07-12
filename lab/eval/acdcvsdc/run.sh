@@ -144,3 +144,12 @@ for m in $(${PRE} exec influxdb influx -database acdc -execute 'show measurement
 do
 	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > "$DATA_DIR/$m.csv"
 done
+
+# Export Report
+RSYNC() {
+NAME=$(readlink -e "$1")
+DIRNAME=$(dirname ${NAME})
+ssh lab2 "mkdir -p ~/lab1/${DIRNAME}"
+rsync -azvP "${NAME}" "lab2:~/lab1/${DIRNAME}"
+}
+RSYNC "${DATA_DIR}" || true
