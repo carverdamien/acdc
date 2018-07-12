@@ -99,8 +99,8 @@ once_prelude $(for c in mysqla mysqlb mysqlc; do ${RUN} ps -q $c; done)
 
 CYCLE=30
 
-X() { activate $(mysql$1); ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-hostname highmysql$1 run --dbsize ${HIGH_DBSIZE} --tx-rate 0 --duration ${CYCLE}; deactivate $(mysql$1); }
-_() {                      ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-hostname lowmysql$1  run --dbsize ${LOW_DBSIZE}  --tx-rate 0 --duration ${CYCLE}; }
+X() { activate $(mysql$1); ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-dbname dbname --mysql-hostname highmysql$1 run --dbsize ${HIGH_DBSIZE} --tx-rate 0 --duration ${CYCLE}; deactivate $(mysql$1); }
+_() {                      ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-dbname dbname --mysql-hostname lowmysql$1  run --dbsize ${LOW_DBSIZE}  --tx-rate 0 --duration ${CYCLE}; }
 
 A() { X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; }
 B() { _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; }
