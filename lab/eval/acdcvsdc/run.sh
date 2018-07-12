@@ -31,38 +31,37 @@ activate()   { :; }
 deactivate() { :; }
 
 case "$CONFIG" in
-    *opt)
+    *-opt)
 	MEMORY=$((3*2**30))
-	exit 1
 	;;
-    *nop)
+    *-nop)
 	;;
 	*orcl)
 	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	;;
-    *rr-*.*)
+    *-rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
-	exit 1
 	;;
-    *ir-*.*)
+    *-ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
-	exit 1
 	;;
-    *ir-*)
+    *-ir-*)
 	IDLEMEMSTAT_DELAY=${CONFIG##*ir-}
 	# once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateSoftLimit; }
 	once_prelude() { ${RUN} exec idlememstat job idlememstat -d ${IDLEMEMSTAT_DELAY} --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
-	exit 1
 	;;
-    *dc)
-	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }
-	;;
-    *acdc)
+    *-acdc)
 	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_{demand,activate}"; }
+	;;
+    *-sacdc)
+	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_{clock_demand,clock_activate,scan}"; }
+	;;
+    *-dc)
+	prelude() { ${RUN} exec host bash -c "echo 1 | tee /rootfs/sys/fs/cgroup/memory/parent/$1/memory.use_clock_demand"; }
 	;;
     *)
 	echo "Unknown CONFIG: $CONFIG"
@@ -109,14 +108,14 @@ done
 
 once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
-CYCLE=60
+CYCLE=30
 
 X() { activate $(redis$1); ${RUN} exec -T memtier$1 python benchmark.py run --hostname highredis$1 -- memtier_benchmark -s redis$1 ${EXTRA_HIGH} --test-time ${CYCLE}; deactivate $(redis$1); }
 _() {                      ${RUN} exec -T memtier$1 python benchmark.py run --hostname lowredis$1  -- memtier_benchmark -s redis$1 ${EXTRA_LOW}  --test-time ${CYCLE}; }
 
-A() { X a; X a; _ a; X a; X a; _ a; }
-B() { _ b; X b; X b; _ b; X b; X b; }
-C() { X c; _ c; X c; X c; _ c; X c; }
+A() { X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; }
+B() { _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; }
+C() { X c; _ c; X c; X c; _ c; X c; X c; _ c; X c; X c; _ c; X c; }
 
 redisa() { ${RUN} ps -q redisa; }
 redisb() { ${RUN} ps -q redisb; }
