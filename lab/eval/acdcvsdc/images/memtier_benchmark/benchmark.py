@@ -5,6 +5,7 @@ import parse
 import influxdb
 import datetime
 import os
+import math
 
 expected_output = """[{}] {timestamp} timestamp: {threads} threads: {ops} ops, {opsps} (avg: {avgopsps}) ops/sec, {bw}/sec (avg: {avgbw}/sec), {lat} (avg: {avglat}) msec latency"""
 output_parser = parse.compile(expected_output)
@@ -43,7 +44,7 @@ def influxformat(measurement, fields, tags={}):
         "measurement": measurement,
         "tags": tags,
         "time": t,
-        "fields": { k:float(fields[k]) for k in fields},
+        "fields": { k:float(fields[k]) for k in fields if not math.isnan(float(fields[k])) },
     }
     yield point
 
