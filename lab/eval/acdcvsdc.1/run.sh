@@ -110,8 +110,11 @@ once_prelude $(for c in redisa redisb redisc; do ${RUN} ps -q $c; done)
 
 CYCLE=30
 
+slow() { docker exec --privileged $1 tc qdisc add dev eth0 root netem loss 10%; }
+unslow() { docker exec --privileged $1 tc qdisc del dev eth0 root; }
+
 X() { activate $(redis$1); ${RUN} exec -T memtier$1 python benchmark.py run --hostname highredis$1 -- memtier_benchmark -s redis$1 ${EXTRA_HIGH} --test-time ${CYCLE}; deactivate $(redis$1); }
-_() {                      ${RUN} exec -T memtier$1 python benchmark.py run --hostname lowredis$1  -- memtier_benchmark -s redis$1 ${EXTRA_LOW}  --test-time ${CYCLE}; }
+_() { slow $(memtier$1);   ${RUN} exec -T memtier$1 python benchmark.py run --hostname lowredis$1  -- memtier_benchmark -s redis$1 ${EXTRA_HIGH} --test-time ${CYCLE}; unslow $(memtier$1); }
 
 A() { X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; }
 B() { _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; }
@@ -120,6 +123,10 @@ C() { X c; _ c; X c; X c; _ c; X c; X c; _ c; X c; X c; _ c; X c; }
 redisa() { ${RUN} ps -q redisa; }
 redisb() { ${RUN} ps -q redisb; }
 redisc() { ${RUN} ps -q redisc; }
+
+memtiera() { ${RUN} ps -q memtiera; }
+memtierb() { ${RUN} ps -q memtierb; }
+memtierc() { ${RUN} ps -q memtierc; }
 
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
 # move_tasks() { :; }
