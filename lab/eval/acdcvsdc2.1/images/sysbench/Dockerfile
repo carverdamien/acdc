@@ -8,6 +8,7 @@ RUN apt-get update \
     mysql-server \
     mysql-client \
     libmysqlclient-dev \
+    iproute2 \
     inotify-tools
 WORKDIR /sysbench
 COPY sysbench .
