@@ -1,0 +1,96 @@
+version: '2.2'
+services:
+  host:
+    image: ubuntu
+    privileged: true
+    entrypoint:
+      - "sleep"
+      - "inf"
+    volumes:
+      - /:/rootfs
+  memtiera:
+    hostname: memtiera
+    build: images/memtier_benchmark
+    links:
+      - redisa
+      - influxdb
+  memtierb:
+    hostname: memtierb
+    build: images/memtier_benchmark
+    links:
+      - redisb
+      - influxdb
+  memtierc:
+    hostname: memtierc
+    build: images/memtier_benchmark
+    links:
+      - redisc
+      - influxdb
+  redisa:
+    image: redis
+    hostname: redisa
+    volumes:
+      - data-redisa:/data
+  redisb:
+    image: redis
+    hostname: redisb
+    volumes:
+      - data-redisb:/data
+  redisc:
+    image: redis
+    hostname: redisc
+    volumes:
+      - data-redisc:/data
+  influxdb:
+    image: influxdb:latest
+  scanner:
+    build: images/scanner
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+  collector:
+    build: images/collector
+    command: [ "--influx", "--influxdbhost=influxdb", "--influxdbname=acdc" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - influxdb
+  idlememstat:
+    build: images/idlememstat
+    privileged: true
+    entrypoint: [ "daemon" ]
+    environment:
+      - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
+      - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
+      - KPAGEIDLE_PATH=/rootfs/sys/kernel/mm/page_idle/bitmap
+      - MEMCG_ROOT_PATH=/rootfs/sys/fs/cgroup/memory
+      - ZONE_INFO_PATH=/rootfs/proc/zoneinfo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc/zoneinfo:/rootfs/proc/zoneinfo
+      - /proc/kpageflags:/rootfs/proc/kpageflags
+      - /proc/kpagecgroup:/rootfs/proc/kpagecgroup
+      - /sys/kernel/mm/page_idle/bitmap:/rootfs/sys/kernel/mm/page_idle/bitmap
+      - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
+    links:
+      - influxdb
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - data-grafana-var-lib:/var/lib/grafana
+      - data-grafana-var-log:/var/log/grafana
+      - data-grafana-etc:/etc/grafana
+    links:
+      - influxdb
+volumes:
+  data-redisa:
+    external: true
+  data-redisb:
+    external: true
+  data-redisc:
+    external: true
+  data-grafana-var-lib:
+  data-grafana-var-log:
+  data-grafana-etc:
