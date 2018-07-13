@@ -12,6 +12,7 @@ RUN apt-get update
 RUN apt-get install -yy \
     libevent-dev \
     python-pip \
+    iproute2 \
     inotify-tools
 COPY --from=builder /usr/local/bin/memtier_benchmark /usr/local/bin/memtier_benchmark
 COPY requirements.txt .
