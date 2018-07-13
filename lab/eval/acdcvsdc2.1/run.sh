@@ -99,8 +99,11 @@ once_prelude $(for c in mysqla mysqlb mysqlc; do ${RUN} ps -q $c; done)
 
 CYCLE=30
 
+slow()   { docker exec --privileged $1 tc qdisc add dev eth0 root netem loss 10%; }
+unslow() { docker exec --privileged $1 tc qdisc del dev eth0 root; }
+
 X() { activate $(mysql$1); ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-dbname dbname --mysql-hostname highmysql$1 run --dbsize ${HIGH_DBSIZE} --tx-rate 0 --duration ${CYCLE}; deactivate $(mysql$1); }
-_() {                      ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-dbname dbname --mysql-hostname lowmysql$1  run --dbsize ${LOW_DBSIZE}  --tx-rate 0 --duration ${CYCLE}; }
+_() { slow  $(sysbench$1); ${RUN} exec -T sysbench$1 python benchmark.py --wait=0 --mysql-dbname dbname --mysql-hostname lowmysql$1  run --dbsize ${HIGH_DBSIZE} --tx-rate 0 --duration ${CYCLE}; unslow $(sysbench$1); }
 
 A() { X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; X a; X a; _ a; }
 B() { _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; _ b; X b; X b; }
@@ -109,6 +112,9 @@ C() { X c; _ c; X c; X c; _ c; X c; X c; _ c; X c; X c; _ c; X c; }
 mysqla() { ${RUN} ps -q mysqla; }
 mysqlb() { ${RUN} ps -q mysqlb; }
 mysqlc() { ${RUN} ps -q mysqlc; }
+sysbencha() { ${RUN} ps -q sysbencha; }
+sysbenchb() { ${RUN} ps -q sysbenchb; }
+sysbenchc() { ${RUN} ps -q sysbenchc; }
 
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
 # move_tasks() { :; }
