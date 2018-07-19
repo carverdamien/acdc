@@ -9,7 +9,8 @@ def main():
     SLEEP=float(sys.argv[3])
     while True:
         time.sleep(SLEEP)
-        force_scans(CGROUP,SCAN)
+        if SCAN > 0:
+            force_scans(CGROUP,SCAN)
         set_reclaim_orders(CGROUP)
 
 def force_scans(CGROUP, SCAN):

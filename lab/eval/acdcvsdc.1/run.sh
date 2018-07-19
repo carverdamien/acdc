@@ -42,7 +42,12 @@ case "$CONFIG" in
 	;;
     *-rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
-	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent $((2**20)) 0; }
+	SCAN=$((2**20))
+	if [ "$SCANNER_CPU_LIMIT" == "0.01" ]
+	then
+	    SCAN=0
+	fi
+	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent ${SCAN} 0; }
 	;;
     *-ir-*.*)
 	IDLEMEMSTAT_CPU_LIMIT=${CONFIG##*ir-}
