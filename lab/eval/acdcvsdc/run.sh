@@ -22,6 +22,7 @@ EXTRA_HIGH="-d ${SIZE} --key-pattern=R:R --key-maximum=${REQUESTS} --ratio=0:1 -
 EXTRA_LOW="-d ${SIZE} --key-pattern=R:R --key-maximum=$((REQUESTS * 1 / 100)) --ratio=0:1 -c 1 -t ${THREADS}"
 
 SCANNER_CPU_LIMIT=1
+SCAN=$((2**20))
 IDLEMEMSTAT_CPU_LIMIT=1
 
 once_prelude() { :; }
@@ -42,7 +43,6 @@ case "$CONFIG" in
 	;;
     *-rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
-	SCAN=$((2**20))
 	if [ "$SCANNER_CPU_LIMIT" == "0.01" ]
 	then
 	    SCAN=0

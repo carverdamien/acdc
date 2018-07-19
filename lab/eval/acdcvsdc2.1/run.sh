@@ -14,6 +14,7 @@ source kernel
 :  ${LOW_DBSIZE:=100000}
 
 SCANNER_CPU_LIMIT=1
+SCAN=$((2**20))
 IDLEMEMSTAT_CPU_LIMIT=1
 
 once_prelude() { :; }
@@ -34,7 +35,6 @@ case "$CONFIG" in
 	;;
     *-rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
-	SCAN=$((2**20))
 	if [ "$SCANNER_CPU_LIMIT" == "0.01" ]
 	then
 	    SCAN=0
