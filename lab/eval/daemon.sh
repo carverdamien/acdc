@@ -2,7 +2,7 @@
 export CONFIG
 for i in {0..99}
 do
-    for c in opt opt-ir-0.9 opt-rr-0.9 orcl nop dc acdc sacdc rr-0.01 ir-0.01 rr-0.1 ir-0.1 rr-0.9 ir-0.9
+    for c in opt orcl nop dc acdc sacdc ir-0.1 ir-1.0 opt-ir-1.0 rr-0.01 rr-1.0 opt-rr-1.0
     do
 	for d in {om,im}-{wss,rate}
 	do

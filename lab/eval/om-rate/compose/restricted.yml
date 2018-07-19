@@ -80,6 +80,7 @@ services:
     build: images/scanner
     privileged: true
     cpus: ${SCANNER_CPU_LIMIT}
+    cpu_shares: 2
     volumes:
       - /sys/fs/cgroup/memory:/rootfs/sys/fs/cgroup/memory
   collector:
@@ -94,6 +95,7 @@ services:
     privileged: true
     entrypoint: [ "daemon" ]
     cpus: ${IDLEMEMSTAT_CPU_LIMIT}
+    cpu_shares: 2
     environment:
       - KPAGEFLAGS_PATH=/rootfs/proc/kpageflags
       - KPAGECGROUP_PATH=/rootfs/proc/kpagecgroup
