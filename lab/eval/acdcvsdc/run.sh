@@ -35,6 +35,16 @@ case "$CONFIG" in
     *-opt)
 	MEMORY=$((3*2**30))
 	;;
+    *-opt-rr-0.9)
+	MEMORY=$((3*2**30))
+	SCANNER_CPU_LIMIT=0.9
+	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent ${SCAN} 0; }
+	;;
+    *-opt-ir-0.9)
+	MEMORY=$((3*2**30))
+	IDLEMEMSTAT_CPU_LIMIT=0.9
+	once_prelude() { ${RUN} exec idlememstat job idlememstat -d 0 --influxdbhost influxdb --influxdbname=acdc --cgroup /rootfs/sys/fs/cgroup/memory/parent --updateReclaimOrder; }
+	;;
     *-nop)
 	;;
 	*orcl)
