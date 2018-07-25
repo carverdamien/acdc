@@ -35,9 +35,9 @@ case "$CONFIG" in
     *-opt)
 	MEMORY=$((3*2**30))
 	;;
-    *-opt-rr-*.*)
+    *-opt-rrs-*.*)
 	MEMORY=$((3*2**30))
-	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
+	SCANNER_CPU_LIMIT=${CONFIG##*rrs-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent ${SCAN} 0; }
 	;;
     *-opt-ir-*.*)
@@ -57,7 +57,7 @@ case "$CONFIG" in
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent ${SCAN} 0; }
 	;;
 	*-rrs-*.*)
-	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
+	SCANNER_CPU_LIMIT=${CONFIG##*rrs-}
 	once_prelude() { ${RUN} exec scanner job reclaimordersetter /rootfs/sys/fs/cgroup/memory/parent ${SCAN} 0; }
 	;;
     *-ir-*.*)
