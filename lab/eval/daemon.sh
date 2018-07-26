@@ -1,5 +1,6 @@
 #!/bin/bash
 export CONFIG
+until docker info; do echo 'Waiting for docker daemon to start'; sleep 1; done
 for i in {0..99}
 do
     for c in opt orcl nop dc acdc sacdc ir-0.1 ir-1.0 opt-ir-0.1 opt-ir-1.0 rr-0.01 rrs-0.1 rrs-1.0 opt-rrs-0.1 opt-rrs-1.0
