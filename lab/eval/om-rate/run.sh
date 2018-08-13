@@ -39,7 +39,7 @@ case "$CONFIG" in
 	;;
     *-nop)
 	;;
-	*orcl)
+	*-orcl)
 	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	;;
