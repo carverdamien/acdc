@@ -43,6 +43,13 @@ case "$CONFIG" in
 	activate()   { echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	deactivate() { echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes"; }
 	;;
+	*-unf)
+	once_prelude() {
+		echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$1/memory.soft_limit_in_bytes";
+		echo -1 | sudo tee "/sys/fs/cgroup/memory/parent/$2/memory.soft_limit_in_bytes";
+		echo  0 | sudo tee "/sys/fs/cgroup/memory/parent/$3/memory.soft_limit_in_bytes";
+	}
+	;;
     *-rr-*.*)
 	SCANNER_CPU_LIMIT=${CONFIG##*rr-}
 	SCAN=0
