@@ -8,7 +8,7 @@ services:
       - "inf"
     volumes:
       - /:/rootfs
-  filebench:
+  filebencha:
     build: images/filebench
     links:
       - influxdb
@@ -16,6 +16,28 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     mem_limit: 1GB
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '100mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '100mb'
+  filebenchb:
+    build: images/filebench
+    links:
+      - influxdb
+    volumes:
+      - data-filebench:/data
+      - ./workloads:/home/workloads
+    mem_limit: 1GB
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '100mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '100mb'
   influxdb:
     image: influxdb:latest
   collector:

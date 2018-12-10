@@ -9,13 +9,15 @@ PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/restricted.yml"
 
 # Prepare
-make -C workloads
+make -C workloads/A
+make -C workloads/B
 ${RUN} down --remove-orphans
 ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec filebench filebench -f workloads/A/prepare.f
+${PRE} exec filebencha filebench -f workloads/A/prepare.f
+${PRE} exec filebenchb filebench -f workloads/B/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} down
@@ -24,9 +26,11 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-RUN() { ${RUN} exec -T filebench python benchmark.py -- filebench -f workloads/A/run.f;}
+RUNA() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/B/run.f;}
 
-RUN &
+RUNA | tee A.out &
+RUNB | tee B.out &
 
 wait
 
