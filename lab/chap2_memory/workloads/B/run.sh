@@ -2,20 +2,20 @@
 # Script that generates run.f
 
 SLEEP=5
-LOW=1
+LOW=10
 MED=1024
-HIG=$((MED*2))
+HIG=$((MED*10*2))
 
 # DEBUG
 SLEEP=2
 
 schedule() {
-warmup $MED 10
+# warmup $MED 10
 phase $LOW 20
 phase $HIG 1
-phase $LOW 39
+phase $LOW 49
 phase $HIG 1
-phase $LOW 39
+phase $LOW 29
 }
 
 main() {

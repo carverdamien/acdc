@@ -2,14 +2,14 @@
 # Script that generates run.f
 
 SLEEP=5
-LOW=1
+LOW=10
 MED=1024
 
 # DEBUG
 SLEEP=2
 
 schedule() {
-warmup $MED 10
+# warmup $MED 10
 phase $MED 60
 phase $LOW 20
 phase $MED 30
