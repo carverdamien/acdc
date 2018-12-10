@@ -15,7 +15,7 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
-${PRE} exec filebench filebench -f workloads/prepare.f
+${PRE} exec filebench filebench -f workloads/A/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
 ${PRE} exec host bash -c 'echo cfq > /sys/block/sda/queue/scheduler'
 ${PRE} down
@@ -24,7 +24,7 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
-RUN() { ${RUN} exec -T filebench python benchmark.py -- filebench -f workloads/run.f;}
+RUN() { ${RUN} exec -T filebench python benchmark.py -- filebench -f workloads/A/run.f;}
 
 RUN &
 
