@@ -15,6 +15,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+    cgroup_parent: parent
     mem_limit: 1GB
     blkio_config:
       device_read_bps:
@@ -30,6 +31,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+    cgroup_parent: parent
     mem_limit: 1GB
     blkio_config:
       device_read_bps:
