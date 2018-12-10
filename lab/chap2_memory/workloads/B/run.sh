@@ -4,14 +4,18 @@
 SLEEP=5
 LOW=1
 MED=1024
+HIG=$((MED*2))
 
 # DEBUG
-SLEEP=1
+SLEEP=2
 
 schedule() {
-phase $MED 60
+warmup $MED 10
 phase $LOW 20
-phase $MED 30
+phase $HIG 1
+phase $LOW 39
+phase $HIG 1
+phase $LOW 39
 }
 
 main() {
@@ -35,6 +39,20 @@ cat <<EOF
 stats clear
 sleep ${SLEEP}
 stats snap
+EOF
+done
+}
+
+warmup() {
+RATE=$1
+CYCLE=$2
+echo "eventgen rate = ${RATE}"
+for i in $(seq ${CYCLE})
+do
+cat <<EOF
+stats clear
+sleep ${SLEEP}
+stats clear
 EOF
 done
 }

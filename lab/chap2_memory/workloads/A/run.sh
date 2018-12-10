@@ -6,9 +6,10 @@ LOW=1
 MED=1024
 
 # DEBUG
-SLEEP=1
+SLEEP=2
 
 schedule() {
+warmup $MED 10
 phase $MED 60
 phase $LOW 20
 phase $MED 30
@@ -35,6 +36,20 @@ cat <<EOF
 stats clear
 sleep ${SLEEP}
 stats snap
+EOF
+done
+}
+
+warmup() {
+RATE=$1
+CYCLE=$2
+echo "eventgen rate = ${RATE}"
+for i in $(seq ${CYCLE})
+do
+cat <<EOF
+stats clear
+sleep ${SLEEP}
+stats clear
 EOF
 done
 }
