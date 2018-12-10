@@ -1,6 +1,6 @@
 #!/bin/bash
 export MODE
-for MODE in baseline 1mcg 2mcgm 2mcgl
+for MODE in 1mcg 2mcgl 2mcgm baseline
 do
     bash run.sh
 done

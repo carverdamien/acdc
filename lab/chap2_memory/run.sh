@@ -20,15 +20,15 @@ RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workl
 ;;
 1mcg)
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 2mcgm)
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 2mcgl)
-MEMA=$((MEMORY*3/4))
-MEMB=$((MEMORY*1/4))
+MEMA=$((MEMORY*7/8))
+MEMB=$((MEMORY*1/8))
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
@@ -70,7 +70,7 @@ waitend() { for f in filebencha filebenchb; do while ${RUN} ps -q $f | xargs doc
 
 case $MODE in
     1mcg)
-	move_tasks "/sys/fs/cgroup/memory/parent/$($filebenchb)" "/sys/fs/cgroup/memory/parent/$($filebencha)"
+	move_tasks "/sys/fs/cgroup/memory/parent/$(filebenchb)" "/sys/fs/cgroup/memory/parent/$(filebencha)"
 	;;
     *)
 	;;
