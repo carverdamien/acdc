@@ -14,23 +14,23 @@ MEMB=$MEMORY
 
 case $MODE in
 baseline)
-MEMORY=$((ROOT_MEM*2))
-RUNA() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/B/run.f;}
+MEMORY=$((MEMORY*2))
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 1mcg)
-RUNA() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 2mcgm)
-RUNA() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 2mcgl)
 MEMA=$((MEMORY*3/4))
 MEMB=$((MEMORY*1/4))
-RUNA() { ${RUN} exec -T filebencha python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 *)
 echo "unknown MODE: ${MODE}"
@@ -63,10 +63,23 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
+filebencha() { ${RUN} ps -q filebencha; }
+filebenchb() { ${RUN} ps -q filebenchb; }
+move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
+waitend() { for f in filebencha filebenchb; do while ${RUN} ps -q $f | xargs docker top | grep filebench; do sleep 1; done; done; }
+
+case $MODE in
+    1mcg)
+	move_tasks "/sys/fs/cgroup/memory/parent/$($filebenchb)" "/sys/fs/cgroup/memory/parent/$($filebencha)"
+	;;
+    *)
+	;;
+esac
+
 RUNA | tee A.out &
 RUNB | tee B.out &
 
-wait
+waitend
 
 # Report
 mkdir -p "data/$MODE"

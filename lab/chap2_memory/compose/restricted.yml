@@ -16,7 +16,7 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     cgroup_parent: parent
-    mem_limit: 1GB
+    mem_limit: ${MEMA}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -32,7 +32,7 @@ services:
       - data-filebench:/data
       - ./workloads:/home/workloads
     cgroup_parent: parent
-    mem_limit: 1GB
+    mem_limit: ${MEMB}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
