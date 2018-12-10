@@ -1,51 +1,37 @@
-LOW=50
-MED=100
-echo '
-set $dir=/data/A/
-set $filesize=1g
-set $iosize=1m
-set $nthreads=1
+#!/bin/bash
+# Script that produces run.f
 
-define file name=largefile,path=$dir,size=$filesize,prealloc,reuse
+MED=50
+HIG=100
 
-define process name=filereaderA,instances=2
-{
-  thread name=filereaderthreadA,memsize=2m,instances=$nthreads
-  {
-    flowop eventlimit name=limit
-    flowop read name=seqread-file,filename=largefile,iosize=$iosize,directio
-  }
+schedule() {
+phase $MED 60
+phase $LOW 20
+phase $MED 30
+# TOTAL 110
 }
 
-eventgen rate = 0
-create files
-create processes
-'
-echo "eventgen rate = $MED"
-for i in {1..60}
-do
-cat <<EOF
-stats clear
-sleep 1
-stats snap
-EOF
-done
-echo "eventgen rate = $LOW"
-for i in {1..20}
-do
-cat <<EOF
-stats clear
-sleep 1
-stats snap
-EOF
-done
-echo "eventgen rate = $MED"
-for i in {1..30}
-do
-cat <<EOF
-stats clear
-sleep 1
-stats snap
-EOF
-done
+### END OF CONFIG ###
+
+main() {
+cat prepare.f
+echo 'create processes'
+schedule
 echo 'shutdown'
+}
+
+phase() {
+RATE=$1
+REPEAT=$2
+echo "eventgen rate = ${RATE}"
+for i in $(seq ${REPEAT})
+do
+cat <<EOF
+stats clear
+sleep 1
+stats snap
+EOF
+done
+}
+
+main

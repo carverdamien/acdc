@@ -1,16 +1,17 @@
 set $dir=/data/A/
 set $filesize=1g
 set $iosize=1m
-set $nthreads=1
 
 define file name=largefile,path=$dir,size=$filesize,prealloc,reuse
 
 define process name=filereader,instances=1
 {
-  thread name=filereaderthread,memsize=10m,instances=$nthreads
+  thread name=filereaderthread,memsize=2m,instances=1
   {
-    flowop read name=seqread-file,filename=largefile,iosize=$iosize,directio
+    flowop eventlimit name=limit
+    flowop read name=seqread-file,filename=largefile,iosize=$iosize
   }
 }
 
+eventgen rate = 0
 create files
