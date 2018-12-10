@@ -10,12 +10,24 @@ RUN="docker-compose --project-directory $PWD -f compose/$MODE/restricted.yml"
 
 case $MODE in
 	Aonly)
+	echo "TODO"
+	exit 1
 ;;
 	Bonly)
+	echo "TODO"
+	exit 1
 ;;
-	isolated)
+	isolatedless)
+	echo "TODO"
+	exit 1
+;;
+	isolatedmore)
+	echo "TODO"
+	exit 1
 ;;
 	process)
+	echo "TODO"
+	exit 1
 ;;
 	*)
 echo "unknown MODE: ${MODE}"
