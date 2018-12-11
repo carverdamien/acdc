@@ -2,6 +2,8 @@ PYTHON=$(wildcard *.py)
 PDF=$(PYTHON:%.py=%.pdf)
 
 all: $(PDF)
+	pdflatex main.tex
+
 %.pdf:%.py
 	python $< $@
 

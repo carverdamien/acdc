@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\begin{document}
+
+\newcommand\subfigurescale{.5\textwidth}
+\newcommand\widthscale{\textwidth}
+\begin{figure*}
+\centering
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-hotread}
+\caption{Two cgroups, A=B=1, Root=2}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-fincore}
+\caption{Two cgroups, A=B=1, Root=2}
+\end{subfigure}
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-hotread}
+\caption{Two cgroups, A=1 B=0, Root=1}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-fincore}
+\caption{Two cgroups, A=1 B=0, Root=1}
+\end{subfigure}
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-hotread}
+\caption{One cgroup, Root=1}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-fincore}
+\caption{One cgroup, Root=1}
+\end{subfigure}
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-hotread}
+\caption{Two cgroup, A=1 B=1, Root=1}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-fincore}
+\caption{Two cgroup, A=1 B=1, Root=1}
+\end{subfigure}
+\caption{Caption}
+\end{figure*}
+
+\end{document}
