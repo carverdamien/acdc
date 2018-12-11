@@ -1,4 +1,4 @@
-
+#include <time.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -16,6 +16,17 @@
 
 char STR_FORMAT[] =  "%-80s %18s %18s %18s %18s %18s %18s\n";
 char DATA_FORMAT[] = "%-80s %'18ld %'18d %'18ld %'18ld %'18ld %18.2f\n";
+char INFLUX_FORMAT[] =
+	"{\"measurement\":\"fincore_stats\","
+	"\"tags\":{\"path\":\"%s\"},"
+	"\"fields\":"
+	"{\"size\":%ld,"
+	"\"total_pages\": %d,"
+	"\"min_cached_page\":%ld,"
+	"\"cached\":%ld,"
+	"\"cached_size\":%ld,"
+	"\"cached_percent\":%f},"
+	"\"time\":%ld}\n";
 
 long DEFAULT_NR_REGIONS       = 160;  // default number of regions
 
@@ -26,6 +37,7 @@ int arg_only_cached           = 0;    // only show cached files
 int arg_graph                 = 0;    // graph the page distribution of files.
 int arg_verbose               = 0;    // level of verbosity.
 int arg_vertical              = 0;    // print variables vertical
+int arg_influxoutput          = 1;    // print influxdb json format
 
 long arg_min_size             = -1;   // required minimum size for files or we ignore them.
 long arg_min_cached_size      = -1;   // required minimum percent cached for files or we ignore them.
@@ -335,6 +347,22 @@ void fincore(char* path,
             _show_headers();
         }
 
+	if (arg_influxoutput) {
+		struct timespec timespec;
+		unsigned long time;
+		clock_gettime(CLOCK_REALTIME,&timespec);
+		time = (int64_t)(timespec.tv_sec) * (int64_t)1000000000 + (int64_t)(timespec.tv_nsec);
+		printf(INFLUX_FORMAT,
+		       path,
+		       file_stat.st_size ,
+		       total_pages ,
+		       min_cached_page,
+		       cached,
+		       cached_size,
+		       cached_perc,
+		       time);
+	} else {
+
         if ( arg_vertical ) {
 
             printf( "%s\n", path );
@@ -357,6 +385,7 @@ void fincore(char* path,
                     cached_perc );
 
         }
+	}
 
         for( i = 0 ; i < nr_regions; ++i ) {
             region_percs[i] = perc(regions[i], region_ptr );
@@ -410,9 +439,10 @@ void help() {
 
 void _show_headers() {
 
+	if(!arg_influxoutput){
     printf( STR_FORMAT, "filename", "size", "total_pages", "min_cached page", "cached_pages", "cached_size", "cached_perc" );
     printf( STR_FORMAT, "--------", "----", "-----------", "---------------", "------------", "-----------", "-----------" );
-    
+	}
     return;
 
 }
@@ -578,7 +608,7 @@ int main(int argc, char *argv[]) {
 
    }
 
-    if ( arg_summarize ) {
+    if ( arg_summarize && !arg_influxoutput ) {
         
         printf( "---\n" );
 
