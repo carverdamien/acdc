@@ -15,7 +15,7 @@ phase $LOW 20
 phase $HIG 1
 phase $LOW 49
 phase $HIG 1
-phase $LOW 29
+phase $LOW 39
 }
 
 main() {
