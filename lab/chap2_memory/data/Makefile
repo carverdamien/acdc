@@ -17,7 +17,7 @@ TEMPLATED=$(foreach v,$(CONFIGS),$(foreach t,$(TEMPLATE:.template/%=%),$(v)-$(t)
 template: $(TEMPLATED)
 define template-rule
 $(1)-%.py:.template/%.py
-	ln -s $$< $$@
+	ln -sf $$< $$@
 endef
 $(foreach v,$(CONFIGS),$(eval $(call template-rule,$v)))
 cleantemplate:
