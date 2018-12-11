@@ -10,3 +10,6 @@ RUN ./configure
 RUN make install || echo 'FIX: target "missing" fails'
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
+COPY wrapper.py \
+     entrypoint.sh ./
+ENTRYPOINT [ "./entrypoint.sh" ]

@@ -38,7 +38,7 @@ def run(args):
         time.sleep(args.loop)
         singlecall(args, client)
 
-def singlecall(args, client)
+def singlecall(args, client):
     p = subprocess.Popen(args.call, stdout=subprocess.PIPE)
     for line in p.stdout:
         line = line[:-1]
