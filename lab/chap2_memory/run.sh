@@ -83,7 +83,7 @@ waitend
 
 # Report
 mkdir -p "data/$MODE"
-for m in memory_stats blkio_stats networks cpu_stats filebench_stats
+for m in memory_stats blkio_stats networks cpu_stats filebench_stats fincore_stats
 do
 	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > "data/$MODE/$m.csv"
 done
