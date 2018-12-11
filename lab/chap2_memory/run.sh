@@ -27,8 +27,11 @@ RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workl
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
 2mcgl)
-MEMA=$((MEMORY*7/8))
-MEMB=$((MEMORY*1/8))
+N=$((2**4))
+N=$((2**5))
+# N=$((2**6)) # B fails
+MEMA=$((MEMORY*(N-1)/N))
+MEMB=$((MEMORY*1/N))
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
 ;;
