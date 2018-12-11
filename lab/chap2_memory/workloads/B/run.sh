@@ -11,6 +11,7 @@ SLEEP=2
 
 schedule() {
 # warmup $MED 10
+phase 0    10
 phase $LOW 20
 phase $HIG 1
 phase $LOW 49

@@ -10,7 +10,7 @@ SLEEP=2
 
 schedule() {
 # warmup $MED 10
-phase $MED 60
+phase $MED 70
 phase $LOW 20
 phase $MED 40
 }
