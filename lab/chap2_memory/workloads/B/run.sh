@@ -4,7 +4,7 @@
 SLEEP=5
 LOW=10
 MED=1024
-HIG=$((MED*1))
+HIG=$((MED*1/2))
 
 # DEBUG
 SLEEP=2
