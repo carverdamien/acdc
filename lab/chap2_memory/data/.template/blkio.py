@@ -20,22 +20,20 @@ img = sys.argv[1]
 basename = os.path.basename(sys.argv[0])
 basename = os.path.splitext(basename)[0]
 config,_ = basename.split('-')
-opname = 'IO Summary'
 
-df = pd.read_csv('%s/filebench_stats.csv' % config)
+df = pd.read_csv('%s/blkio_stats.csv' % config)
 
 figsize = (6.4*1.6, 4.8)
 fig = plt.figure(figsize=figsize)
 ax = fig.add_subplot(111)
 
-for filename in np.unique(df['filename']):
-	sel = df['filename'] == filename
-	sel = np.logical_and(sel, df['opname'] == opname)
+for service in ['filebencha','filebenchb']:
+	sel = df['com.docker.compose.service'] == service
 	X = np.array(df['time'][sel], dtype='datetime64[ns]')
 	X = (X - X[0])/OneSec
-	Y = df['mb/s'][sel]
-	ax.plot(X,Y,label=filename)
+	Y = df['Rbps'][sel]
+	Y = Y/(2**20)
+	ax.plot(X,Y,label=service)
 
-ax.legend()
-# ax.set_ylim(0,2000)
+# ax.legend()
 fig.savefig(img)

@@ -4,10 +4,11 @@
 SLEEP=5
 LOW=10
 MED=1024
-HIG=$((MED*10*2))
+HIG=$((MED*1))
 
 # DEBUG
 SLEEP=2
+LOW=0
 
 schedule() {
 # warmup $MED 10

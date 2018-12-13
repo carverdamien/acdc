@@ -7,6 +7,7 @@ MED=1024
 
 # DEBUG
 SLEEP=2
+LOW=0
 
 schedule() {
 # warmup $MED 10
