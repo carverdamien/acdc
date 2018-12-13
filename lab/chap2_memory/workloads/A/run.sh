@@ -14,7 +14,7 @@ schedule() {
 # warmup $MED 10
 phase $MED 80
 phase $LOW 20
-phase $MED 40
+phase $MED 70
 }
 
 main() {
