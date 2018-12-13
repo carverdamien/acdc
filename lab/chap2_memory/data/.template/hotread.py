@@ -22,6 +22,7 @@ basename = os.path.splitext(basename)[0]
 config,_ = basename.split('-')
 opname = 'IO Summary'
 
+X0 = np.datetime64(min(pd.read_csv('%s/fincore_stats.csv' % config)['time']), 'ns')
 df = pd.read_csv('%s/filebench_stats.csv' % config)
 
 figsize = (6.4*1.6, 4.8)
@@ -32,7 +33,7 @@ for filename in np.unique(df['filename']):
 	sel = df['filename'] == filename
 	sel = np.logical_and(sel, df['opname'] == opname)
 	X = np.array(df['time'][sel], dtype='datetime64[ns]')
-	#X = (X - X[0])/OneSec
+	X = (X - X0)/OneSec
 	Y = df['mb/s'][sel]
 	ax.plot(X,Y,label=filename)
 
