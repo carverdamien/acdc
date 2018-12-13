@@ -32,7 +32,7 @@ for filename in np.unique(df['filename']):
 	sel = df['filename'] == filename
 	sel = np.logical_and(sel, df['opname'] == opname)
 	X = np.array(df['time'][sel], dtype='datetime64[ns]')
-	X = (X - X[0])/OneSec
+	#X = (X - X[0])/OneSec
 	Y = df['mb/s'][sel]
 	ax.plot(X,Y,label=filename)
 
