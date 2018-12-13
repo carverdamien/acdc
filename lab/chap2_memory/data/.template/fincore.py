@@ -30,8 +30,10 @@ ax = fig.add_subplot(111)
 for path in np.unique(df['path']):
 	sel = df['path'] == path
 	X = np.array(df['time'][sel], dtype='datetime64[ns]')
+	X = (X - X[0])/OneSec
 	Y = df['cached_size'][sel]
+	Y = Y/(2**20)
 	ax.plot(X,Y,label=path)
 
-ax.legend()
+# ax.legend()
 fig.savefig(img)

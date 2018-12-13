@@ -1,13 +1,15 @@
 #!/bin/bash
 # Script that generates run.f
 
+SLEEP_BEFORE_SPAWN="sleep 30"
 SLEEP=5
 LOW=10
 MED=1024
-HIG=$((MED*10*2))
+HIG=$((MED*1/2))
 
 # DEBUG
 SLEEP=2
+LOW=0
 
 schedule() {
 # warmup $MED 10
@@ -20,11 +22,12 @@ phase $LOW 39
 
 main() {
 source prepare.sh
-echo '
+echo "
+${SLEEP_BEFORE_SPAWN}
 create processes
 eventgen rate = 1
 sleep 1
-'
+"
 schedule
 echo 'shutdown'
 }
