@@ -15,16 +15,16 @@ MEMB=$MEMORY
 case $MODE in
 baseline)
 MEMORY=$((MEMORY*2))
-RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
 1mcg)
-RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
 2mcgm)
-RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
 2mcgl)
 N=$((2**4))
@@ -32,8 +32,8 @@ N=$((2**5))
 # N=$((2**6)) # B fails
 MEMA=$((MEMORY*(N-1)/N))
 MEMB=$((MEMORY*1/N))
-RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebench -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebench -f workloads/B/run.f;}
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
 *)
 echo "unknown MODE: ${MODE}"
@@ -66,10 +66,14 @@ ${PRE} down
 ${RUN} create
 ${RUN} up -d
 
+# Copy filebench
+${RUN} exec -T filebencha cp -a /usr/local/bin/filebench{,a}
+${RUN} exec -T filebenchb cp -a /usr/local/bin/filebench{,b}
+
 filebencha() { ${RUN} ps -q filebencha; }
 filebenchb() { ${RUN} ps -q filebenchb; }
 move_tasks() { for task in $(cat $1/tasks); do echo $task | sudo tee $2/tasks; done; }
-waitend() { for f in filebencha filebenchb; do while ${RUN} ps -q $f | xargs docker top | grep filebench; do sleep 1; done; done; }
+waitend() { for f in filebencha filebenchb; do while ${RUN} ps -q $f | xargs docker top | grep -q filebench; do sleep 1; done; done; }
 
 case $MODE in
     1mcg)
