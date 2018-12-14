@@ -1,13 +1,11 @@
 version: '2.2'
 services:
   host:
-    image: ubuntu
+    build: images/host
     privileged: true
-    entrypoint:
-      - "sleep"
-      - "inf"
     volumes:
       - /:/rootfs
+      - ./data:/data
   filebencha:
     build: images/filebench
     links:

@@ -79,14 +79,26 @@ case $MODE in
 	;;
 esac
 
+# Start ftrace
+DATA_DIR="data/$MODE"
+mkdir -p ${DATA_DIR}
+TRACE_DAT=/${DATA_DIR}/trace.dat
+${RUN} exec host rm -f ${TRACE_DAT}*
+${RUN} exec -T host job trace-cmd record -p function_graph -l try_to_free_mem_cgroup_pages -g try_to_free_mem_cgroup_pages -o ${TRACE_DAT}
+
 RUNA | tee A.out &
 RUNB | tee B.out &
 
 waitend
 
+# Stop ftrace
+${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
+while ${RUN} exec host pgrep trace-cmd; do echo 'waiting'; sleep 1; done
+
 # Report
-mkdir -p "data/$MODE"
+DATA_DIR="data/$MODE"
+mkdir -p "${DATA_DIR}"
 for m in memory_stats blkio_stats networks cpu_stats filebench_stats fincore_stats
 do
-	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > "data/$MODE/$m.csv"
+	${PRE} exec influxdb influx -database acdc -execute "select * from $m" -format=csv > "${DATA_DIR}/$m.csv"
 done
