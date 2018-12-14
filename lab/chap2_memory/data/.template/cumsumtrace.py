@@ -46,17 +46,27 @@ figsize = (6.4*1.6, 4.8)
 fig = plt.figure(figsize=figsize)
 ax = fig.add_subplot(111)
 
-# for proc in np.unique(df['proc']):
-#         sel = df['proc'] == proc
-#         sel = np.logical_and(sel, df['func'] == func)
-#         X, Y = aggregate(df,sel,1)
-#         Y = np.cumsum(Y)
-#         ax.plot(X,Y,label=proc)
-X = df['time']
-Y = np.cumsum(df['delay'])
-ax.plot(X,Y)
-ax.set_yscale('log')
-# ax.legend()
+# Simple
+# X = df['time']
+# Y = np.cumsum(df['delay'])
+# ax.plot(X,Y)
+# ax.set_yscale('log')
+
+# Build proc selector
+KEYS = ['a','b']
+SEL = {k:np.zeros(len(df),dtype=bool) for k in KEYS}
+for proc in np.unique(df['proc']):
+        for k in KEYS:
+                if k == proc.split('-')[0][-1]:
+                        SEL[k] = np.logical_or(SEL[k], df['proc'] == proc)
+
+for k in KEYS:
+        sel = np.logical_and(df['func'] == func, SEL[k])
+        X,Y = aggregate(df,sel,1)
+        Y = np.cumsum(Y)
+        ax.plot(X,Y,label=k)
+
+ax.legend()
 fig.savefig(img)
 
 
