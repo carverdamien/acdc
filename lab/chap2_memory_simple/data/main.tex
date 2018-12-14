@@ -1,0 +1,98 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pdflscape}
+\usepackage{geometry}
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+ 
+\def \perf {hotread}
+\def \first {fincore}
+\def \second {blkio}
+% \def \third {cpu}
+\def \third {cumsumtrace}
+
+\begin{document}
+
+\begin{landscape}
+\newcommand\subfigurescale{.3\textwidth}
+\newcommand\widthscale{\textwidth}
+\begin{figure*}
+\centering
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-\perf}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-\first}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-\third}
+\end{subfigure}
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-\perf}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-\first}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-\third}
+\end{subfigure}
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-\perf}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-\first}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-\third}
+\end{subfigure}
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-\perf}
+\caption{\perf}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-\first}
+\caption{\first}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-\second}
+\caption{\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-\third}
+\caption{\third}
+\end{subfigure}
+\end{figure*}
+\end{landscape}
+
+\end{document}
