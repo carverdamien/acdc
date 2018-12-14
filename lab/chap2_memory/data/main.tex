@@ -2,74 +2,97 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{pdflscape}
+\usepackage{geometry}
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+ 
+\def \perf {hotread}
+\def \first {fincore}
+\def \second {blkio}
+% \def \third {cpu}
+\def \third {cumsumtrace}
 
 \begin{document}
 
+\begin{landscape}
 \newcommand\subfigurescale{.3\textwidth}
 \newcommand\widthscale{\textwidth}
 \begin{figure*}
 \centering
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./baseline-hotread}
-\caption{Two cgroups, A=B=1, Root=2}
+\includegraphics[width=\widthscale]{./baseline-\perf}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./baseline-fincore}
-\caption{Two cgroups, A=B=1, Root=2}
+\includegraphics[width=\widthscale]{./baseline-\first}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./baseline-blkio}
-\caption{Two cgroups, A=B=1, Root=2}
+\includegraphics[width=\widthscale]{./baseline-\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./baseline-\third}
 \end{subfigure}
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./2mcgl-hotread}
-\caption{Two cgroups, A=1 B=0, Root=1}
+\includegraphics[width=\widthscale]{./2mcgl-\perf}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./2mcgl-fincore}
-\caption{Two cgroups, A=1 B=0, Root=1}
+\includegraphics[width=\widthscale]{./2mcgl-\first}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./2mcgl-blkio}
-\caption{Two cgroups, A=1 B=0, Root=1}
+\includegraphics[width=\widthscale]{./2mcgl-\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgl-\third}
 \end{subfigure}
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./1mcg-hotread}
-\caption{One cgroup, Root=1}
+\includegraphics[width=\widthscale]{./1mcg-\perf}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./1mcg-fincore}
-\caption{One cgroup, Root=1}
+\includegraphics[width=\widthscale]{./1mcg-\first}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./1mcg-blkio}
-\caption{One cgroup, Root=1}
+\includegraphics[width=\widthscale]{./1mcg-\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./1mcg-\third}
 \end{subfigure}
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./2mcgm-hotread}
-\caption{Two cgroup, A=1 B=1, Root=1}
+\includegraphics[width=\widthscale]{./2mcgm-\perf}
+\caption{\perf}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./2mcgm-fincore}
-\caption{Two cgroup, A=1 B=1, Root=1}
+\includegraphics[width=\widthscale]{./2mcgm-\first}
+\caption{\first}
 \end{subfigure}%
 \begin{subfigure}[t]{\subfigurescale}
 \centering
-\includegraphics[width=\widthscale]{./2mcgm-blkio}
-\caption{Two cgroup, A=1 B=1, Root=1}
+\includegraphics[width=\widthscale]{./2mcgm-\second}
+\caption{\second}
+\end{subfigure}%
+\begin{subfigure}[t]{\subfigurescale}
+\centering
+\includegraphics[width=\widthscale]{./2mcgm-\third}
+\caption{\third}
 \end{subfigure}
-\caption{Caption}
 \end{figure*}
+\end{landscape}
 
 \end{document}
