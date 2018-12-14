@@ -1,7 +1,7 @@
 id="$(basename $(readlink -e .))"
 dir="/data/${id}/"
 memory=$((2**30))
-inmemory=$((memory*1/2))
+inmemory=$((memory*(64+16)/128))
 outofmemory=$((2*memory))
 iosize="1m"
 
