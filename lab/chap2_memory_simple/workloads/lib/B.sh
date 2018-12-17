@@ -3,7 +3,7 @@ dir="/data/${id}/"
 memory=$((2**30))
 inmemory=$((memory*(64+16)/128))
 outofmemory=$((2*memory))
-iosize="256k"
+iosize="1m"
 
 echo "
 define file name=fileinmemory,    path=${dir}, size=${inmemory},    prealloc, reuse
