@@ -18,10 +18,10 @@ MEMORY=$((MEMORY*2))
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
-1mcg)
-RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
-;;
+#1mcg)
+#RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+#RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
+#;;
 2mcgm)
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
@@ -30,6 +30,7 @@ RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f work
 N=$((2**4))
 N=$((2**5))
 # N=$((2**6)) # B fails
+N=2
 MEMA=$((MEMORY*(N-1)/N))
 MEMB=$((MEMORY*1/N))
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
@@ -84,11 +85,11 @@ case $MODE in
 esac
 
 # Start ftrace
-DATA_DIR="data/$MODE"
-mkdir -p ${DATA_DIR}
-TRACE_DAT=/${DATA_DIR}/trace.dat
-${RUN} exec host rm -f ${TRACE_DAT}*
-${RUN} exec -T host job trace-cmd record -p function_graph -l try_to_free_mem_cgroup_pages -g try_to_free_mem_cgroup_pages -o ${TRACE_DAT}
+# DATA_DIR="data/$MODE"
+# mkdir -p ${DATA_DIR}
+# TRACE_DAT=/${DATA_DIR}/trace.dat
+# ${RUN} exec host rm -f ${TRACE_DAT}*
+# ${RUN} exec -T host job trace-cmd record -p function_graph -l try_to_free_mem_cgroup_pages -g try_to_free_mem_cgroup_pages -o ${TRACE_DAT}
 
 RUNA | tee A.out &
 RUNB | tee B.out &
@@ -96,8 +97,8 @@ RUNB | tee B.out &
 waitend
 
 # Stop ftrace
-${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
-while ${RUN} exec host pgrep trace-cmd; do echo 'waiting'; sleep 1; done
+# ${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
+# while ${RUN} exec host pgrep trace-cmd; do echo 'waiting'; sleep 1; done
 
 # Report
 DATA_DIR="data/$MODE"
