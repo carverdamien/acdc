@@ -72,13 +72,13 @@ fmlock_init() {
 LOCK_TIME=$1
 if [ "${USE_FMLOCK}" == "y" ]
 then
-echo "system \"bash -c '/shared/linux-fmlock ${dir}/fileinmemory1/00000001/00000001 ${LOCK_TIME} &'\""
+echo "system \"job /shared/linux-fmlock ${dir}/fileinmemory1/00000001/00000001 ${LOCK_TIME}\""
 fi
 }
 fmlock() {
 LOCK_TIME=$1
 if [ "${USE_FMLOCK}" == "y" ]
 then 
-echo "system \"bash -c '/shared/linux-fmlock ${dir}/fileinmemory2/00000001/00000001 ${LOCK_TIME} &'\""
+echo "system \"job /shared/linux-fmlock ${dir}/fileinmemory2/00000001/00000001 ${LOCK_TIME}\""
 fi
 }
