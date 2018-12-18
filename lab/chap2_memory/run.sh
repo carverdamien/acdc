@@ -8,6 +8,7 @@ source kernel
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
 
+DELTA=$((70*2**20))
 MEMORY=$((2**30))
 MEMA=$MEMORY
 MEMB=$MEMORY
@@ -53,6 +54,8 @@ echo "unknown MODE: ${MODE}"
 exit 1
 ;;
 esac
+
+MEMORY=$((MEMORY + DELTA))
 
 sed "s/\${MEMA}/${MEMA}/"   compose/restricted.yml |
 sed "s/\${MEMB}/${MEMB}/" > compose/.restricted.yml

@@ -1,6 +1,6 @@
 #!/bin/bash
 export MODE
-for MODE in baseline 2mcgl 2mcgm
+for MODE in fmlock baseline 2mcgl 2mcgm
 do
     bash run.sh
 done
