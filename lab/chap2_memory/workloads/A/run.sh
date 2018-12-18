@@ -1,18 +1,12 @@
 #!/bin/bash
 # Script that generates run.f
+set -e
 
 SLEEP_BEFORE_SPAWN=""
-SLEEP=2
+: ${TIME_SCALE:=2}
 LOW=0
 MED=1024
 MED=$((MED*3))
-
-schedule() {
-# warmup $MED 10
-phase $MED 80
-phase $LOW 20
-phase $MED 70
-}
 
 schedule() {
 phase $MED 50
@@ -20,10 +14,8 @@ phase $LOW 30
 phase $MED 30
 }
 
-cycle() { echo $1; }
-# cycle() { echo $(( $1 / SLEEP )); }
-
 main() {
+check
 source prepare.sh
 echo "
 ${SLEEP_BEFORE_SPAWN}
@@ -37,13 +29,13 @@ echo 'shutdown'
 
 phase() {
 RATE=$1
-CYCLE=$(cycle $2)
+CYCLE=$2
 echo "eventgen rate = ${RATE}"
 for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep ${SLEEP}
+sleep ${TIME_SCALE}
 stats snap
 EOF
 done
@@ -57,10 +49,14 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep ${SLEEP}
+sleep ${TIME_SCALE}
 stats clear
 EOF
 done
+}
+
+check() {
+[ ${TIME_SCALE} -gt 1 ]
 }
 
 main

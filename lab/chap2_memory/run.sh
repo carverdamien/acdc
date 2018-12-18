@@ -12,6 +12,8 @@ MEMORY=$((2**30))
 MEMA=$MEMORY
 MEMB=$MEMORY
 
+export TIME_SCALE=2
+
 case $MODE in
 baseline)
 MEMORY=$((MEMORY*2))
@@ -46,8 +48,8 @@ sed "s/\${MEMA}/${MEMA}/"   compose/restricted.yml |
 sed "s/\${MEMB}/${MEMB}/" > compose/.restricted.yml
 
 # Prepare
-make -C workloads/A
-make -C workloads/B
+make -B -C workloads/A
+make -B -C workloads/B
 ${RUN} down --remove-orphans
 ${PRE} down --remove-orphans
 ${PRE} build
