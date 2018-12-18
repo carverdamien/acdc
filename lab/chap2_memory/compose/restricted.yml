@@ -13,6 +13,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+      - shared:/shared
     cgroup_parent: parent
     mem_limit: ${MEMA}
     blkio_config:
@@ -29,6 +30,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+      - shared:/shared
     cgroup_parent: parent
     mem_limit: ${MEMB}
     blkio_config:
@@ -52,6 +54,7 @@ services:
     command: [ "/data" ]
     volumes:
       - data-filebench:/data
+      - shared:/shared
     links:
       - influxdb
   idlememstat:
@@ -89,3 +92,4 @@ volumes:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
+  shared:
