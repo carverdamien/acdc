@@ -10,15 +10,24 @@ MED=1024
 HIG=$MED
 
 schedule() {
+fmlock_init $((110 * TIME_SCALE))
+fadvise_inactive
 phase $LOW 20
+fadvise_active
 phase $HIG 1
-phase $LOW 39
+phase $LOW 9
+fadvise_inactive
+phase $LOW 30
+fadvise_active
+fmlock $((10 * TIME_SCALE))
 phase $HIG 1
-phase $LOW 49
+phase $LOW 9
+fadvise_inactive
+phase $LOW 40
 }
 
 main() {
-checks
+check
 source prepare.sh
 echo "
 ${SLEEP_BEFORE_SPAWN}

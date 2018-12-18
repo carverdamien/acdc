@@ -44,4 +44,28 @@ define process name=process${id},instances=1
 
 eventgen rate = 0
 create files
+system \"/shared/linux-fadvise ${dir}/fileinmemory/00000001/00000001 POSIX_FADV_NORMAL\"
+system \"/shared/linux-fadvise ${dir}/fileoutofmemory/00000001/00000001 POSIX_FADV_NORMAL\"
 "
+fadvise_active() {
+if [ "${USE_FADVISE}" == "y" ] 
+then
+echo "system \"/shared/linux-fadvise ${dir}/fileinmemory/00000001/00000001 POSIX_FADV_WILLNEED\""
+echo "system \"/shared/linux-fadvise ${dir}/fileoutofmemory/00000001/00000001 POSIX_FADV_NORMAL\""
+fi
+}
+fadvise_inactive() {
+if [ "${USE_FADVISE}" == "y" ]
+then
+echo "system \"/shared/linux-fadvise ${dir}/fileinmemory/00000001/00000001 POSIX_FADV_NORMAL\""
+echo "system \"/shared/linux-fadvise ${dir}/fileoutofmemory/00000001/00000001 POSIX_FADV_NORMAL\""
+fi
+}
+fmlock_init() { :; }
+fmlock() {
+LOCK_TIME=$1
+if [ "${USE_FMLOCK}" == "y" ]
+then
+echo "system \"bash -c '/shared/linux-fmlock ${dir}/fileinmemory/00000001/00000001 ${LOCK_TIME} &'\""
+fi
+}

@@ -38,6 +38,16 @@ MEMB=$((MEMORY*1/N))
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
+fadvise)
+export USE_FADVISE=y
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
+;;
+fmlock)
+export USE_FMLOCK=y
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
+;;
 *)
 echo "unknown MODE: ${MODE}"
 exit 1
@@ -55,6 +65,7 @@ ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
+${PRE} exec fincore cp -a linux-fadvise linux-fmlock /shared/
 ${PRE} exec filebencha filebench -f workloads/A/prepare.f
 ${PRE} exec filebenchb filebench -f workloads/B/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
@@ -63,7 +74,6 @@ ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir 
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/parent/memory.use_hierarchy'
 ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/parent/memory.limit_in_bytes"
-${PRE} exec fincore cp -a linux-fadvise /shared/
 ${PRE} down
 
 # Run

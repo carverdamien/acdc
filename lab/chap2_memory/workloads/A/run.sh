@@ -9,8 +9,14 @@ MED=1024
 MED=$((MED*3))
 
 schedule() {
+fmlock_init $((110 * TIME_SCALE))
+fadvise_active
+fmlock $((50 * TIME_SCALE))
 phase $MED 50
+fadvise_inactive
 phase $LOW 30
+fadvise_active
+fmlock $((30 * TIME_SCALE))
 phase $MED 30
 }
 

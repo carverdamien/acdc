@@ -16,6 +16,8 @@ services:
       - shared:/shared
     cgroup_parent: parent
     mem_limit: ${MEMA}
+    ulimits:
+      memlock: ${MEMA}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -33,6 +35,8 @@ services:
       - shared:/shared
     cgroup_parent: parent
     mem_limit: ${MEMB}
+    ulimits:
+      memlock: ${MEMB}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
