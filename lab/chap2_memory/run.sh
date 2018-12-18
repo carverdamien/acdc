@@ -61,6 +61,7 @@ ${PRE} exec host bash -c '! [ -d /rootfs/sys/fs/cgroup/memory/parent ] || rmdir 
 ${PRE} exec host bash -c 'mkdir /rootfs/sys/fs/cgroup/memory/parent'
 ${PRE} exec host bash -c 'echo 1 > /rootfs/sys/fs/cgroup/memory/parent/memory.use_hierarchy'
 ${PRE} exec host bash -c "echo ${MEMORY} > /rootfs/sys/fs/cgroup/memory/parent/memory.limit_in_bytes"
+${PRE} exec fincore cp -a linux-fadvise /shared/
 ${PRE} down
 
 # Run
