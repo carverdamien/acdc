@@ -4159,11 +4159,11 @@ parser_system(cmd_t *cmd)
 	filebench_log(LOG_VERBOSE,
 	    "Running '%s'", string);
 
-	if (system(string) < 0) {
+	while (system(string) < 0) {
 		filebench_log(LOG_ERROR,
 		    "system exec failed: %s",
 		    strerror(errno));
-		filebench_shutdown(1);
+		//filebench_shutdown(1);
 	}
 	free(string);
 }

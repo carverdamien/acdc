@@ -9,11 +9,11 @@ PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
 
 DELTA=$((70*2**20))
-MEMORY=$((2**30))
+MEMORY=$((2**30 + DELTA))
 MEMA=$MEMORY
 MEMB=$MEMORY
 
-export TIME_SCALE=2
+export TIME_SCALE=10
 
 case $MODE in
 baseline)
@@ -54,8 +54,6 @@ echo "unknown MODE: ${MODE}"
 exit 1
 ;;
 esac
-
-MEMORY=$((MEMORY + DELTA))
 
 sed "s/\${MEMA}/${MEMA}/"   compose/restricted.yml |
 sed "s/\${MEMB}/${MEMB}/" > compose/.restricted.yml
