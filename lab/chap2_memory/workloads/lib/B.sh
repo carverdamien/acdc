@@ -16,13 +16,11 @@ define file name=fileoutofmemory, path=${dir}, size=${outofmemory}, prealloc, re
 define process name=process${id},instances=1
 {
   # We can control event thread
-  thread name=${id}evt,memsize=${smallio},instances=1
+  thread name=${id}evt,memsize=${bigio},instances=1
   {
     flowop eventlimit name=limit1
-    # flowop read name=evtread1, filename=fileinmemory1, iosize=${smallio}, fd=3
-    # flowop read name=evtread2, filename=fileinmemory1, iosize=${smallio}, fd=4
-    flowop read name=evtread3, filename=fileinmemory2, iosize=${smallio}, fd=5
-    flowop read name=evtread4, filename=fileinmemory2, iosize=${smallio}, fd=6
+    flowop read name=evtread3, filename=fileinmemory2, iosize=${bigio}, fd=5
+    flowop read name=evtread4, filename=fileinmemory2, iosize=${bigio}, fd=6
   }
   # We have no control over touch thread
   # Its goal is to keep fileinmemory1 in memory
@@ -30,7 +28,6 @@ define process name=process${id},instances=1
   thread name=${id}tch,memsize=${smallestio},instances=1
   {
     flowop read random, name=tchread1, filename=fileinmemory1, iosize=${smallestio}, fd=7
-    # flowop read name=tchread2, filename=fileinmemory1, iosize=${smallestio}, fd=8
   }
   # We have no control over always thread
   thread name=${id}alw,memsize=${bigio},instances=1

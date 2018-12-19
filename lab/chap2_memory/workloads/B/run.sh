@@ -7,7 +7,7 @@ SLEEP_BEFORE_SPAWN=""
 : ${TIME_SCALE:=2}
 LOW=0
 MED=1024
-HIG=$MED
+HIG=$((MED/4))
 
 schedule() {
 fmlock_init $((110 * TIME_SCALE))
