@@ -1,46 +1,81 @@
 id="$(basename $(readlink -e .))"
 dir="/data/${id}/"
 memory=$((2**30))
-inmemory=$((memory*(64+16)/128))
+inmemory=$((memory*40/100))
 outofmemory=$((2*memory))
-iosize="512k"
+
+bigio=$((2**20))
+smallio=$((bigio / 4))
+smallestio=$((2**16))
 
 echo "
-define file name=fileinmemory,    path=${dir}, size=${inmemory},    prealloc, reuse
+define file name=fileinmemory1,   path=${dir}, size=${inmemory},    prealloc, reuse
+define file name=fileinmemory2,   path=${dir}, size=${inmemory},    prealloc, reuse
 define file name=fileoutofmemory, path=${dir}, size=${outofmemory}, prealloc, reuse
 
-# processB doit gener process A
 define process name=process${id},instances=1
 {
-  thread name=${id}hot,memsize=${iosize},instances=1
+  # We can control event thread
+  thread name=${id}evt,memsize=${bigio},instances=1
   {
-    # Si hotread{1,2} partage les fd de coldread{1,2},
-    # alors il faut attendre que tout soit charger pour maximiser le throughput
-    # Si hotread{1,2} ne partage pas les fd de coldread{1,2},
-    # il finira par rejoindre coldread{1,2}
-    # 
-    # Il faut que thread hot puisse, en parallel de coldread{1,2}, charger fileinmemory
-    #
-    # flowop eventlimit name=limit1
-    # flowop read name=hotread1, filename=fileinmemory, iosize=${iosize}, fd=3
-    # flowop eventlimit name=limit2
-    # flowop read name=hotread2, filename=fileinmemory, iosize=${iosize}, fd=4
-    flowop eventlimit name=limit3
-    flowop read random, name=hotread3, filename=fileinmemory, iosize=${iosize}, fd=6
+    flowop eventlimit name=limit1
+    flowop read name=evtread3, filename=fileinmemory2, iosize=${bigio}, fd=5
+    flowop read name=evtread4, filename=fileinmemory2, iosize=${bigio}, fd=6
   }
-  # thread cold doit gener processA sans gener thread hot
-  thread name=${id}cold,memsize=${iosize},instances=1
+  # We have no control over touch thread
+  # Its goal is to keep fileinmemory1 in memory
+  # but since it uses smallestio it should waste a lot of time on syscalls
+  thread name=${id}tch,memsize=${smallestio},instances=1
   {
-    # coldread{1,2} prepare la memoire pour thread hot.
-    # coldread{1,2} doit gener processA
-    flowop read name=coldread1, filename=fileinmemory, iosize=${iosize}, fd=3
-    flowop read name=coldread2, filename=fileinmemory, iosize=${iosize}, fd=4
-    # coldread3 doit ralentir thread cold.
-    # Double touch sur fileoutofmemory gene thread hot et l'empeche de charger fileinmemory
-    flowop read name=coldread3, filename=fileoutofmemory, iosize=${iosize}, fd=5
+    flowop read random, name=tchread1, filename=fileinmemory1, iosize=${smallestio}, fd=7
+  }
+  # We have no control over always thread
+  thread name=${id}alw,memsize=${bigio},instances=1
+  { 
+    flowop read name=alwread1, filename=fileinmemory1,   iosize=${bigio}, fd=9
+    flowop read name=alwread2, filename=fileinmemory1,   iosize=${bigio}, fd=10
+
+    # alw thread must be slowed with a fileoutofmemory
+    flowop read name=alwread3, filename=fileoutofmemory, iosize=${smallio}, fd=11
+
+    # Third touch to secure fileoutofmemory after loosing time on fileoutofmemory
+    flowop read name=alwread4, filename=fileinmemory1,   iosize=${bigio}, fd=12
   }
 }
 
 eventgen rate = 0
 create files
+system \"/shared/linux-fadvise ${dir}/fileinmemory1/00000001/00000001 POSIX_FADV_NORMAL\"
+system \"/shared/linux-fadvise ${dir}/fileinmemory2/00000001/00000001 POSIX_FADV_NORMAL\"
+system \"/shared/linux-fadvise ${dir}/fileoutofmemory/00000001/00000001 POSIX_FADV_NORMAL\"
 "
+fadvise_active() {
+if [ "${USE_FADVISE}" == "y" ] 
+then
+echo "system \"/shared/linux-fadvise ${dir}/fileinmemory1/00000001/00000001 POSIX_FADV_WILLNEED\""
+echo "system \"/shared/linux-fadvise ${dir}/fileinmemory2/00000001/00000001 POSIX_FADV_WILLNEED\""
+echo "system \"/shared/linux-fadvise ${dir}/fileoutofmemory/00000001/00000001 POSIX_FADV_NORMAL\""
+fi
+}
+fadvise_inactive() {
+if [ "${USE_FADVISE}" == "y" ]
+then
+echo "system \"/shared/linux-fadvise ${dir}/fileinmemory1/00000001/00000001 POSIX_FADV_WILLNEED\""
+echo "system \"/shared/linux-fadvise ${dir}/fileinmemory2/00000001/00000001 POSIX_FADV_NORMAL\""
+echo "system \"/shared/linux-fadvise ${dir}/fileoutofmemory/00000001/00000001 POSIX_FADV_NORMAL\""
+fi
+}
+fmlock_init() {
+LOCK_TIME=$1
+if [ "${USE_FMLOCK}" == "y" ]
+then
+echo "system \"job /shared/linux-fmlock ${dir}/fileinmemory1/00000001/00000001 ${LOCK_TIME}\""
+fi
+}
+fmlock() {
+LOCK_TIME=$1
+if [ "${USE_FMLOCK}" == "y" ]
+then 
+echo "system \"job /shared/linux-fmlock ${dir}/fileinmemory2/00000001/00000001 ${LOCK_TIME}\""
+fi
+}

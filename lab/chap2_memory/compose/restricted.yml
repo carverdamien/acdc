@@ -13,8 +13,11 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+      - shared:/shared
     cgroup_parent: parent
     mem_limit: ${MEMA}
+    ulimits:
+      memlock: ${MEMA}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -29,8 +32,11 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+      - shared:/shared
     cgroup_parent: parent
     mem_limit: ${MEMB}
+    ulimits:
+      memlock: ${MEMB}
     blkio_config:
       device_read_bps:
         - path: /dev/sda
@@ -52,6 +58,7 @@ services:
     command: [ "/data" ]
     volumes:
       - data-filebench:/data
+      - shared:/shared
     links:
       - influxdb
   idlememstat:
@@ -89,3 +96,4 @@ volumes:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
+  shared:

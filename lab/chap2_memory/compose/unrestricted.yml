@@ -13,6 +13,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+      - shared:/shared
   filebenchb:
     build: images/filebench
     links:
@@ -20,6 +21,7 @@ services:
     volumes:
       - data-filebench:/data
       - ./workloads:/home/workloads
+      - shared:/shared
   influxdb:
     image: influxdb:latest
   collector:
@@ -34,6 +36,7 @@ services:
     command: [ "/data" ]
     volumes:
       - data-filebench:/data
+      - shared:/shared
     links:
       - influxdb
   idlememstat:
@@ -71,3 +74,4 @@ volumes:
   data-grafana-var-lib:
   data-grafana-var-log:
   data-grafana-etc:
+  shared:

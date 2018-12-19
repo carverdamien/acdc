@@ -8,9 +8,12 @@ source kernel
 PRE="docker-compose --project-directory $PWD -f compose/unrestricted.yml"
 RUN="docker-compose --project-directory $PWD -f compose/.restricted.yml"
 
-MEMORY=$((2**30))
+DELTA=$((70*2**20))
+MEMORY=$((2**30 + DELTA))
 MEMA=$MEMORY
 MEMB=$MEMORY
+
+export TIME_SCALE=10
 
 case $MODE in
 baseline)
@@ -18,10 +21,10 @@ MEMORY=$((MEMORY*2))
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
-1mcg)
-RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
-RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
-;;
+#1mcg)
+#RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+#RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
+#;;
 2mcgm)
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
@@ -30,8 +33,19 @@ RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f work
 N=$((2**4))
 N=$((2**5))
 # N=$((2**6)) # B fails
+N=2
 MEMA=$((MEMORY*(N-1)/N))
 MEMB=$((MEMORY*1/N))
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
+;;
+fadvise)
+export USE_FADVISE=y
+RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
+RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
+;;
+fmlock)
+export USE_FMLOCK=y
 RUNA() { ${RUN} exec -T filebencha job python benchmark.py -- filebencha -f workloads/A/run.f;}
 RUNB() { ${RUN} exec -T filebenchb job python benchmark.py -- filebenchb -f workloads/B/run.f;}
 ;;
@@ -45,13 +59,14 @@ sed "s/\${MEMA}/${MEMA}/"   compose/restricted.yml |
 sed "s/\${MEMB}/${MEMB}/" > compose/.restricted.yml
 
 # Prepare
-make -C workloads/A
-make -C workloads/B
+make -B -C workloads/A
+make -B -C workloads/B
 ${RUN} down --remove-orphans
 ${PRE} down --remove-orphans
 ${PRE} build
 ${PRE} create
 ${PRE} up -d
+${PRE} exec fincore cp -a linux-fadvise linux-fmlock /shared/
 ${PRE} exec filebencha filebench -f workloads/A/prepare.f
 ${PRE} exec filebenchb filebench -f workloads/B/prepare.f
 ${PRE} exec host bash -c 'echo 3 > /rootfs/proc/sys/vm/drop_caches'
@@ -84,11 +99,11 @@ case $MODE in
 esac
 
 # Start ftrace
-DATA_DIR="data/$MODE"
-mkdir -p ${DATA_DIR}
-TRACE_DAT=/${DATA_DIR}/trace.dat
-${RUN} exec host rm -f ${TRACE_DAT}*
-${RUN} exec -T host job trace-cmd record -p function_graph -l try_to_free_mem_cgroup_pages -g try_to_free_mem_cgroup_pages -o ${TRACE_DAT}
+# DATA_DIR="data/$MODE"
+# mkdir -p ${DATA_DIR}
+# TRACE_DAT=/${DATA_DIR}/trace.dat
+# ${RUN} exec host rm -f ${TRACE_DAT}*
+# ${RUN} exec -T host job trace-cmd record -p function_graph -l try_to_free_mem_cgroup_pages -g try_to_free_mem_cgroup_pages -o ${TRACE_DAT}
 
 RUNA | tee A.out &
 RUNB | tee B.out &
@@ -96,8 +111,8 @@ RUNB | tee B.out &
 waitend
 
 # Stop ftrace
-${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
-while ${RUN} exec host pgrep trace-cmd; do echo 'waiting'; sleep 1; done
+# ${RUN} exec host bash -c 'kill -s SIGINT $(pgrep trace-cmd)'
+# while ${RUN} exec host pgrep trace-cmd; do echo 'waiting'; sleep 1; done
 
 # Report
 DATA_DIR="data/$MODE"

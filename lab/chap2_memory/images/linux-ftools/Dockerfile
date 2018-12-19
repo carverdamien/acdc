@@ -13,3 +13,5 @@ RUN pip install -r requirements.txt
 COPY wrapper.py \
      entrypoint.sh ./
 ENTRYPOINT [ "./entrypoint.sh" ]
+COPY linux-fmlock.c ./
+RUN gcc -o linux-fmlock linux-fmlock.c

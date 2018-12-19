@@ -1,26 +1,33 @@
 #!/bin/bash
 # Script that generates run.f
+set -e
 
 SLEEP_BEFORE_SPAWN="sleep 30"
-SLEEP=5
-LOW=10
-MED=1024
-HIG=$((MED*1/2))
-
-# DEBUG
-SLEEP=2
+SLEEP_BEFORE_SPAWN=""
+: ${TIME_SCALE:=2}
 LOW=0
+MED=1024
+HIG=$((MED/4))
 
 schedule() {
-# warmup $MED 10
+fmlock_init $((110 * TIME_SCALE))
+fadvise_inactive
 phase $LOW 20
+fadvise_active
 phase $HIG 1
-phase $LOW 49
+phase $LOW 9
+fadvise_inactive
+phase $LOW 30
+fadvise_active
+fmlock $((10 * TIME_SCALE))
 phase $HIG 1
-phase $LOW 69
+phase $LOW 9
+fadvise_inactive
+phase $LOW 40
 }
 
 main() {
+check
 source prepare.sh
 echo "
 ${SLEEP_BEFORE_SPAWN}
@@ -40,7 +47,7 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep ${SLEEP}
+sleep ${TIME_SCALE}
 stats snap
 EOF
 done
@@ -54,10 +61,14 @@ for i in $(seq ${CYCLE})
 do
 cat <<EOF
 stats clear
-sleep ${SLEEP}
+sleep ${TIME_SCALE}
 stats clear
 EOF
 done
+}
+
+check() {
+[ ${TIME_SCALE} -gt 1 ]
 }
 
 main
